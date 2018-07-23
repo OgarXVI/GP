@@ -5,6 +5,7 @@ import static javafx.application.Application.launch;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 
 
@@ -20,6 +21,14 @@ public class MainApp extends Application {
         stage.setTitle("Symbolic Regression");
         stage.setScene(scene);
         stage.show();
+        
+        //SET MESSENGER, TODO: NULL POINTER ERROR
+        Messenger ms = new Messenger((TextArea)scene.lookup("ConsoleOutput"));
+        //TEST
+        ms.AppendMesseage("HAHAHAH");
+        ms.AppendMesseage("HAHAHAH");ms.AppendMesseage("HAHAHAH");ms.AppendMesseage("HAHAHAH");
+        
+        
     }
 
     /**

@@ -6,6 +6,7 @@
 package cz.ogarxvi.view;
 
 import java.util.ArrayList;
+import javafx.scene.control.TextArea;
 
 /**
  * Class for saving reports and printing them.
@@ -13,23 +14,29 @@ import java.util.ArrayList;
  */
 public class Messenger {
     /***
-     * 
+     * TODO: REFACTOR TO STACK
      */
     private ArrayList<String> messages;
     /***
+     *
+     */
+    private TextArea textArea;
+    /***
      * 
      */
-    public Messenger() {
+    public Messenger(TextArea textArea) {
         this.messages = new ArrayList<>();
+        this.textArea = textArea;
     }
     /***
      * 
      */
     public void ClearMessenger(){
         this.messages.clear();
+        this.textArea.setText("");
     }
     /***
-     * 
+     * Return first messeage
      * @return 
      */
     public String GetMesseage(){
@@ -43,13 +50,20 @@ public class Messenger {
         return tmpS;
     }
     /***
-     * 
+     * Add messeage
      * @param s 
      */
     public void AddMesseage(String s){
         if (s == null)
             return;
         messages.add(s);
+    }
+    /***
+     * Append text to Text Area
+     * @param s
+     */
+    public void AppendMesseage(String s){
+        textArea.appendText(s);
     }
     
 }
