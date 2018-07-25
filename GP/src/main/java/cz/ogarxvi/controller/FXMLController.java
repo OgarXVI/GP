@@ -33,4 +33,17 @@ public class FXMLController implements Initializable {
             }
     }
     
+    @FXML
+    private void LoadCSV(ActionEvent event){
+            JFileChooser fileChooser = new JFileChooser();
+            int returnValue = fileChooser.showOpenDialog(null);
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                
+                //TODO: FILL TABLE FOR VIEW
+                CSVReader xlsR = new CSVReader();
+                xlsR.ReadCSV(selectedFile);
+            }
+    }
+    
 }

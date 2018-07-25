@@ -14,7 +14,7 @@
           <Menu mnemonicParsing="false" text="File">
             <items>
                   <MenuItem mnemonicParsing="false" onAction="#LoadXLS" text="Load XLSX" />
-                  <MenuItem mnemonicParsing="false" text="Load CVS" />
+                  <MenuItem mnemonicParsing="false" onAction="#LoadCSV" text="Load CVS" />
               <MenuItem mnemonicParsing="false" onAction="#CloseFromMenuItem" text="Close" />
             </items>
           </Menu>
