@@ -5,6 +5,7 @@
  */
 package cz.ogarxvi.controller;
 
+import cz.ogarxvi.model.Messenger;
 import java.io.File;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -20,7 +21,10 @@ public class XLSXReader {
     //TODO: AUTO?
     private int[][] xlsData;
 
-    public XLSXReader() {
+    private Messenger m;
+    
+    public XLSXReader(Messenger m) {
+        this.m = m;
         xlsData = new int[3][3];
     }
     
@@ -49,14 +53,16 @@ public class XLSXReader {
     
     for(int r = 0; r < rows; r++) {
         row = sheet.getRow(r);
+        String tmpS = "";
         if(row != null) {
             for(int c = 0; c < cols; c++) {
                 cell = row.getCell((short)c);
                 if(cell != null) {
-                    //TODO:
-                    System.out.println(cell);
+                    tmpS += cell.toString() + " ";
                 }
             }
+            m.AddMesseage(tmpS);
+            m.GetMesseage();
         }
     }
 } catch(Exception ioe) {

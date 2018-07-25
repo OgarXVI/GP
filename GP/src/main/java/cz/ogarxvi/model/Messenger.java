@@ -23,6 +23,7 @@ public class Messenger {
     private TextArea textArea;
     /***
      * 
+     * @param textArea
      */
     public Messenger(TextArea textArea) {
         this.messages = new ArrayList<>();
@@ -47,6 +48,7 @@ public class Messenger {
         String tmpS = tmpAL.get(0);
         tmpAL.remove(0);
         messages = tmpAL;
+        AppendMesseage(tmpS);
         return tmpS;
     }
     /***
@@ -56,7 +58,7 @@ public class Messenger {
     public void AddMesseage(String s){
         if (s == null)
             return;
-        messages.add(s);
+        messages.add(s + System.lineSeparator());
     }
     /***
      * Append text to Text Area

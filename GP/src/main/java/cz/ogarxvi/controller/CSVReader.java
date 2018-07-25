@@ -5,6 +5,7 @@
  */
 package cz.ogarxvi.controller;
 
+import cz.ogarxvi.model.Messenger;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -20,7 +21,10 @@ public class CSVReader {
      //TODO: AUTO?
     private int[][] xlsData;
 
-    public CSVReader() {
+    private Messenger m;
+    
+    public CSVReader(Messenger m) {
+        this.m = m;
         xlsData = new int[3][3];
     }
     
@@ -32,8 +36,8 @@ public class CSVReader {
             while ((line = br.readLine()) != null) {
                 String[] splitedData = line.split(",");
                 //TODO:
-                System.out.println(Arrays.toString(splitedData));
-
+                m.AddMesseage(Arrays.toString(splitedData));
+                m.GetMesseage();
             }
 
         } catch (IOException e) {
