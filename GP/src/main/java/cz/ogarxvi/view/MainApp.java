@@ -1,11 +1,13 @@
 package cz.ogarxvi.view;
 
+import cz.ogarxvi.model.Messenger;
+import cz.ogarxvi.controller.XLSXReader;
+import java.io.File;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 
 
@@ -23,12 +25,8 @@ public class MainApp extends Application {
         stage.show();
         
         //SET MESSENGER, TODO: NULL POINTER ERROR
-        Messenger ms = new Messenger((TextArea)scene.lookup("ConsoleOutput"));
-        //TEST
-        ms.AppendMesseage("HAHAHAH");
-        ms.AppendMesseage("HAHAHAH");ms.AppendMesseage("HAHAHAH");ms.AppendMesseage("HAHAHAH");
-        
-        
+        Messenger ms = new Messenger(null);
+       
     }
 
     /**

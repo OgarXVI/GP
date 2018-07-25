@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cz.ogarxvi.view;
+package cz.ogarxvi.model;
 
 import java.util.ArrayList;
 import javafx.scene.control.TextArea;
@@ -63,6 +63,7 @@ public class Messenger {
      * @param s
      */
     public void AppendMesseage(String s){
+        if (textArea!= null)
         textArea.appendText(s);
     }
     
