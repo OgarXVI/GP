@@ -69,4 +69,9 @@ public class Messenger {
         textArea.appendText(s);
     }
     
+    public void GetAllMesseages(){
+        while (!messages.isEmpty())
+            GetMesseage();
+    }
+    
 }

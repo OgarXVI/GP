@@ -1,8 +1,5 @@
 package cz.ogarxvi.view;
 
-import cz.ogarxvi.model.Messenger;
-import cz.ogarxvi.controller.XLSXReader;
-import java.io.File;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.fxml.FXMLLoader;
@@ -23,10 +20,6 @@ public class MainApp extends Application {
         stage.setTitle("Symbolic Regression");
         stage.setScene(scene);
         stage.show();
-        
-        //SET MESSENGER, TODO: NULL POINTER ERROR
-        Messenger ms = new Messenger(null);
-       
     }
 
     /**

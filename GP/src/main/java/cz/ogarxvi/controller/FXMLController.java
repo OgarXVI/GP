@@ -100,8 +100,15 @@ public class FXMLController implements Initializable {
 
     @FXML
     private void StartCalculation(ActionEvent event) {
-        m.AddMesseage("Vlákno bylo puštěno, ale bohužel okamžitě prerušeno... :(");
-        m.GetMesseage();
+        m.AddMesseage(PopulationSIzeTextField.getText()==null?PopulationSIzeTextField.getText():PopulationSIzeTextField.getPromptText());
+        m.AddMesseage(NumberOfGenerationsTextField.getText()==null?NumberOfGenerationsTextField.getText():NumberOfGenerationsTextField.getPromptText());
+        m.AddMesseage(ReproductionProbabilityTextField.getText()==null?ReproductionProbabilityTextField.getText():ReproductionProbabilityTextField.getPromptText());
+        m.AddMesseage(MutationProbabilityTextField.getText()==null?MutationProbabilityTextField.getText():MutationProbabilityTextField.getPromptText());
+        m.AddMesseage(CrossingProbabilityTextField.getText()==null?CrossingProbabilityTextField.getText():CrossingProbabilityTextField.getPromptText());
+        m.AddMesseage(TreeMaxDepthAfterOperationTextField.getText()==null?TreeMaxDepthAfterOperationTextField.getText():TreeMaxDepthAfterOperationTextField.getPromptText());
+        m.AddMesseage(TreeMaxInicializationDepthTextField.getText()==null?TreeMaxInicializationDepthTextField.getText():TreeMaxInicializationDepthTextField.getPromptText());
+        //TODO:
+        m.GetAllMesseages();
     }
 
     @FXML
@@ -112,6 +119,7 @@ public class FXMLController implements Initializable {
     @FXML
     private void StopCalculation(ActionEvent event) {
         m.ClearMessenger();
+        //TODO: STOP THREAD
     }
     
 }
