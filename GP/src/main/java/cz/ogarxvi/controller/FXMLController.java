@@ -93,14 +93,14 @@ public class FXMLController implements Initializable {
                 File selectedFile = fileChooser.getSelectedFile();
                 
                 //TODO: FILL TABLE FOR VIEW
-                CSVReader xlsR = new CSVReader(m);
+                CSVReader xlsR = new CSVReader(m, TableView);
                 xlsR.ReadCSV(selectedFile);
             }
     }
 
     @FXML
     private void StartCalculation(ActionEvent event) {
-        m.AddMesseage("Vlákno bylo puštěno, ale bohužel okamžitě prerušeno... :(\n");
+        m.AddMesseage("Vlákno bylo puštěno, ale bohužel okamžitě prerušeno... :(");
         m.GetMesseage();
     }
 

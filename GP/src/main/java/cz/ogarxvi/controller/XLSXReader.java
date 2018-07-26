@@ -93,7 +93,7 @@ public class XLSXReader {
         }
     }
 
-    public String[][] getXLSXData(){
+    public String[][] GetData(){
         return this.xlsxData;
     }
     
