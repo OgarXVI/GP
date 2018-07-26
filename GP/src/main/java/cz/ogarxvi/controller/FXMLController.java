@@ -2,6 +2,7 @@ package cz.ogarxvi.controller;
 
 import cz.ogarxvi.model.Messenger;
 import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -52,7 +53,7 @@ public class FXMLController implements Initializable {
     @FXML
     private Button StopButton;
     @FXML
-    private TableView<?> TableView;
+    private TableView<String[]> TableView;
     
     //Thread t = null;
     Messenger m;
@@ -70,21 +71,23 @@ public class FXMLController implements Initializable {
     }
     
     @FXML
-    private void LoadXLS(ActionEvent event){
+    private void LoadXLS(ActionEvent event) throws URISyntaxException{
             JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setCurrentDirectory(new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI()));
             int returnValue = fileChooser.showOpenDialog(null);
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fileChooser.getSelectedFile();
                 
                 //TODO: FILL TABLE FOR VIEW
-                XLSXReader xlsR = new XLSXReader(m);
+                XLSXReader xlsR = new XLSXReader(m, TableView);
                 xlsR.ReadXLSX(selectedFile);
             }
     }
     
     @FXML
-    private void LoadCSV(ActionEvent event){
+    private void LoadCSV(ActionEvent event) throws URISyntaxException{
             JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setCurrentDirectory(new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI()));
             int returnValue = fileChooser.showOpenDialog(null);
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fileChooser.getSelectedFile();

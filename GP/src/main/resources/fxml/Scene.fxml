@@ -71,8 +71,8 @@
             <ComboBox fx:id="FunctionsComboBox" layoutX="15.0" layoutY="410.0" prefHeight="25.0" prefWidth="177.0" promptText="Functions" />
             <ComboBox fx:id="TerminalsComboBox" layoutX="15.0" layoutY="445.0" prefHeight="25.0" prefWidth="177.0" promptText="Terminals" />
             <Button fx:id="StartButton" layoutX="15.0" layoutY="500.0" mnemonicParsing="false" onAction="#StartCalculation" text="Start" />
-            <Button fx:id="PauseButton" layoutX="72.0" layoutY="500.0" mnemonicParsing="false" onAction="#PauseCalculation" text="Pause" />
-            <Button fx:id="StopButton" layoutX="136.0" layoutY="500.0" mnemonicParsing="false" onAction="#StopCalculation" text="Stop" />
+            <Button fx:id="PauseButton" layoutX="74.0" layoutY="500.0" mnemonicParsing="false" onAction="#PauseCalculation" text="Pause" />
+            <Button fx:id="StopButton" layoutX="139.0" layoutY="500.0" mnemonicParsing="false" onAction="#StopCalculation" text="Stop" />
          </children></AnchorPane>
    </children>
 </AnchorPane>

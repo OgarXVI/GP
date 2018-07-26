@@ -7,6 +7,15 @@ package cz.ogarxvi.controller;
 
 import cz.ogarxvi.model.Messenger;
 import java.io.File;
+import java.util.Arrays;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellDataFeatures;
+import javafx.scene.control.TableView;
+import javafx.util.Callback;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -17,57 +26,75 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  * @author OgarXVI
  */
 public class XLSXReader {
-    
-    //TODO: AUTO?
-    private int[][] xlsData;
 
+    private String[][] xlsxData;
     private Messenger m;
-    
-    public XLSXReader(Messenger m) {
+    private TableView<String[]> tv;
+
+    public XLSXReader(Messenger m, TableView<String[]> tv) {
         this.m = m;
-        xlsData = new int[3][3];
-    }
-    
-    public void ReadXLSX(File file){
-    try {
-    XSSFWorkbook wb = new XSSFWorkbook(file);;
-    XSSFSheet sheet = wb.getSheetAt(0);
-    XSSFRow row;
-    XSSFCell cell;
-
-    int rows; // No of rows
-    rows = sheet.getPhysicalNumberOfRows();
-
-    int cols = 0; // No of columns
-    int tmp = 0;
-
-    // This trick ensures that we get the data properly even if it doesn't start from first few rows
-    for(int i = 0; i < 10 || i < rows; i++) {
-        row = sheet.getRow(i);
-        if(row != null) {
-            tmp = sheet.getRow(i).getPhysicalNumberOfCells();
-            if(tmp > cols) cols = tmp;
-        }
+        this.tv = tv;
     }
 
-    
-    for(int r = 0; r < rows; r++) {
-        row = sheet.getRow(r);
-        String tmpS = "";
-        if(row != null) {
-            for(int c = 0; c < cols; c++) {
-                cell = row.getCell((short)c);
-                if(cell != null) {
-                    tmpS += cell.toString() + " ";
+    public void ReadXLSX(File file) {
+        try {
+            XSSFWorkbook wb = new XSSFWorkbook(file);;
+            XSSFSheet sheet = wb.getSheetAt(0);
+            XSSFRow row;
+            XSSFCell cell;
+
+            int rows;
+            rows = sheet.getPhysicalNumberOfRows();
+
+            int cols = 0;
+            int tmp = 0;
+
+            for (int i = 0; i < 10 || i < rows; i++) {
+                row = sheet.getRow(i);
+                if (row != null) {
+                    tmp = sheet.getRow(i).getPhysicalNumberOfCells();
+                    if (tmp > cols) {
+                        cols = tmp;
+                    }
                 }
             }
-            m.AddMesseage(tmpS);
-            m.GetMesseage();
+            xlsxData = new String[rows][cols];
+
+            for (int r = 0; r < rows; r++) {
+                row = sheet.getRow(r);
+                if (row != null) {
+                    for (int c = 0; c < cols; c++) {
+                        cell = row.getCell((short) c);
+                        if (cell != null) {
+                            xlsxData[r][c] = cell.toString();
+                        }
+                    }
+                }
+            }
+            ObservableList<String[]> data = FXCollections.observableArrayList();
+            data.addAll(Arrays.asList(xlsxData));
+            data.remove(0);
+            for (int i = 0; i < xlsxData[0].length; i++) {
+                TableColumn tc = new TableColumn(xlsxData[0][i]);
+                final int colNo = i;
+                tc.setCellValueFactory(new Callback<CellDataFeatures<String[], String>, ObservableValue<String>>() {
+                    @Override
+                    public ObservableValue<String> call(CellDataFeatures<String[], String> p) {
+                        return new SimpleStringProperty((p.getValue()[colNo]));
+                    }
+                });
+                tc.setPrefWidth(90);
+                tv.getColumns().add(tc);
+            }
+            tv.setItems(data);
+        } catch (Exception ioe) {
+            ioe.printStackTrace();
+            
         }
     }
-} catch(Exception ioe) {
-    ioe.printStackTrace();
-}
+
+    public String[][] getXLSXData(){
+        return this.xlsxData;
     }
     
 }
