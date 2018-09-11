@@ -3,12 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cz.ogarxvi.model;
+package cz.ogarxvi.genetic;
 
 /**
- *
+ * Třída vypočítavající a určující zdatnost chromozonu.
  * @author OgarXVI
  */
-public class Population {
+public class Fitness {
+    
+    /*TODO:*/
+    private int fitness;
+    
+    
     
 }

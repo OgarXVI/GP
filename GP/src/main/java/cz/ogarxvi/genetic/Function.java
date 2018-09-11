@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cz.ogarxvi.model;
+package cz.ogarxvi.genetic;
 
 /**
- *
+ * Třída prezentující funkci, tedy genotypy s argumenty.
  * @author OgarXVI
  */
-public class GeneticAlgorithm {
+public class Function extends Gen{
     
 }

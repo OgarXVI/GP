@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cz.ogarxvi.model;
+package cz.ogarxvi.genetic;
 
 /**
  *
  * @author OgarXVI
  */
-public class Fitness {
+public class GeneticAlgorithm {
     
 }

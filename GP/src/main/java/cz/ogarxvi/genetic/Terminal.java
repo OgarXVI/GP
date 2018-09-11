@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cz.ogarxvi.model;
+package cz.ogarxvi.genetic;
 
 /**
- *
+ * Třída prezentující terminál, tedy genotyp bez argumentů, proměnné či konstanty.
  * @author OgarXVI
  */
-public class Chromosome {
+public class Terminal extends Gen{
     
 }

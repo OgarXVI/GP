@@ -1,4 +1,4 @@
-package cz.ogarxvi.controller;
+package cz.ogarxvi.model;
 
 import cz.ogarxvi.model.Messenger;
 import java.io.File;
