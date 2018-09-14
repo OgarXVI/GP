@@ -7,6 +7,7 @@ package cz.ogarxvi.model;
 
 import cz.ogarxvi.model.Messenger;
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.Arrays;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
@@ -38,8 +39,11 @@ public class XLSXReader {
 
     public void ReadXLSX(File file) {
         try {
-            XSSFWorkbook wb = new XSSFWorkbook(file);;
-            XSSFSheet sheet = wb.getSheetAt(0);
+            FileInputStream fis = new FileInputStream(file);
+            // Finds the workbook instance for XLSX file
+            XSSFWorkbook myWorkBook = new XSSFWorkbook (fis);
+            // Return first sheet from the XLSX workbook
+            XSSFSheet sheet = myWorkBook.getSheetAt(0);
             XSSFRow row;
             XSSFCell cell;
 

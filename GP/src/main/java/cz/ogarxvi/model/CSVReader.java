@@ -5,7 +5,7 @@
  */
 package cz.ogarxvi.model;
 
-import cz.ogarxvi.model.Messenger;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;

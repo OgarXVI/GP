@@ -13,6 +13,10 @@ import java.util.List;
  */
 public class Gen {
     
-    protected List<Gen> gens; 
+    protected String instruction; //CO VLASTNĚ GEN PREZENTUJE
+    protected List<Gen> gens; // POD GENY
+    protected int arity; // POČET ARGUMENTŮ
+    protected int depth; // HLOUBKA VE STROMĚ
+    
     
 }

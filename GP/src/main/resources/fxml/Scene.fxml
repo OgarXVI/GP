@@ -13,7 +13,7 @@
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane id="AnchorPane" prefHeight="600" prefWidth="800" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.ogarxvi.controller.FXMLController">
+<AnchorPane id="AnchorPane" prefHeight="600" prefWidth="800" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.ogarxvi.model.FXMLController">
    <children>
       <MenuBar layoutX="14.0" layoutY="14.0" prefHeight="26.0" prefWidth="766.0">
         <menus>

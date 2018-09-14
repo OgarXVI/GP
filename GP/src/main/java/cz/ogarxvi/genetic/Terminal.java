@@ -11,4 +11,15 @@ package cz.ogarxvi.genetic;
  */
 public class Terminal extends Gen{
     
+    public Terminal(String instruc){
+        this.instruction = instruc;
+        this.arity = 0;
+    }
+    
+    public Terminal(String instruc, int depth){
+        this.instruction = instruc;
+        this.arity = 0;
+        this.depth = depth;
+    }
+    
 }
