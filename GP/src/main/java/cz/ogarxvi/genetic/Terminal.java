@@ -6,10 +6,12 @@
 package cz.ogarxvi.genetic;
 
 /**
- * Třída prezentující terminál, tedy genotyp bez argumentů, proměnné či konstanty.
+ * Třída prezentující terminál, tedy genotyp bez argumentů, proměnné či
+ * konstanty.
+ *
  * @author OgarXVI
  */
-public class Terminal extends Gen{
+/*public class Terminal extends Gen{
     
     public Terminal(String instruc){
         this.instruction = instruc;
@@ -21,5 +23,5 @@ public class Terminal extends Gen{
         this.arity = 0;
         this.depth = depth;
     }
-    
-}
+
+}*/

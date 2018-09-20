@@ -1,12 +1,10 @@
 package cz.ogarxvi.model;
 
-import cz.ogarxvi.model.Messenger;
+
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -18,7 +16,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javax.swing.JFileChooser;
-import javax.swing.SwingUtilities;
 
 public class FXMLController implements Initializable {
 
@@ -100,6 +97,7 @@ public class FXMLController implements Initializable {
 
     @FXML
     private void StartCalculation(ActionEvent event) {
+        /*
         m.AddMesseage(PopulationSIzeTextField.getText()==null?PopulationSIzeTextField.getText():PopulationSIzeTextField.getPromptText());
         m.AddMesseage(NumberOfGenerationsTextField.getText()==null?NumberOfGenerationsTextField.getText():NumberOfGenerationsTextField.getPromptText());
         m.AddMesseage(ReproductionProbabilityTextField.getText()==null?ReproductionProbabilityTextField.getText():ReproductionProbabilityTextField.getPromptText());
@@ -109,6 +107,11 @@ public class FXMLController implements Initializable {
         m.AddMesseage(TreeMaxInicializationDepthTextField.getText()==null?TreeMaxInicializationDepthTextField.getText():TreeMaxInicializationDepthTextField.getPromptText());
         //TODO:
         m.GetAllMesseages();
+        */
+        GPController demo = new GPController(m);
+        demo.run();
+        
+        
     }
 
     @FXML

@@ -5,10 +5,18 @@
  */
 package cz.ogarxvi.genetic;
 
+import java.util.List;
+
 /**
  * Třída prezentující funkci, tedy genotypy s argumenty.
+ *
  * @author OgarXVI
  */
-public class Function extends Gen{
+/*public class Function extends Gen{
     
-}
+    public Function(String instruction, List<Gen> children, int numberOfArguments){
+        this.instruction = instruction;
+        this.gens = children;
+        this.arity = numberOfArguments;
+    }
+ */
