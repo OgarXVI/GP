@@ -8,8 +8,6 @@ package cz.ogarxvi.genetic;
 import java.util.List;
 
 /**
- * Třída prezentující populaci, množinu genů, tedy celý program. Je dána
- * zdatností a kořenem celého stromu. Kořen vždy začíná genem typu funkce.
  *
  * @author OgarXVI
  */

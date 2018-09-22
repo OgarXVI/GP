@@ -16,7 +16,7 @@ public class Population<C extends Chromosome<C>> implements Iterable<C> {
 
     private static final int DEFAULT_NUMBER_OF_CHROMOSOMES = 32;
 
-    private List<C> chromosomes = new ArrayList<C>(DEFAULT_NUMBER_OF_CHROMOSOMES);
+    private List<C> chromosomes = new ArrayList<>(DEFAULT_NUMBER_OF_CHROMOSOMES);
 
     private final Random random = new Random();
 

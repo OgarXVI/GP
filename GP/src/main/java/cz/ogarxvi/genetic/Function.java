@@ -12,11 +12,11 @@ import java.util.List;
  *
  * @author OgarXVI
  */
-/*public class Function extends Gen{
+public class Function extends Gen{
     
     public Function(String instruction, List<Gen> children, int numberOfArguments){
         this.instruction = instruction;
         this.gens = children;
         this.arity = numberOfArguments;
     }
- */
+}

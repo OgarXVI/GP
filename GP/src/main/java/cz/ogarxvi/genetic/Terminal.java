@@ -11,7 +11,7 @@ package cz.ogarxvi.genetic;
  *
  * @author OgarXVI
  */
-/*public class Terminal extends Gen{
+public class Terminal extends Gen{
     
     public Terminal(String instruc){
         this.instruction = instruc;
@@ -24,4 +24,4 @@ package cz.ogarxvi.genetic;
         this.depth = depth;
     }
 
-}*/
+}

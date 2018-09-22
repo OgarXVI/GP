@@ -10,25 +10,20 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Třída prezentující prvek ve stromu chromozomu.
+ * Třída prezentující prvek ve stromu chromozomu.  
  *
  * @author OgarXVI
  */
-/*public class Gen {
-    
+public class Gen implements Chromosome<Gen>, Cloneable {
+
+    private final Random random = new Random();
+
+    protected final int[] vector = new int[5];
     protected String instruction; // CO VLASTNĚ GEN PREZENTUJE
     protected List<Gen> gens; // POD GENY
     protected int arity; // POČET ARGUMENTŮ
     protected int depth; // HLOUBKA VE STROMĚ
     protected double value; //HODNOTA GENU, V PŘÍPADĚ FUNKCÍ JDE O VÝSLEDEK FUNKCE 
-
-}*/
-public class Gen implements Chromosome<Gen>, Cloneable {
-
-    private final Random random = new Random();
-
-    private final int[] vector = new int[5];
-
     /**
      * Returns clone of current chromosome, which is mutated a bit
      */

@@ -23,7 +23,7 @@ public class GeneticAlgorithm<C extends Chromosome<C>, T extends Comparable<T>> 
 
     private class ChromosomesComparator implements Comparator<C> {
 
-        private final Map<C, T> cache = new WeakHashMap<C, T>();
+        private final Map<C, T> cache = new WeakHashMap<>();
 
         @Override
         public int compare(C chr1, C chr2) {
@@ -32,7 +32,7 @@ public class GeneticAlgorithm<C extends Chromosome<C>, T extends Comparable<T>> 
             int ret = fit1.compareTo(fit2);
             return ret;
         }
-
+        
         public T fit(C chr) {
             T fit = this.cache.get(chr);
             if (fit == null) {
@@ -42,9 +42,7 @@ public class GeneticAlgorithm<C extends Chromosome<C>, T extends Comparable<T>> 
             return fit;
         }
 
-        ;
-
-		public void clearCache() {
+	public void clearCache() {
             this.cache.clear();
         }
     }
