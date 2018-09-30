@@ -3,18 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cz.ogarxvi.genetic;
-
-import java.util.List;
+package cz.ogarxvi.model;
 
 /**
  *
  * @author OgarXVI
  */
-public interface Chromosome<C extends Chromosome<C>> {
-
-    List<C> crossover(C anotherChromosome);
-
-    C mutate();
-
+public interface IReader {
+    public String[][] GetData();
 }

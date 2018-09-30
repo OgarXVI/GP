@@ -5,26 +5,66 @@
  */
 package cz.ogarxvi.genetic;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
 /**
- * Rozhraní vypočítavající a určující zdatnost chromozonu.
  *
  * @author OgarXVI
  */
-public class Fitness<C extends Chromosome<C>, T extends Comparable<T>> {
+public class Fitness {
 
-    private final int[] target = {10, 20, 30, 40, 50};
+    private double value;
 
-    public Double calculate(Gen chromosome) {
-        double delta = 0;
-        int[] v = chromosome.getVector();
-        for (int i = 0; i < 5; i++) {
-            delta += this.sqr(v[i] - this.target[i]);
-        }
-        return delta;
+    public Fitness() {
+        this.value = Double.MAX_VALUE;
     }
 
-    private double sqr(double x) {
-        return x * x;
+    public Fitness(double f) {
+        this.value = f;
+    }
+
+    public void calculate(String formula, String[] params, double[][] mathData, double[] expectedResults) {
+        double val = 0d;
+        //Prepare engine for calculate formula
+        ScriptEngineManager mgr = new ScriptEngineManager();
+        ScriptEngine engine = mgr.getEngineByName("JavaScript");
+        //Edit formula and calculate formula's results
+        double[] calcResult = new double[expectedResults.length];
+        for (int i = 0; i < expectedResults.length; i++) {
+            String pomF = formula;
+            for (int j = 0; j < params.length; j++) {
+                pomF = pomF.replace(params[j], String.valueOf(mathData[i][j]));
+            }
+            try {
+                //WUT
+                calcResult[i] = new Double(String.valueOf(engine.eval(pomF)));
+                //TODO: FOR TESTING
+                System.out.println(pomF + " = " + calcResult[i] + "(" + expectedResults[i] + ")");
+            } catch (ScriptException ex) {
+                Logger.getLogger(Fitness.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        //Compare expectedResults and calcResults and return final fitness
+        for (int i = 0; i < calcResult.length; i++) {
+            val += (calcResult[i] - expectedResults[i]);
+        }
+        val = val/calcResult.length;
+        
+        value = val;
+    }
+
+    public double getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(this.value);
     }
 
 }

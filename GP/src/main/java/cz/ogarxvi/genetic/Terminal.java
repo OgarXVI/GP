@@ -1,27 +1,21 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cz.ogarxvi.genetic;
 
 /**
- * Třída prezentující terminál, tedy genotyp bez argumentů, proměnné či
- * konstanty.
- *
- * @author OgarXVI
+ * T��da reprezentuj�c� termin�l a d�d�c� od t��dy Gen.
  */
-public class Terminal extends Gen{
-    
-    public Terminal(String instruc){
-        this.instruction = instruc;
-        this.arity = 0;
+public class Terminal extends Gen {
+
+    public Terminal(String prikaz) {
+        this.prikaz = prikaz;
+        this.arita = 0;
+        this.jeFunkce = false;
     }
-    
-    public Terminal(String instruc, int depth){
-        this.instruction = instruc;
-        this.arity = 0;
-        this.depth = depth;
+
+    public Terminal(String prikaz, int hloubka) {
+        this.prikaz = prikaz;
+        this.arita = 0;
+        this.hloubka = hloubka;
+        this.jeFunkce = false;
     }
 
 }

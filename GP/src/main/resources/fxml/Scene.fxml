@@ -42,7 +42,7 @@
          </children></AnchorPane>
       <AnchorPane layoutX="14.0" layoutY="306.0" prefHeight="277.0" prefWidth="562.0">
          <children>
-            <TextArea fx:id="ConsoleOutput" editable="false" prefHeight="278.0" prefWidth="562.0" />
+            <TextArea fx:id="ConsoleOutput" editable="false" prefHeight="276.0" prefWidth="559.0" promptText="Program started..." />
          </children>
       </AnchorPane>
       <AnchorPane layoutX="586.0" layoutY="52.0" prefHeight="531.0" prefWidth="200.0">
@@ -54,13 +54,13 @@
             <Label layoutX="15.0" layoutY="200.0" text="Crossing probability:" />
             <Label layoutX="15.0" layoutY="250.0" text="Tree max operation depth:" />
             <Label layoutX="15.0" layoutY="300.0" text="Tree max init depth:" />
-            <TextField fx:id="PopulationSIzeTextField" layoutX="15.0" layoutY="20.0" prefHeight="25.0" prefWidth="177.0" promptText="100" />
+            <TextField fx:id="PopulationSIzeTextField" layoutX="15.0" layoutY="20.0" prefHeight="25.0" prefWidth="177.0" promptText="10" />
             <TextField fx:id="NumberOfGenerationsTextField" layoutX="15.0" layoutY="70.0" prefHeight="25.0" prefWidth="177.0" promptText="10" />
-            <TextField fx:id="ReproductionProbabilityTextField" layoutX="15.0" layoutY="120.0" prefHeight="25.0" prefWidth="177.0" promptText="0.6" />
-            <TextField fx:id="MutationProbabilityTextField" layoutX="15.0" layoutY="170.0" prefHeight="25.0" prefWidth="177.0" promptText="0.2" />
-            <TextField fx:id="CrossingProbabilityTextField" layoutX="15.0" layoutY="220.0" prefHeight="25.0" prefWidth="177.0" promptText="0.2" />
-            <TextField fx:id="TreeMaxDepthAfterOperationTextField" layoutX="15.0" layoutY="270.0" prefHeight="25.0" prefWidth="177.0" promptText="20" />
-            <TextField fx:id="TreeMaxInicializationDepthTextField" layoutX="15.0" layoutY="320.0" prefHeight="25.0" prefWidth="177.0" promptText="20" />
+            <TextField fx:id="ReproductionProbabilityTextField" layoutX="15.0" layoutY="120.0" prefHeight="25.0" prefWidth="177.0" promptText="0.1" />
+            <TextField fx:id="MutationProbabilityTextField" layoutX="15.0" layoutY="170.0" prefHeight="25.0" prefWidth="177.0" promptText="0.3" />
+            <TextField fx:id="CrossingProbabilityTextField" layoutX="15.0" layoutY="220.0" prefHeight="25.0" prefWidth="177.0" promptText="0.6" />
+            <TextField fx:id="TreeMaxDepthAfterOperationTextField" layoutX="15.0" layoutY="270.0" prefHeight="25.0" prefWidth="177.0" promptText="8" />
+            <TextField fx:id="TreeMaxInicializationDepthTextField" layoutX="15.0" layoutY="320.0" prefHeight="25.0" prefWidth="177.0" promptText="5" />
             <ToggleButton fx:id="ElitistToogleButton" layoutX="15.0" layoutY="365.0" mnemonicParsing="false" text="Elitism" />
             <MenuButton fx:id="SelectionMenu" layoutX="90.0" layoutY="365.0" mnemonicParsing="false" text="Selection">
               <items>
