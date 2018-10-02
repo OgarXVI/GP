@@ -5,7 +5,7 @@
  */
 package cz.ogarxvi.model;
 
-import cz.ogarxvi.genetic.GenetickyAlgoritmus;
+import cz.ogarxvi.genetic.GeneticAlgorithm;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -21,8 +21,8 @@ public class GPController extends Thread {
     private Messenger m;
     private Button pauseButton;
     private Button stopButton;
-    private int pocetGeneraci;
-    private int velikostPocatecniPopulace;
+    private int numberOfGeneration;
+    private int sizeOfInitPopulation;
     private int maximalniInicializacniHloubkaStromu;
     private int maximalniHloubkaStromuPoKrizeni;
     private double krizeni;
@@ -33,15 +33,15 @@ public class GPController extends Thread {
     private boolean decimace;
     private boolean editace;
     private int pocetKroku;
-    private int metodaInicializace;
+    private int selectionMethod;
     
-    public GPController(Messenger m, DataHandler dh, Button pauseButton, Button stopButton, int pocetGeneraci, int velikostPocatecniPopulace, int maximalniInicializacniHloubkaStromu, int maximalniHloubkaStromuPoKrizeni, double krizeni, double reprodukce, double mutace, double krizeniVUzluFunkce, boolean zachovavatNejzdatnejsihoJedince, boolean decimace, boolean editace, int pocetKroku, int metodaInicializace) {
+    public GPController(Messenger m, DataHandler dh, Button pauseButton, Button stopButton, int pocetGeneraci, int velikostPocatecniPopulace, int maximalniInicializacniHloubkaStromu, int maximalniHloubkaStromuPoKrizeni, double krizeni, double reprodukce, double mutace, double krizeniVUzluFunkce, boolean zachovavatNejzdatnejsihoJedince, boolean decimace, boolean editace, int pocetKroku, int selectionMethod) {
         this.m = m;
         this.dh = dh;
         this.pauseButton = pauseButton;
         this.stopButton = stopButton;
-        this.pocetGeneraci = pocetGeneraci;
-        this.velikostPocatecniPopulace = velikostPocatecniPopulace;
+        this.numberOfGeneration = pocetGeneraci;
+        this.sizeOfInitPopulation = velikostPocatecniPopulace;
         this.maximalniInicializacniHloubkaStromu = maximalniInicializacniHloubkaStromu;
         this.maximalniHloubkaStromuPoKrizeni = maximalniHloubkaStromuPoKrizeni;
         this.krizeni = krizeni;
@@ -52,7 +52,7 @@ public class GPController extends Thread {
         this.decimace = decimace;
         this.editace = editace;
         this.pocetKroku = pocetKroku;
-        this.metodaInicializace = metodaInicializace;
+        this.selectionMethod = selectionMethod;
     }
 
     public GPController(Messenger mm) {
@@ -62,8 +62,8 @@ public class GPController extends Thread {
     public void run() {
 
         try {
-            GenetickyAlgoritmus genetickyAlgoritmus = new GenetickyAlgoritmus(stopButton, m, dh);
-            genetickyAlgoritmus.provadejGenetickyAlgoritmus(pocetGeneraci, velikostPocatecniPopulace, maximalniInicializacniHloubkaStromu, maximalniHloubkaStromuPoKrizeni, reprodukce, krizeni, mutace, krizeniVUzluFunkce, zachovavatNejzdatnejsihoJedince, decimace, editace, pocetKroku, metodaInicializace);
+            GeneticAlgorithm ga = new GeneticAlgorithm(stopButton, m, dh);
+            ga.runGP(numberOfGeneration, sizeOfInitPopulation, maximalniInicializacniHloubkaStromu, maximalniHloubkaStromuPoKrizeni, reprodukce, krizeni, mutace, krizeniVUzluFunkce, zachovavatNejzdatnejsihoJedince, decimace, editace, pocetKroku, selectionMethod);
         } catch (Exception e) {
             e.printStackTrace();
         }

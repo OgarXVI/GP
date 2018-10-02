@@ -39,7 +39,8 @@ public class CSVReader implements IReader {
         tv.getSelectionModel().clearSelection();
     }
 
-    public void ReadCSV(File file) {
+    
+    public void ReadFile(File file) {
         String line = null;
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {

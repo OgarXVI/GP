@@ -5,72 +5,71 @@ import java.util.List;
 
 
 /**
- * T��da p�edstavuj�c� geny. Ka�d� uzel stromu je Genem (funkc�, nebo termin�lem - t��dy Funkce a Terminal d�d� od t�to t��dy Gen).
- * Ka�d� gen um� vypsat sv� p��kazy a p��kazy sv�ch podgen� (poduzl�), a to ve tvaru �iteln�m pro u�ivatele a pou�iteln�m pro opakovan� p�ehr�n� �e�en�.
+ * Třída představující geny. Každý uzel stromu je genem (fukncí nebo terminálem).
+ * Každý gen umí vypsat svůj příkaz a příkazy svých podgenů a te ve tvaru použitelným při výpočtu vzorce.
  */
 public class Gen {
 	
-	public static int nejvyssiHloubka = 0;
+	public static int maxDepth = 0;
 	
-	protected String prikaz;
-	protected boolean jeFunkce = false;
+	protected String command;
+	protected boolean isFunction = false;
 	protected int arita;
-	protected List<Gen> geny;
-	protected int hloubka;
+	protected List<Gen> gens;
+	protected int depth;
 	
 	public Gen(String prikaz, int arita) {
-		this.prikaz = prikaz;
+		this.command = prikaz;
 		this.arita = arita;
-		if (arita != 0) geny = new ArrayList<Gen>(arita);
+		if (arita != 0) gens = new ArrayList<Gen>(arita);
 	}
 	
 	public Gen() {
 	}
 	
-	public Gen(Gen gen)	{	// kop�rovac� konstruktor
-		this.prikaz = gen.prikaz;
-		this.jeFunkce = gen.jeFunkce;
+	public Gen(Gen gen)	{	
+		this.command = gen.command;
+		this.isFunction = gen.isFunction;
 		this.arita = gen.arita;
-		this.hloubka = gen.hloubka;
-		if (this.jeFunkce) this.geny = new ArrayList<Gen>(this.arita);
+		this.depth = gen.depth;
+		if (this.isFunction) this.gens = new ArrayList<Gen>(this.arita);
 		
 		for (int i = 0; i < this.arita; i++) {
-			Gen podgen = new Gen(gen.geny.get(i));
-			this.geny.add(podgen);
+			Gen podgen = new Gen(gen.gens.get(i));
+			this.gens.add(podgen);
 		}
 	
 	}
 	
-	public String vypis() {
+	public String print() {
                 switch(arita){
-                    case 0: return prikaz;
+                    case 0: return command;
                         
-                    case 1: return prikaz + geny.get(0).vypis();
+                    case 1: return command + gens.get(0).print();
                         
-                    case 2: return prikaz + geny.get(0).vypis() + geny.get(1).vypis();
+                    case 2: return command + gens.get(0).print() + gens.get(1).print();
                         
-                    case 3: return prikaz + geny.get(0).vypis() + geny.get(1).vypis() + geny.get(2).vypis();
+                    case 3: return command + gens.get(0).print() + gens.get(1).print() + gens.get(2).print();
                         
-                    case 4: return prikaz + geny.get(0).vypis() + geny.get(1).vypis() + geny.get(2).vypis() + geny.get(3).vypis();
+                    case 4: return command + gens.get(0).print() + gens.get(1).print() + gens.get(2).print() + gens.get(3).print();
                         
                 }
 		return "";
 	}
 	
 
-	public void opravHloubku() {
-		// po k��en� jsou v gen.hloubka nespr�vn� �daje - napr. gen mel drive hloubku 4, po krizeni muze byt ve skutecnosti v hloubce 1 apod.
-		
-		if (hloubka == 0) {							// pokud je aktu�ln� opravovan� gen ko�en, m� hloubku 0 a nen� t�eba jej opravit
-			for (int i = 0; i < geny.size(); i++) {
-				geny.get(i).hloubka = 1;			// podgeny ko�enu mus� m�t hloubku 1
-				geny.get(i).opravHloubku();
+	public void fixDepth() {
+	
+		if (depth == 0) {							
+			for (int i = 0; i < gens.size(); i++) {
+				gens.get(i).depth = 1;			
+				gens.get(i).fixDepth();
 			}
-		} else {									// pokud se jedn� o gen hlub�� ne� ko�en (libovoln� podgen)
-			if (isJeFunkce()) {
-				for (int i = 0; i < geny.size(); i++) {
-					geny.get(i).hloubka = hloubka + 1;	// podgeny mus� m�t hloubku o 1 vy��� ne� aktu�ln� gen
-					geny.get(i).opravHloubku();
+		} else {									
+			if (isFunction()) {
+				for (int i = 0; i < gens.size(); i++) {
+					gens.get(i).depth = depth + 1;	
+					gens.get(i).fixDepth();
 				}
 			}
 		}	
@@ -85,40 +84,47 @@ public class Gen {
 		this.arita = arita;
 	}
 
-	public boolean isJeFunkce() {
-		return jeFunkce;
+	public boolean isFunction() {
+		return isFunction;
 	}
 
-	public void setJeFunkce(boolean jeFunkce) {
-		this.jeFunkce = jeFunkce;
+	public void setIsFunction(boolean jeFunkce) {
+		this.isFunction = jeFunkce;
 	}
 
-	public String getPrikaz() {
-		return prikaz;
+	public String getCommand() {
+		return command;
 	}
 
-	public void setPrikaz(String prikaz) {
-		this.prikaz = prikaz;
+	public void setCommand(String prikaz) {
+		this.command = prikaz;
 	}
 	
-	public void setNejvyssiHloubka(Gen gen) {
-		Gen.nejvyssiHloubka = 0;
-		nejvyssiHloubka(gen);
+	public void setMaxDepth(Gen gen) {
+		Gen.maxDepth = 0;
+		getMaxDepth(gen);
 	}
 	
-	private void nejvyssiHloubka(Gen gen) {
-		if (gen.hloubka > nejvyssiHloubka) nejvyssiHloubka = gen.hloubka;
+	private void getMaxDepth(Gen gen) {
+		if (gen.depth > maxDepth) maxDepth = gen.depth;
 		for (int i = 0; i < gen.arita; i++) {
-			gen.geny.get(i).nejvyssiHloubka(gen.geny.get(i));
+			gen.gens.get(i).getMaxDepth(gen.gens.get(i));
 		}
 	}
 	
-	public int getHloubka() {
-		return hloubka;
+	public int getDepth() {
+		return depth;
 	}
 	
-	public void setHloubka(int hloubka) {
-		this.hloubka = hloubka;
+	public void setDepth(int depth) {
+		this.depth = depth;
 	}
 
+    @Override
+    public String toString() {
+        return command;
+    }
+
+        
+        
 }

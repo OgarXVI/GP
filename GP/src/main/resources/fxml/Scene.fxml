@@ -13,39 +13,32 @@
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane id="AnchorPane" prefHeight="600" prefWidth="800" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.ogarxvi.model.FXMLController">
+<AnchorPane id="AnchorPane" prefHeight="650" prefWidth="800" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.ogarxvi.model.FXMLController">
    <children>
-      <MenuBar layoutX="14.0" layoutY="14.0" prefHeight="26.0" prefWidth="766.0">
+      <MenuBar layoutY="14.0" prefHeight="26.0" prefWidth="829.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-                  <MenuItem mnemonicParsing="false" onAction="#LoadXLS" text="Load XLSX" />
-                  <MenuItem mnemonicParsing="false" onAction="#LoadCSV" text="Load CVS" />
-              <MenuItem mnemonicParsing="false" onAction="#CloseFromMenuItem" text="Close" />
+                  <MenuItem mnemonicParsing="false" onAction="#LoadFile" text="Load Data" />
+                  <MenuItem mnemonicParsing="false" text="Save Output" />
+              <MenuItem mnemonicParsing="false" onAction="#CloseFromMenuItem" text="Exit" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Show">
             <items>
-              <MenuItem mnemonicParsing="false" text="Graph" />
+              <MenuItem mnemonicParsing="false" onAction="#ShowGraph" text="Graph" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="About">
             <items>
-              <MenuItem mnemonicParsing="false" text="About" />
+              <MenuItem mnemonicParsing="false" onAction="#ShowAbout" text="About" />
             </items>
           </Menu>
         </menus>
       </MenuBar>
-      <AnchorPane layoutX="14.0" layoutY="52.0" prefHeight="238.0" prefWidth="562.0" style="-fx-background-color: #ffff88;">
-         <children>
-            <TableView fx:id="TableView" editable="true" prefHeight="246.0" prefWidth="562.0" />
-         </children></AnchorPane>
-      <AnchorPane layoutX="14.0" layoutY="306.0" prefHeight="277.0" prefWidth="562.0">
-         <children>
-            <TextArea fx:id="ConsoleOutput" editable="false" prefHeight="276.0" prefWidth="559.0" promptText="Program started..." />
-         </children>
-      </AnchorPane>
-      <AnchorPane layoutX="586.0" layoutY="52.0" prefHeight="531.0" prefWidth="200.0">
+      <TableView fx:id="TableView" editable="true" layoutX="14.0" layoutY="52.0" prefHeight="246.0" prefWidth="600.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="216.0" />
+      <TextArea fx:id="ConsoleOutput" editable="false" layoutX="15.0" layoutY="305.0" prefHeight="330.0" prefWidth="600.0" promptText="Program started..." AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="215.0" AnchorPane.topAnchor="305.0" />
+      <AnchorPane layoutX="591.0" layoutY="52.0" prefHeight="574.0" prefWidth="194.0">
          <children>
             <Label layoutX="15.0" text="Population size:" />
             <Label layoutX="15.0" layoutY="50.0" text="Number of generations:" />
@@ -54,25 +47,26 @@
             <Label layoutX="15.0" layoutY="200.0" text="Crossing probability:" />
             <Label layoutX="15.0" layoutY="250.0" text="Tree max operation depth:" />
             <Label layoutX="15.0" layoutY="300.0" text="Tree max init depth:" />
-            <TextField fx:id="PopulationSIzeTextField" layoutX="15.0" layoutY="20.0" prefHeight="25.0" prefWidth="177.0" promptText="10" />
-            <TextField fx:id="NumberOfGenerationsTextField" layoutX="15.0" layoutY="70.0" prefHeight="25.0" prefWidth="177.0" promptText="10" />
-            <TextField fx:id="ReproductionProbabilityTextField" layoutX="15.0" layoutY="120.0" prefHeight="25.0" prefWidth="177.0" promptText="0.1" />
-            <TextField fx:id="MutationProbabilityTextField" layoutX="15.0" layoutY="170.0" prefHeight="25.0" prefWidth="177.0" promptText="0.3" />
-            <TextField fx:id="CrossingProbabilityTextField" layoutX="15.0" layoutY="220.0" prefHeight="25.0" prefWidth="177.0" promptText="0.6" />
-            <TextField fx:id="TreeMaxDepthAfterOperationTextField" layoutX="15.0" layoutY="270.0" prefHeight="25.0" prefWidth="177.0" promptText="8" />
-            <TextField fx:id="TreeMaxInicializationDepthTextField" layoutX="15.0" layoutY="320.0" prefHeight="25.0" prefWidth="177.0" promptText="5" />
-            <ToggleButton fx:id="ElitistToogleButton" layoutX="15.0" layoutY="365.0" mnemonicParsing="false" text="Elitism" />
-            <MenuButton fx:id="SelectionMenu" layoutX="90.0" layoutY="365.0" mnemonicParsing="false" text="Selection">
+            <TextField fx:id="PopulationSIzeTextField" layoutX="15.0" layoutY="20.0" promptText="20" />
+            <TextField fx:id="NumberOfGenerationsTextField" layoutX="15.0" layoutY="70.0" promptText="20" />
+            <TextField fx:id="ReproductionProbabilityTextField" layoutX="15.0" layoutY="120.0" promptText="0.1" />
+            <TextField fx:id="MutationProbabilityTextField" layoutX="15.0" layoutY="170.0" promptText="0.3" />
+            <TextField fx:id="CrossoverProbabilityTextField" layoutX="15.0" layoutY="220.0" promptText="0.6" />
+            <TextField fx:id="TreeMaxDepthAfterOperationTextField" layoutX="15.0" layoutY="270.0" promptText="8" />
+            <TextField fx:id="TreeMaxInicializationDepthTextField" layoutX="15.0" layoutY="320.0" promptText="5" />
+            <ToggleButton fx:id="ElitistToogleButton" layoutX="15.0" layoutY="365.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="63.0" text="Elitism" />
+            <ToggleButton fx:id="ElitistToogleButton1" layoutX="109.0" layoutY="365.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="92.0" text="Editation" />
+            <MenuButton fx:id="SelectionMenu" contentDisplay="CENTER" layoutX="14.0" layoutY="408.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="186.0" text="Selection">
               <items>
-                <MenuItem mnemonicParsing="false" text="Tournament" />
-                <MenuItem mnemonicParsing="false" text="Roulete" />
+                <MenuItem fx:id="tournamentMenuItem" mnemonicParsing="false" onAction="#TournamentSelected" text="Tournament" />
+                <MenuItem fx:id="RouleteMenuItem" mnemonicParsing="false" onAction="#RouleteSelected" text="Roulete" />
               </items>
             </MenuButton>
-            <ComboBox fx:id="FunctionsComboBox" layoutX="15.0" layoutY="410.0" prefHeight="25.0" prefWidth="177.0" promptText="Functions" />
-            <ComboBox fx:id="TerminalsComboBox" layoutX="15.0" layoutY="445.0" prefHeight="25.0" prefWidth="177.0" promptText="Terminals" />
-            <Button fx:id="StartButton" layoutX="15.0" layoutY="500.0" mnemonicParsing="false" onAction="#StartCalculation" text="Start" />
-            <Button fx:id="PauseButton" layoutX="74.0" layoutY="500.0" mnemonicParsing="false" onAction="#PauseCalculation" text="Pause" />
-            <Button fx:id="StopButton" layoutX="139.0" layoutY="500.0" mnemonicParsing="false" onAction="#StopCalculation" text="Stop" />
+            <ComboBox fx:id="FunctionsComboBox" layoutX="14.0" layoutY="457.0" prefHeight="26.0" prefWidth="186.0" promptText="Functions" />
+            <ComboBox fx:id="TerminalsComboBox" layoutX="14.0" layoutY="504.0" prefHeight="26.0" prefWidth="186.0" promptText="Terminals" />
+            <Button fx:id="StartButton" layoutX="14.0" layoutY="561.0" mnemonicParsing="false" onAction="#StartCalculation" text="Start" />
+            <Button fx:id="PauseButton" layoutX="79.0" layoutY="561.0" mnemonicParsing="false" onAction="#PauseCalculation" text="Clear" />
+            <Button fx:id="StopButton" layoutX="143.0" layoutY="561.0" mnemonicParsing="false" onAction="#StopCalculation" text="Stop" />
          </children></AnchorPane>
    </children>
 </AnchorPane>

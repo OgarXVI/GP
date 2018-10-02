@@ -38,7 +38,7 @@ public class XLSXReader implements IReader {
         this.xlsxData = new String[3][3];
     }
 
-    public void ReadXLSX(File file) {
+    public void ReadFile(File file) {
         try {
             FileInputStream fis = new FileInputStream(file);
             // Finds the workbook instance for XLSX file
