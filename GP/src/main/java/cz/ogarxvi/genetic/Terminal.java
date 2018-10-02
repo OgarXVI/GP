@@ -1,27 +1,33 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cz.ogarxvi.genetic;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Třída prezentující terminál, tedy genotyp bez argumentů, proměnné či
- * konstanty.
- *
- * @author OgarXVI
- */
-public class Terminal extends Gen{
-    
-    public Terminal(String instruc){
-        this.instruction = instruc;
-        this.arity = 0;
-    }
-    
-    public Terminal(String instruc, int depth){
-        this.instruction = instruc;
-        this.arity = 0;
-        this.depth = depth;
+ * Třída prezentujcí terminál.  
+*/
+public class Terminal extends Gen {
+
+    public Terminal(String command) {
+        this.command = command;
+        this.arita = 0;
+        this.isFunction = false;
     }
 
+    public Terminal(String command, int depth) {
+        this.command = command;
+        this.arita = 0;
+        this.depth = depth;
+        this.isFunction = false;
+    }
+
+    public static List<Gen> getSet(String command){
+        List<Gen> pomListGens = new ArrayList<>();
+        String[] terminals = command.split(",");
+        for (String terminal : terminals) {
+            pomListGens.add(new Terminal(terminal));
+        }        
+        return pomListGens;
+    }
+    
 }

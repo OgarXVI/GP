@@ -26,7 +26,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  *
  * @author OgarXVI
  */
-public class XLSXReader {
+public class XLSXReader implements IReader {
 
     private String[][] xlsxData;
     private Messenger m;
@@ -35,13 +35,14 @@ public class XLSXReader {
     public XLSXReader(Messenger m, TableView<String[]> tv) {
         this.m = m;
         this.tv = tv;
+        this.xlsxData = new String[3][3];
     }
 
-    public void ReadXLSX(File file) {
+    public void ReadFile(File file) {
         try {
             FileInputStream fis = new FileInputStream(file);
             // Finds the workbook instance for XLSX file
-            XSSFWorkbook myWorkBook = new XSSFWorkbook (fis);
+            XSSFWorkbook myWorkBook = new XSSFWorkbook(fis);
             // Return first sheet from the XLSX workbook
             XSSFSheet sheet = myWorkBook.getSheetAt(0);
             XSSFRow row;
@@ -75,6 +76,11 @@ public class XLSXReader {
                     }
                 }
             }
+
+            tv.getColumns().clear();
+            tv.getItems().clear();
+            tv.getSelectionModel().clearSelection();
+
             ObservableList<String[]> data = FXCollections.observableArrayList();
             data.addAll(Arrays.asList(xlsxData));
             data.remove(0);
@@ -93,12 +99,13 @@ public class XLSXReader {
             tv.setItems(data);
         } catch (Exception ioe) {
             ioe.printStackTrace();
-            
+
         }
     }
 
-    public String[][] GetData(){
+    @Override
+    public String[][] GetData() {
         return this.xlsxData;
     }
-    
+
 }

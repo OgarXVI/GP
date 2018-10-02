@@ -1,79 +1,130 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cz.ogarxvi.genetic;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+
 
 /**
- * Třída prezentující prvek ve stromu chromozomu.  
- *
- * @author OgarXVI
+ * Třída představující geny. Každý uzel stromu je genem (fukncí nebo terminálem).
+ * Každý gen umí vypsat svůj příkaz a příkazy svých podgenů a te ve tvaru použitelným při výpočtu vzorce.
  */
-public class Gen implements Chromosome<Gen>, Cloneable {
+public class Gen {
+	
+	public static int maxDepth = 0;
+	
+	protected String command;
+	protected boolean isFunction = false;
+	protected int arita;
+	protected List<Gen> gens;
+	protected int depth;
+	
+	public Gen(String prikaz, int arita) {
+		this.command = prikaz;
+		this.arita = arita;
+		if (arita != 0) gens = new ArrayList<Gen>(arita);
+	}
+	
+	public Gen() {
+	}
+	
+	public Gen(Gen gen)	{	
+		this.command = gen.command;
+		this.isFunction = gen.isFunction;
+		this.arita = gen.arita;
+		this.depth = gen.depth;
+		if (this.isFunction) this.gens = new ArrayList<Gen>(this.arita);
+		
+		for (int i = 0; i < this.arita; i++) {
+			Gen podgen = new Gen(gen.gens.get(i));
+			this.gens.add(podgen);
+		}
+	
+	}
+	
+	public String print() {
+                switch(arita){
+                    case 0: return command;
+                        
+                    case 1: return command + gens.get(0).print();
+                        
+                    case 2: return command + gens.get(0).print() + gens.get(1).print();
+                        
+                    case 3: return command + gens.get(0).print() + gens.get(1).print() + gens.get(2).print();
+                        
+                    case 4: return command + gens.get(0).print() + gens.get(1).print() + gens.get(2).print() + gens.get(3).print();
+                        
+                }
+		return "";
+	}
+	
 
-    private final Random random = new Random();
+	public void fixDepth() {
+	
+		if (depth == 0) {							
+			for (int i = 0; i < gens.size(); i++) {
+				gens.get(i).depth = 1;			
+				gens.get(i).fixDepth();
+			}
+		} else {									
+			if (isFunction()) {
+				for (int i = 0; i < gens.size(); i++) {
+					gens.get(i).depth = depth + 1;	
+					gens.get(i).fixDepth();
+				}
+			}
+		}	
+	}
 
-    protected final int[] vector = new int[5];
-    protected String instruction; // CO VLASTNĚ GEN PREZENTUJE
-    protected List<Gen> gens; // POD GENY
-    protected int arity; // POČET ARGUMENTŮ
-    protected int depth; // HLOUBKA VE STROMĚ
-    protected double value; //HODNOTA GENU, V PŘÍPADĚ FUNKCÍ JDE O VÝSLEDEK FUNKCE 
-    /**
-     * Returns clone of current chromosome, which is mutated a bit
-     */
-    @Override
-    public Gen mutate() {
-        Gen result = this.clone();
+	
+	public int getArita() {
+		return arita;
+	}
 
-        // just select random element of vector
-        // and increase or decrease it on small value
-        int index = random.nextInt(this.vector.length);
-        int mutationValue = random.nextInt(3) - random.nextInt(3);
-        result.vector[index] += mutationValue;
+	public void setArita(int arita) {
+		this.arita = arita;
+	}
 
-        return result;
-    }
+	public boolean isFunction() {
+		return isFunction;
+	}
 
-    /**
-     * Returns list of siblings <br/>
-     * Siblings are actually new chromosomes, <br/>
-     * created using any of crossover strategy
-     */
-    @Override
-    public List<Gen> crossover(Gen other) {
-        Gen thisClone = this.clone();
-        Gen otherClone = other.clone();
+	public void setIsFunction(boolean jeFunkce) {
+		this.isFunction = jeFunkce;
+	}
 
-        // one point crossover
-        int index = random.nextInt(this.vector.length - 1);
-        for (int i = index; i < this.vector.length; i++) {
-            int tmp = thisClone.vector[i];
-            thisClone.vector[i] = otherClone.vector[i];
-            otherClone.vector[i] = tmp;
-        }
+	public String getCommand() {
+		return command;
+	}
 
-        return Arrays.asList(thisClone, otherClone);
-    }
-
-    @Override
-    protected Gen clone() {
-        Gen clone = new Gen();
-        System.arraycopy(this.vector, 0, clone.vector, 0, this.vector.length);
-        return clone;
-    }
-
-    public int[] getVector() {
-        return this.vector;
-    }
+	public void setCommand(String prikaz) {
+		this.command = prikaz;
+	}
+	
+	public void setMaxDepth(Gen gen) {
+		Gen.maxDepth = 0;
+		getMaxDepth(gen);
+	}
+	
+	private void getMaxDepth(Gen gen) {
+		if (gen.depth > maxDepth) maxDepth = gen.depth;
+		for (int i = 0; i < gen.arita; i++) {
+			gen.gens.get(i).getMaxDepth(gen.gens.get(i));
+		}
+	}
+	
+	public int getDepth() {
+		return depth;
+	}
+	
+	public void setDepth(int depth) {
+		this.depth = depth;
+	}
 
     @Override
     public String toString() {
-        return Arrays.toString(this.vector);
+        return command;
     }
+
+        
+        
 }
