@@ -117,5 +117,10 @@
             <version>3.17</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>org.controlsfx</groupId>
+            <artifactId>controlsfx</artifactId>
+            <version>8.40.14</version>
+        </dependency>
     </dependencies>
 </project>

@@ -24,7 +24,6 @@ import javafx.util.Callback;
  */
 public class CSVReader implements IReader {
 
-    //TODO: AUTO?
     private String[][] csvData;
 
     private Messenger m;

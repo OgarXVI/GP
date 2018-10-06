@@ -19,11 +19,8 @@ import javafx.scene.control.TextArea;
  * @author OgarXVI
  */
 public class Messenger {
-
-    /**
-     * *
-     * TODO: REFACTOR TO STACK
-     */
+    
+    
     private ArrayList<String> messages;
     /**
      * *

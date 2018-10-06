@@ -19,8 +19,6 @@ public class GPController extends Thread {
 
     private DataHandler dh;
     private Messenger m;
-    private Button pauseButton;
-    private Button stopButton;
     private int numberOfGeneration;
     private int sizeOfInitPopulation;
     private int maximalniInicializacniHloubkaStromu;
@@ -35,11 +33,9 @@ public class GPController extends Thread {
     private int pocetKroku;
     private int selectionMethod;
     
-    public GPController(Messenger m, DataHandler dh, Button pauseButton, Button stopButton, int pocetGeneraci, int velikostPocatecniPopulace, int maximalniInicializacniHloubkaStromu, int maximalniHloubkaStromuPoKrizeni, double krizeni, double reprodukce, double mutace, double krizeniVUzluFunkce, boolean zachovavatNejzdatnejsihoJedince, boolean decimace, boolean editace, int pocetKroku, int selectionMethod) {
+    public GPController(Messenger m, DataHandler dh, int pocetGeneraci, int velikostPocatecniPopulace, int maximalniInicializacniHloubkaStromu, int maximalniHloubkaStromuPoKrizeni, double krizeni, double reprodukce, double mutace, double krizeniVUzluFunkce, boolean zachovavatNejzdatnejsihoJedince, boolean decimace, boolean editace, int pocetKroku, int selectionMethod) {
         this.m = m;
         this.dh = dh;
-        this.pauseButton = pauseButton;
-        this.stopButton = stopButton;
         this.numberOfGeneration = pocetGeneraci;
         this.sizeOfInitPopulation = velikostPocatecniPopulace;
         this.maximalniInicializacniHloubkaStromu = maximalniInicializacniHloubkaStromu;
@@ -62,18 +58,12 @@ public class GPController extends Thread {
     public void run() {
 
         try {
-            GeneticAlgorithm ga = new GeneticAlgorithm(stopButton, m, dh);
+            GeneticAlgorithm ga = new GeneticAlgorithm(m, dh);
             ga.runGP(numberOfGeneration, sizeOfInitPopulation, maximalniInicializacniHloubkaStromu, maximalniHloubkaStromuPoKrizeni, reprodukce, krizeni, mutace, krizeniVUzluFunkce, zachovavatNejzdatnejsihoJedince, decimace, editace, pocetKroku, selectionMethod);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-    }
-
-    GPController(Messenger m, Button PauseButton, Button StopButton) {
-        this.m = m;
-        this.pauseButton = PauseButton;
-        this.stopButton = StopButton;
     }
 
 }

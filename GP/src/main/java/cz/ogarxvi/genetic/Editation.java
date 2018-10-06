@@ -18,17 +18,35 @@ public class Editation {
 		treesForReplace = new ArrayList<Gen>();
 		substituteTrees = new ArrayList<Gen>();
                 
-                //SEZNAM NÁHRADNÍCH STROMŮ
+                //REPLACEMENT
                 
-		// PROG1 - 1 + 1 = 2
-		Gen strom1 = new Gen("+", 2);
-		strom1.gens.add(new Terminal("1"));
-		strom1.gens.add(new Terminal("1"));
-		strom1.setIsFunction(true);
-		treesForReplace.add(strom1);
+		Gen prog1 = new Gen("+", 2);
+		prog1.gens.add(new Terminal("1"));
+		prog1.gens.add(new Terminal("1"));
+		prog1.setIsFunction(true);
+		treesForReplace.add(prog1);
+		Gen replaceProg1 = new Terminal("2");
+		substituteTrees.add(replaceProg1);
+                
+		Gen prog2 = new Gen("+", 3);
+		prog2.gens.add(new Terminal("1"));
+		prog2.gens.add(new Terminal("1"));
+                prog2.gens.add(new Terminal("1"));
+		prog2.setIsFunction(true);
+		treesForReplace.add(prog1);
+		Gen replaceProg2 = new Terminal("3");
+		substituteTrees.add(replaceProg2);
+                
+                Gen prog3 = new Gen("*", 2);
+		prog3.gens.add(new Terminal("1"));
+		prog3.gens.add(new Terminal("0"));
+		prog3.setIsFunction(true);
+		treesForReplace.add(prog3);
 		// NAHRAZENÍ PROG1
-		Gen nahradniStrom1 = new Terminal("2");
-		substituteTrees.add(nahradniStrom1);
+		Gen replaceProg3 = new Terminal("0");
+		substituteTrees.add(replaceProg3);
+                
+                
 		
 	}
 	

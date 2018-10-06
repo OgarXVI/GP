@@ -2,39 +2,27 @@ package cz.ogarxvi.genetic;
 
 import cz.ogarxvi.model.DataHandler;
 import cz.ogarxvi.model.Messenger;
-import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import javafx.scene.control.Button;
-import javax.swing.JButton;
-import javax.swing.JTextArea;
-import javax.swing.text.BadLocationException;
 
 public class GeneticAlgorithm {
 
     private DataHandler dataHandler;
     private Messenger messenger;
     private List<Chromosome> population;
-    private Button stopButton;
-    private boolean stop = false;
+    //private boolean stop = false;
     private Editation editation = new Editation();
     private double probabilityOfCrossoverFunctionsInNodes = 0.00;
 
-    public GeneticAlgorithm(Button buttonZastavit) {
-        // TODO - dodělat button zastavit, aby nastavilo stop = true
-    }
-
-    public GeneticAlgorithm(Button stopButton, Messenger m, DataHandler dh) {
+    public GeneticAlgorithm(Messenger m, DataHandler dh) {
         messenger = m;
         dataHandler = dh;
     }
 
     public void runGP(int numberOfGenerations, int initSizeOfPopulation, int initTreeMaxDepth, int treeMaxDepthAfterOperation, double reproductionProbability, double crossoverProbability, double mutationProbability, double crossoverInFunctionNodes, boolean elitismus, boolean decimation, boolean editable, int numberOfSteps, int selectionMethod) {
 
-        stop = false;
+        dataHandler.setGpStop(false); 
         probabilityOfCrossoverFunctionsInNodes = crossoverInFunctionNodes;
 
         List<Gen> setOfTerminals = new ArrayList<Gen>();
@@ -42,11 +30,6 @@ public class GeneticAlgorithm {
 
         
         if (dataHandler!=null){
-            //VARIABLES
-            String[] paramsDH = dataHandler.getParams();
-            for (String string : paramsDH) {
-                setOfTerminals.add(new Terminal(string));
-            }
             //TERMINALS
             setOfTerminals.addAll(dataHandler.getLoadedTerminals());           
             //FUNCTIONS
@@ -129,7 +112,7 @@ public class GeneticAlgorithm {
         Chromosome bestChromosome = new Chromosome(population.get(0));
 
         for (int i = 0; i < numberOfGenerations; i++) {	
-            if (stop) {
+            if (dataHandler.isGpStop()) {
                 break;
             }
 
@@ -141,19 +124,16 @@ public class GeneticAlgorithm {
                     population.get(j).setRoot(editation.editRoot(population.get(j).getRoot()));	
                 }
 
-                // TODO - nastavit každému genotypu jeho zdatnost => vypočítat to
                 // vzít genotyp, rozparsovat ho na vzoreček, do kterýho jde dosadit čísla za proměnný a vypočítat ho,
                 // pak dosadit čísla do proměnných z tabulky (pro všechny řádky v tabulce), určit pro každý ten řádek výsledek,
                 // porovnat pro každý ten řádek výsledek se sloupcem F, a rozdíl bude hrubá zdatnost. Tu převedeme na standardizovanou
                 // (tzn. čím víc se blíží nule, tím je to lepší), a tu zapíšeme jako zdatnost. 
-                // TODO - dále v kódu udělat, aby byla jako lepší zdatnost braná ta nižší (ideálně nula), néé ta vyšší, jako to bylo!!
                 //messenger.AddMesseage("P: " + j + " " + populace.get(j).getKoren().vypis());
                 //Generace: " + i + " Jedinec:" + j + "   " + 
                 String pomFormula = messenger.preToInfix(population.get(j).getRoot().print());
-                double originFitness = population.get(j).getFitness().getValue(); // !! TODO - není to tady nějaký blbě? Jaká je ta originální hodnota? (Možná to není třeba řešit.)
+                double originFitness = population.get(j).getFitness().getValue(); 
                 population.get(j).getFitness().calculate(pomFormula, dataHandler.getParams(), dataHandler.getMathData(), dataHandler.getExpectedResults());
                 //messenger.AddMesseage("G: " + i + " J: " + j + "  " + populace.get(j).getKoren().vypis());
-                //TODO: Upravit z prefix na infix, který snad bude lépe počítatelný pro PC?
                 // messenger.AddMesseage("Jeho úprava je:   " + messenger.preToInfix(populace.get(j).getKoren().vypis()));
                 
                 if (Math.abs(population.get(j).getFitness().getValue()) < Math.abs(bestChromosome.getFitness().getValue())) {
@@ -170,7 +150,7 @@ public class GeneticAlgorithm {
             //TODO: BETTER END
             // ukončovací podmínka - když je zdatnost nejlepšího jedince 0, ukončíme algoritmus
             if (bestChromosomeInGeneration.getFitness().getValue() == 0.00) {
-                stop = true;
+                dataHandler.setGpStop(true);
                 messenger.AddMesseage("The Best:  " +  messenger.preToInfix(bestChromosomeInGeneration.getRoot().print()));
                 messenger.GetMesseage();
                 return;
@@ -422,15 +402,6 @@ public class GeneticAlgorithm {
     public double getRandomDouble(int horniHranice) {
         return Math.random() * horniHranice;
     }
-
-    public Button getStopButton() {
-        return stopButton;
-    }
-
-    public void setStopButton(Button stopButton) {
-        this.stopButton = stopButton;
-    }
-
 
     public static void quicksort(List<Chromosome> populace, int left, int right) {
         if (left < right) {

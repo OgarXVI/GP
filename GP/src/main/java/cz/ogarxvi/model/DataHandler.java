@@ -27,9 +27,11 @@ public class DataHandler {
     private double[][] mathData;
     private double[] expectedResults;
     private boolean loaded;
-    
+
     private List<Gen> loadedFunctions;
     private List<Gen> loadedTerminals;
+
+    private boolean gpStop;
 
     public DataHandler() {
         loaded = false;
@@ -41,7 +43,7 @@ public class DataHandler {
         //Clear params for data
         params = data[0];
         params = Arrays.copyOf(params, params.length - 1);
-        //Get mathData for calculation(without results), TODO: should this do before and just once too!
+        //Get mathData for calculation(without results), 
         mathData = new double[data.length - 1][params.length];
         //Get Results (F columm)
         expectedResults = new double[data.length - 1];
@@ -53,6 +55,8 @@ public class DataHandler {
             expectedResults[i] = Double.valueOf(data[i + 1][mathData[i].length]);
         }
         loaded = true;
+
+        loadParamsAsTerminals();
 
         System.out.println("PARAM:");
         System.out.println(Arrays.toString(params));
@@ -101,7 +105,24 @@ public class DataHandler {
         return loadedTerminals;
     }
 
-    
+    public boolean isGpStop() {
+        return gpStop;
+    }
+
+    public void setGpStop(boolean gpStop) {
+        this.gpStop = gpStop;
+    }
+
+    public void loadParamsAsTerminals() {
+        if (isLoaded()) {
+            //VARIABLES
+            String[] paramsDH = this.getParams();
+            for (String string : paramsDH) {
+                loadedTerminals.add(new Terminal(string));
+            }
+        }
+    }
+
     public static class BoxDataItem {
 
         private List<Gen> gens;
@@ -113,7 +134,7 @@ public class DataHandler {
             this.arita = -1;
             this.selected = false;
         }
-        
+
         public BoxDataItem(List<Gen> gens, int arita) {
             this.gens = gens;
             this.arita = arita;
@@ -132,18 +153,16 @@ public class DataHandler {
             this.selected = selected;
         }
 
-        
-        
         @Override
         public String toString() {
-            return gens.toString() + (arita==-1?"":" (Arita: " + arita +")");
+            return gens.toString() + (arita == -1 ? "" : " (Arita: " + arita + ")");
         }
-        
-        public static ObservableList<DataHandler.BoxDataItem> generateFunctionBoxItems(){
+
+        public static ObservableList<DataHandler.BoxDataItem> generateFunctionBoxItems() {
             List ol = new ArrayList<>();
             ol.add(new DataHandler.BoxDataItem(Function.getSet("+,-,*", 2), 2));
             ol.add(new DataHandler.BoxDataItem(Function.getSet("-,*,+", 3), 3));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("+,-,*,/", 2),2));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("+,-,*,/", 2), 2));
             return FXCollections.observableArrayList(ol);
         }
 
