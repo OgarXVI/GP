@@ -163,6 +163,7 @@ public class DataHandler {
             ol.add(new DataHandler.BoxDataItem(Function.getSet("+,-,*", 2), 2));
             ol.add(new DataHandler.BoxDataItem(Function.getSet("-,*,+", 3), 3));
             ol.add(new DataHandler.BoxDataItem(Function.getSet("+,-,*,/", 2), 2));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("sin", 1), 1));
             return FXCollections.observableArrayList(ol);
         }
 

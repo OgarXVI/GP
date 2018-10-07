@@ -92,7 +92,10 @@ public class Gen {
 				
 			case "/" :
 				return gens.get(0).provedSeBezZobrazeni(values) / gens.get(1).provedSeBezZobrazeni(values);
-				
+			
+                        case "sin" :
+                                return Math.sin(gens.get(0).provedSeBezZobrazeni(values));
+                                
                         default:
                             return values.get(command);
 		}
