@@ -3,8 +3,11 @@ package cz.ogarxvi.genetic;
 import cz.ogarxvi.model.DataHandler;
 import cz.ogarxvi.model.Messenger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import org.apache.commons.collections4.list.TreeList;
 
 public class GeneticAlgorithm {
 
@@ -130,9 +133,37 @@ public class GeneticAlgorithm {
                 // (tzn. čím víc se blíží nule, tím je to lepší), a tu zapíšeme jako zdatnost. 
                 //messenger.AddMesseage("P: " + j + " " + populace.get(j).getKoren().vypis());
                 //Generace: " + i + " Jedinec:" + j + "   " + 
+                
+                // TODO - anglicky:
+                List<Double> vysledky = new ArrayList<>();
+                Map<String, Double> values = new HashMap<>();
+                for (int k = 0; k < dataHandler.getMathData().length; k++) {
+                    for (int l = 0; l < dataHandler.getMathData()[k].length; l++) {
+                        values.put(dataHandler.getParams()[l], dataHandler.getMathData()[k][l]);
+                    }
+                }
+                for (int m = 0; m < dataHandler.getLoadedTerminals().size(); m++) {
+                    if (! Character.isLetter(dataHandler.getLoadedTerminals().get(m).command.charAt(0))) {
+                        values.put(dataHandler.getLoadedTerminals().get(m).command, Double.valueOf(dataHandler.getLoadedTerminals().get(m).command));
+                    }
+                }
+                
+                for (int k = 0; k < dataHandler.getMathData().length; k++) {
+                    vysledky.add(population.get(j).getRoot().provedSeBezZobrazeni(values));
+                }
+                
+                
+                population.get(j).getFitness().calculate(vysledky, dataHandler.getExpectedResults());
+                
+       
+                
+                /*
                 String pomFormula = messenger.preToInfix(population.get(j).getRoot().print());
+                System.out.println(population.get(j).getRoot().print());
                 double originFitness = population.get(j).getFitness().getValue(); 
                 population.get(j).getFitness().calculate(pomFormula, dataHandler.getParams(), dataHandler.getMathData(), dataHandler.getExpectedResults());
+                */
+
                 //messenger.AddMesseage("G: " + i + " J: " + j + "  " + populace.get(j).getKoren().vypis());
                 // messenger.AddMesseage("Jeho úprava je:   " + messenger.preToInfix(populace.get(j).getKoren().vypis()));
                 
@@ -144,14 +175,13 @@ public class GeneticAlgorithm {
                     bestChromosomeInGeneration = new Chromosome(population.get(j));
                 }
             }
-            
-            messenger.AddMesseage(bestChromosomeInGeneration.getFitness().getValue() + "  " + messenger.preToInfix(bestChromosomeInGeneration.getRoot().print()) );
+            messenger.AddMesseage(bestChromosomeInGeneration.getFitness().getValue() + "  " + bestChromosomeInGeneration.getRoot().print() );
             messenger.GetMesseage();
             //TODO: BETTER END
             // ukončovací podmínka - když je zdatnost nejlepšího jedince 0, ukončíme algoritmus
             if (bestChromosomeInGeneration.getFitness().getValue() == 0.00) {
                 dataHandler.setGpStop(true);
-                messenger.AddMesseage("The Best:  " +  messenger.preToInfix(bestChromosomeInGeneration.getRoot().print()));
+                messenger.AddMesseage("The Best:  " +  bestChromosomeInGeneration.getRoot().print());
                 messenger.GetMesseage();
                 return;
             }

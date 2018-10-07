@@ -168,6 +168,8 @@ public class DataHandler {
 
         public static ObservableList<DataHandler.BoxDataItem> generateTerminalsBoxItems() {
             List ol = new ArrayList<>();
+            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("-5")));
+            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("-1")));
             ol.add(new DataHandler.BoxDataItem(Terminal.getSet("0")));
             ol.add(new DataHandler.BoxDataItem(Terminal.getSet("1")));
             ol.add(new DataHandler.BoxDataItem(Terminal.getSet("0,1,2")));

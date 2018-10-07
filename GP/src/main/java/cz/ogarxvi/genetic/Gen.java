@@ -2,6 +2,8 @@ package cz.ogarxvi.genetic;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import org.apache.commons.collections4.list.TreeList;
 
 
 /**
@@ -15,6 +17,7 @@ public class Gen {
 	protected String command;
 	protected boolean isFunction = false;
 	protected int arita;
+        
 	protected List<Gen> gens;
 	protected int depth;
 	
@@ -42,16 +45,16 @@ public class Gen {
 	}
 	
 	public String print() {
-                switch(arita){
+                switch (arita) {
                     case 0: return command;
                         
-                    case 1: return command + gens.get(0).print();
+                    case 1: return command + ((depth != 0) ? "(" : "") + gens.get(0).print() + ((depth != 0) ? ")" : "");
                         
-                    case 2: return command + gens.get(0).print() + gens.get(1).print();
+                    case 2: return ((depth != 0) ? "(" : "") + gens.get(0).print() + command + gens.get(1).print() + ((depth != 0) ? ")" : "");
                         
-                    case 3: return command + gens.get(0).print() + gens.get(1).print() + gens.get(2).print();
+                    case 3: return ((depth != 0) ? "(" : "") + gens.get(0).print() + command + gens.get(1).print() + command + gens.get(2).print() + ((depth != 0) ? ")" : "");
                         
-                    case 4: return command + gens.get(0).print() + gens.get(1).print() + gens.get(2).print() + gens.get(3).print();
+                    case 4: return ((depth != 0) ? "(" : "") + gens.get(0).print() + command + gens.get(1).print() + command + gens.get(2).print() + command + gens.get(3).print() + ((depth != 0) ? ")" : "");
                         
                 }
 		return "";
@@ -73,6 +76,26 @@ public class Gen {
 				}
 			}
 		}	
+	}
+        
+        // TODO - do angličtiny
+        public double provedSeBezZobrazeni(Map<String, Double> values) {
+		switch (command) {
+			case "+" :
+				return gens.get(0).provedSeBezZobrazeni(values) + gens.get(1).provedSeBezZobrazeni(values);
+				
+			case "-" :
+				return gens.get(0).provedSeBezZobrazeni(values) - gens.get(1).provedSeBezZobrazeni(values);
+
+			case "*" :
+				return gens.get(0).provedSeBezZobrazeni(values) * gens.get(1).provedSeBezZobrazeni(values);
+				
+			case "/" :
+				return gens.get(0).provedSeBezZobrazeni(values) / gens.get(1).provedSeBezZobrazeni(values);
+				
+                        default:
+                            return values.get(command);
+		}
 	}
 
 	

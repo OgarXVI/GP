@@ -134,7 +134,7 @@ public class FXMLController implements Initializable {
                         ? MutationProbabilityTextField.getPromptText() : MutationProbabilityTextField.getText());
         double crossoverInFunctionNode = 0.0f;
         boolean elitism = ElitistToogleButton.isSelected();
-        boolean decimation = false;
+        boolean decimation = true;
         boolean editation = true;
         int numberOfSteps = 1;
 
@@ -184,6 +184,9 @@ public class FXMLController implements Initializable {
             }
             ir.ReadFile(selectedFile);
             dh.parseData(ir.GetData());
+                    
+        Clear(event);
+        
             updateOutput();
         }
     }
@@ -195,14 +198,17 @@ public class FXMLController implements Initializable {
         m.GetAllMesseages();
     }
 
-    private void setListenersOnComboBox(CheckComboBox<DataHandler.BoxDataItem> FunctionsComboBox, List loadedFunctions) {
-        FunctionsComboBox.getCheckModel().getCheckedItems().addListener(new ListChangeListener<DataHandler.BoxDataItem>() {
+    private void setListenersOnComboBox(CheckComboBox<DataHandler.BoxDataItem> checkComboBox, List loadedFunctions) {
+        checkComboBox.getCheckModel().getCheckedItems().addListener(new ListChangeListener<DataHandler.BoxDataItem>() {
             @Override
             public void onChanged(ListChangeListener.Change<? extends DataHandler.BoxDataItem> c) {
-                ObservableList<DataHandler.BoxDataItem> olChecked = FunctionsComboBox.getCheckModel().getCheckedItems();
+                ObservableList<DataHandler.BoxDataItem> olChecked = checkComboBox.getCheckModel().getCheckedItems();
                 loadedFunctions.clear();
                 for (DataHandler.BoxDataItem boxDataItem : olChecked) {
                     loadedFunctions.addAll(boxDataItem.getGens());
+                }
+                if (checkComboBox.equals(TerminalsComboBox)){
+                    dh.loadParamsAsTerminals();
                 }
                 updateOutput();
             }

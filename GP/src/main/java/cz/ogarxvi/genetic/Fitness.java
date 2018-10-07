@@ -5,6 +5,7 @@
  */
 package cz.ogarxvi.genetic;
 
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.script.ScriptEngine;
@@ -50,12 +51,24 @@ public class Fitness {
 
         value = val;
     }
+    
+    public void calculate(List<Double> calcResult, double[] expectedResults) {
+        double val = 0;        
+        
+        for (int i = 0; i < expectedResults.length; i++) {
+            val += (calcResult.get(i) - expectedResults[i]);
+        }
+        val = val / calcResult.size();
+
+        value = val;
+    }
 
     public double getValue() {
         return value;
     }
 
     private double eval(final String str) {
+        System.out.println("EVAL: " + str);
         return new Object() {
             int pos = -1, ch;
 
