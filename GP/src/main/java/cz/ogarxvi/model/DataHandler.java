@@ -31,6 +31,7 @@ public class DataHandler {
     private List<Gen> loadedFunctions;
     private List<Gen> loadedTerminals;
 
+    //MAYBE: BEST GEN FOR GRAPH
     private boolean gpStop;
 
     public DataHandler() {
@@ -160,21 +161,38 @@ public class DataHandler {
 
         public static ObservableList<DataHandler.BoxDataItem> generateFunctionBoxItems() {
             List ol = new ArrayList<>();
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("+,-,*", 2), 2));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("-,*,+", 3), 3));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("+,-,*,/", 2), 2));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("+", 2), 2));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("-", 2), 2));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("*", 2), 2));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("/", 2), 2));
             ol.add(new DataHandler.BoxDataItem(Function.getSet("sin", 1), 1));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("cos", 1), 1));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("tan", 1), 1));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("sqrt", 1), 1));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("abs", 1), 1));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("exp", 1), 1));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("log", 1), 1));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("log10", 1), 1));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("!", 1), 1));
+
             return FXCollections.observableArrayList(ol);
         }
 
         public static ObservableList<DataHandler.BoxDataItem> generateTerminalsBoxItems() {
             List ol = new ArrayList<>();
             ol.add(new DataHandler.BoxDataItem(Terminal.getSet("-5")));
+            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("-4")));
+            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("-3")));
+            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("-2")));
             ol.add(new DataHandler.BoxDataItem(Terminal.getSet("-1")));
             ol.add(new DataHandler.BoxDataItem(Terminal.getSet("0")));
             ol.add(new DataHandler.BoxDataItem(Terminal.getSet("1")));
-            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("0,1,2")));
-            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("0,1,2,3,4,5")));
+            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("2")));
+            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("3")));
+            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("4")));
+            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("5")));
+            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("-5,-4,-3,-2,-1")));
+            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("1,2,3,4,5")));
             ol.add(new DataHandler.BoxDataItem(Terminal.getSet("2,4,6,8")));
             ol.add(new DataHandler.BoxDataItem(Terminal.getSet("1,3,5,7,9")));
 

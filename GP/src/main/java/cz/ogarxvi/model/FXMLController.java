@@ -84,8 +84,8 @@ public class FXMLController implements Initializable {
         FunctionsComboBox.getItems().addAll(DataHandler.BoxDataItem.generateFunctionBoxItems());
         TerminalsComboBox.getItems().addAll(DataHandler.BoxDataItem.generateTerminalsBoxItems());
 
-        // FunctionsComboBox.setItems();
-        // TerminalsComboBox.setItems(DataHandler.BoxDataItem.generateTerminalsBoxItems());
+        
+        
         setListenersOnComboBox(FunctionsComboBox, dh.getLoadedFunctions());
         setListenersOnComboBox(TerminalsComboBox, dh.getLoadedTerminals());
 
@@ -225,7 +225,7 @@ public class FXMLController implements Initializable {
     private void ShowGraph(ActionEvent event) {
         Parent root;
         try {
-            root = FXMLLoader.load(getClass().getClassLoader().getResource("/fxml/Graph.fxml"));
+            root = FXMLLoader.load(getClass().getResource("/fxml/Graph.fxml"));
             Stage stage = new Stage();
             stage.setTitle("TreeGraph");
             stage.setScene(new Scene(root, 450, 450));
@@ -238,6 +238,7 @@ public class FXMLController implements Initializable {
 
     @FXML
     private void ShowAbout(ActionEvent event) {
+        JOptionPane.showMessageDialog(null, "Autor: Jaroslav Dibitanzl ");
     }
 
     @FXML

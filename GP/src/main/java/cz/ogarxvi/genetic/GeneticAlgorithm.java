@@ -149,7 +149,7 @@ public class GeneticAlgorithm {
                 }
                 
                 for (int k = 0; k < dataHandler.getMathData().length; k++) {
-                    vysledky.add(population.get(j).getRoot().provedSeBezZobrazeni(values));
+                    vysledky.add(population.get(j).getRoot().resolveCommand(values));
                 }
                 
                 
@@ -277,9 +277,9 @@ public class GeneticAlgorithm {
                 Gen gen = selectedGen.getGenAbove().gens.get(selectedGen.genIndex());
 
                 if ((gen.depth - 1) == treeMaxDepthAfterOperation) {	
-                    gen = setOfTerminals.get(getRandomNumber(3));
+                    gen = setOfTerminals.get(getRandomNumber(setOfTerminals.size()));
                 } else {
-                    Gen f = setOfFunctions.get(getRandomNumber(3));
+                    Gen f = setOfFunctions.get(getRandomNumber(setOfFunctions.size()));
                     gen = new Function(f.command, f.arita, gen.depth, treeMaxDepthAfterOperation, setOfTerminals, setOfFunctions);
                 }
 
