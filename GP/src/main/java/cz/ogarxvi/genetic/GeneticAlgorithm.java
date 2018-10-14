@@ -7,14 +7,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import org.apache.commons.collections4.list.TreeList;
 
 public class GeneticAlgorithm {
 
     private DataHandler dataHandler;
     private Messenger messenger;
     private List<Chromosome> population;
-    //private boolean stop = false;
     private Editation editation = new Editation();
     private double probabilityOfCrossoverFunctionsInNodes = 0.00;
 
@@ -39,40 +37,6 @@ public class GeneticAlgorithm {
             setOfFunctions.addAll(dataHandler.getLoadedFunctions());
         }
         
-        /*
-        Gen a = new Terminal("X");
-        Gen b = new Terminal("Y");
-        Gen c = new Terminal("Z");
-        Gen const1 = new Terminal("1");
-        Gen const2 = new Terminal("2");
-        Gen const5 = new Terminal("5");
-
-        setOfTerminals.add(a);
-        setOfTerminals.add(b);
-        setOfTerminals.add(c);
-        setOfTerminals.add(const1);
-        setOfTerminals.add(const2);
-        setOfTerminals.add(const5);
-
-        Gen plus2 = new Gen("+", 2);
-        Gen plus3 = new Gen("+", 3);
-        Gen plus4 = new Gen("+", 4);
-        Gen minus2 = new Gen("-", 2);
-        Gen minus3 = new Gen("-", 3);
-        Gen krat2 = new Gen("*", 2);
-        Gen deleno2 = new Gen("/", 2);
-
-        setOfFunctions.add(plus2);
-        setOfFunctions.add(plus3);
-        setOfFunctions.add(plus3);
-        setOfFunctions.add(plus3);
-        setOfFunctions.add(plus4);
-        setOfFunctions.add(plus4);
-        setOfFunctions.add(minus2);
-        setOfFunctions.add(minus3);
-        setOfFunctions.add(krat2);
-        setOfFunctions.add(deleno2);
-        */
         population = new ArrayList<Chromosome>(initSizeOfPopulation);
 
         int numberOfReproduction = (int) (reproductionProbability * initSizeOfPopulation);
@@ -92,7 +56,7 @@ public class GeneticAlgorithm {
         int numberOfProgramBeforeDecimation = 10 * initSizeOfPopulation;
 
         if (decimation) {
-            population = new ArrayList<Chromosome>(numberOfProgramBeforeDecimation);
+            population = new ArrayList<>(numberOfProgramBeforeDecimation);
 
             numberOfReproduction = (int) (reproductionProbability * numberOfProgramBeforeDecimation);
             numberOfCrossover = (int) (crossoverProbability * numberOfProgramBeforeDecimation) / 2;		
@@ -126,16 +90,8 @@ public class GeneticAlgorithm {
                 if (editable) {
                     population.get(j).setRoot(editation.editRoot(population.get(j).getRoot()));	
                 }
-
-                // vzít genotyp, rozparsovat ho na vzoreček, do kterýho jde dosadit čísla za proměnný a vypočítat ho,
-                // pak dosadit čísla do proměnných z tabulky (pro všechny řádky v tabulce), určit pro každý ten řádek výsledek,
-                // porovnat pro každý ten řádek výsledek se sloupcem F, a rozdíl bude hrubá zdatnost. Tu převedeme na standardizovanou
-                // (tzn. čím víc se blíží nule, tím je to lepší), a tu zapíšeme jako zdatnost. 
-                //messenger.AddMesseage("P: " + j + " " + populace.get(j).getKoren().vypis());
-                //Generace: " + i + " Jedinec:" + j + "   " + 
-                
-                // TODO - anglicky:
-                List<Double> vysledky = new ArrayList<>();
+                    
+                List<Double> results = new ArrayList<>();
                 Map<String, Double> values = new HashMap<>();
                 for (int k = 0; k < dataHandler.getMathData().length; k++) {
                     for (int l = 0; l < dataHandler.getMathData()[k].length; l++) {
@@ -149,23 +105,11 @@ public class GeneticAlgorithm {
                 }
                 
                 for (int k = 0; k < dataHandler.getMathData().length; k++) {
-                    vysledky.add(population.get(j).getRoot().resolveCommand(values));
+                    results.add(population.get(j).getRoot().resolveCommand(values));
                 }
                 
                 
-                population.get(j).getFitness().calculate(vysledky, dataHandler.getExpectedResults());
-                
-       
-                
-                /*
-                String pomFormula = messenger.preToInfix(population.get(j).getRoot().print());
-                System.out.println(population.get(j).getRoot().print());
-                double originFitness = population.get(j).getFitness().getValue(); 
-                population.get(j).getFitness().calculate(pomFormula, dataHandler.getParams(), dataHandler.getMathData(), dataHandler.getExpectedResults());
-                */
-
-                //messenger.AddMesseage("G: " + i + " J: " + j + "  " + populace.get(j).getKoren().vypis());
-                // messenger.AddMesseage("Jeho úprava je:   " + messenger.preToInfix(populace.get(j).getKoren().vypis()));
+                population.get(j).getFitness().calculate(results, dataHandler.getExpectedResults());
                 
                 if (Math.abs(population.get(j).getFitness().getValue()) < Math.abs(bestChromosome.getFitness().getValue())) {
                     bestChromosome = new Chromosome(population.get(j));
@@ -177,9 +121,9 @@ public class GeneticAlgorithm {
             }
             messenger.AddMesseage(bestChromosomeInGeneration.getFitness().getValue() + "  " + bestChromosomeInGeneration.getRoot().print() );
             messenger.GetMesseage();
-            //TODO: BETTER END
-            // ukončovací podmínka - když je zdatnost nejlepšího jedince 0, ukončíme algoritmus
-            if (bestChromosomeInGeneration.getFitness().getValue() == 0.00) {
+            //END
+            if (bestChromosomeInGeneration.getFitness().getValue() == 0.00 ||
+                i-1==numberOfGenerations) {
                 dataHandler.setGpStop(true);
                 messenger.AddMesseage("The Best:  " +  bestChromosomeInGeneration.getRoot().print());
                 messenger.GetMesseage();

@@ -1,5 +1,6 @@
 package cz.ogarxvi.model;
 
+import cz.ogarxvi.model.DataHandler.BoxDataItem;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -76,6 +77,10 @@ public class FXMLController implements Initializable {
     @FXML
     private Button ClearButton;
 
+    //Listeners
+    private ListChangeListener<DataHandler.BoxDataItem> functionCheckComboBoxListener;
+    private ListChangeListener<DataHandler.BoxDataItem> terminalCheckComboBoxListener;
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         m = new Messenger(ConsoleOutput);
@@ -83,13 +88,43 @@ public class FXMLController implements Initializable {
 
         FunctionsComboBox.getItems().addAll(DataHandler.BoxDataItem.generateFunctionBoxItems());
         TerminalsComboBox.getItems().addAll(DataHandler.BoxDataItem.generateTerminalsBoxItems());
-
         
+        functionCheckComboBoxListener = new ListChangeListener<DataHandler.BoxDataItem>() {
+            @Override
+            public void onChanged(ListChangeListener.Change<? extends DataHandler.BoxDataItem> c) {
+                ObservableList<DataHandler.BoxDataItem> olChecked = FunctionsComboBox.getCheckModel().getCheckedItems();
+                dh.getLoadedFunctions().clear();
+                for (DataHandler.BoxDataItem boxDataItem : olChecked) {
+                    dh.getLoadedFunctions().addAll(boxDataItem.getGens());
+                }
+                if (FunctionsComboBox.equals(TerminalsComboBox)){
+                    dh.loadParamsAsTerminals();
+                }
+                m.ClearMessenger();
+                updateOutput();
+            }
+        };
         
-        setListenersOnComboBox(FunctionsComboBox, dh.getLoadedFunctions());
-        setListenersOnComboBox(TerminalsComboBox, dh.getLoadedTerminals());
+        terminalCheckComboBoxListener = new ListChangeListener<DataHandler.BoxDataItem>() {
+            @Override
+            public void onChanged(ListChangeListener.Change<? extends DataHandler.BoxDataItem> c) {
+                ObservableList<DataHandler.BoxDataItem> olChecked = TerminalsComboBox.getCheckModel().getCheckedItems();
+                dh.getLoadedTerminals().clear();
+                for (DataHandler.BoxDataItem boxDataItem : olChecked) {
+                    dh.getLoadedTerminals().addAll(boxDataItem.getGens());
+                }
+                if (TerminalsComboBox.equals(TerminalsComboBox)){
+                    dh.loadParamsAsTerminals();
+                }
+                m.ClearMessenger();
+                updateOutput();
+            }
+        };
 
-        updateOutput();
+        setListenersOnComboBox(FunctionsComboBox, functionCheckComboBoxListener);
+        setListenersOnComboBox(TerminalsComboBox, terminalCheckComboBoxListener);
+
+        // updateOutput();
     }
 
     @FXML
@@ -190,9 +225,7 @@ public class FXMLController implements Initializable {
             }
             ir.ReadFile(selectedFile);
             dh.parseData(ir.GetData());
-                    
-        Clear(event);
-        
+                   
             updateOutput();
         }
     }
@@ -204,21 +237,8 @@ public class FXMLController implements Initializable {
         m.GetAllMesseages();
     }
 
-    private void setListenersOnComboBox(CheckComboBox<DataHandler.BoxDataItem> checkComboBox, List loadedFunctions) {
-        checkComboBox.getCheckModel().getCheckedItems().addListener(new ListChangeListener<DataHandler.BoxDataItem>() {
-            @Override
-            public void onChanged(ListChangeListener.Change<? extends DataHandler.BoxDataItem> c) {
-                ObservableList<DataHandler.BoxDataItem> olChecked = checkComboBox.getCheckModel().getCheckedItems();
-                loadedFunctions.clear();
-                for (DataHandler.BoxDataItem boxDataItem : olChecked) {
-                    loadedFunctions.addAll(boxDataItem.getGens());
-                }
-                if (checkComboBox.equals(TerminalsComboBox)){
-                    dh.loadParamsAsTerminals();
-                }
-                updateOutput();
-            }
-        });
+    private void setListenersOnComboBox(CheckComboBox<DataHandler.BoxDataItem> checkComboBox, ListChangeListener<DataHandler.BoxDataItem> listener) {
+        checkComboBox.getCheckModel().getCheckedItems().addListener(functionCheckComboBoxListener);
     }
 
     @FXML
@@ -244,6 +264,7 @@ public class FXMLController implements Initializable {
     @FXML
     private void TournamentSelected(ActionEvent event) {
         m.AddMesseage("Tournament selection selected!");
+        SelectionMenu.setText("Selection: Tournament");
         selectionMethod = 0;
         m.GetMesseage();
     }
@@ -251,6 +272,7 @@ public class FXMLController implements Initializable {
     @FXML
     private void RouleteSelected(ActionEvent event) {
         m.AddMesseage("Roulete selection selected!");
+        SelectionMenu.setText("Selection: Roulette");
         selectionMethod = 1;
         m.GetMesseage();
     }
@@ -259,8 +281,20 @@ public class FXMLController implements Initializable {
     private void Clear(ActionEvent event) {
         m.ClearMessenger();
         dh.getLoadedTerminals().clear();
+        uncheckCheckComboBox(FunctionsComboBox, functionCheckComboBoxListener);
         dh.getLoadedFunctions().clear();
+        uncheckCheckComboBox(TerminalsComboBox, terminalCheckComboBoxListener);
         dh.loadParamsAsTerminals();
+        updateOutput();
+        
+        //
+        FunctionsComboBox.getCheckModel().clearChecks();
+        TerminalsComboBox.getCheckModel().clearChecks();
     }
 
+    
+    private void uncheckCheckComboBox(CheckComboBox<BoxDataItem> FunctionsComboBox1, ListChangeListener<BoxDataItem> functionCheckComboBoxListener1){
+        FunctionsComboBox1.getCheckModel().getCheckedItems().removeListener(functionCheckComboBoxListener1);
+    }
+    
 }
