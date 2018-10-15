@@ -5,6 +5,8 @@
  */
 package cz.ogarxvi.genetic;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -13,28 +15,28 @@ import java.util.List;
  */
 public class Fitness {
 
-    private double value;
+    private BigDecimal value;
 
     public Fitness() {
-        this.value = Double.MAX_VALUE;
+        this.value = new BigDecimal(Long.MAX_VALUE);
     }
 
-    public Fitness(double f) {
+    public Fitness(BigDecimal f) {
         this.value = f;
     }
 
-    public void calculate(List<Double> calcResult, double[] expectedResults) {
-        double val = 0;        
+    public void calculate(List<BigDecimal> calcResult, BigDecimal[] expectedResults) {
+        BigDecimal val = new BigDecimal(BigInteger.ZERO);        
         
         for (int i = 0; i < expectedResults.length; i++) {
-            val += (calcResult.get(i) - expectedResults[i]);
+            val = val.add(calcResult.get(i).subtract(expectedResults[i]));
         }
-        val = val / calcResult.size();
+        val = val.divide(BigDecimal.valueOf(calcResult.size()));
 
         value = val;
     }
 
-    public double getValue() {
+    public BigDecimal getValue() {
         return value;
     }
 

@@ -30,8 +30,18 @@ import javafx.scene.control.ToggleButton;
 import javafx.stage.Stage;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import org.abego.treelayout.TreeLayout;
+import org.abego.treelayout.netbeans.demo.AbegoTreeLayoutForNetbeansDemo;
+import org.abego.treelayout.netbeans.demo.AbegoTreeLayoutForNetbeansDemo.TreeScene;
+import org.abego.treelayout.util.DefaultTreeForTreeLayout;
 import org.apache.commons.io.FilenameUtils;
 import org.controlsfx.control.CheckComboBox;
+import org.netbeans.api.visual.graph.GraphScene;
+import org.netbeans.api.visual.graph.layout.GraphLayout;
+import org.netbeans.api.visual.graph.layout.GraphLayoutFactory;
+import org.netbeans.api.visual.graph.layout.GraphLayoutSupport;
+import org.netbeans.api.visual.layout.LayoutFactory;
+import org.netbeans.api.visual.layout.SceneLayout;
 
 public class FXMLController implements Initializable {
 
@@ -80,7 +90,7 @@ public class FXMLController implements Initializable {
     //Listeners
     private ListChangeListener<DataHandler.BoxDataItem> functionCheckComboBoxListener;
     private ListChangeListener<DataHandler.BoxDataItem> terminalCheckComboBoxListener;
-    
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         m = new Messenger(ConsoleOutput);
@@ -88,7 +98,7 @@ public class FXMLController implements Initializable {
 
         FunctionsComboBox.getItems().addAll(DataHandler.BoxDataItem.generateFunctionBoxItems());
         TerminalsComboBox.getItems().addAll(DataHandler.BoxDataItem.generateTerminalsBoxItems());
-        
+
         functionCheckComboBoxListener = new ListChangeListener<DataHandler.BoxDataItem>() {
             @Override
             public void onChanged(ListChangeListener.Change<? extends DataHandler.BoxDataItem> c) {
@@ -97,14 +107,14 @@ public class FXMLController implements Initializable {
                 for (DataHandler.BoxDataItem boxDataItem : olChecked) {
                     dh.getLoadedFunctions().addAll(boxDataItem.getGens());
                 }
-                if (FunctionsComboBox.equals(TerminalsComboBox)){
+                if (FunctionsComboBox.equals(TerminalsComboBox)) {
                     dh.loadParamsAsTerminals();
                 }
                 m.ClearMessenger();
                 updateOutput();
             }
         };
-        
+
         terminalCheckComboBoxListener = new ListChangeListener<DataHandler.BoxDataItem>() {
             @Override
             public void onChanged(ListChangeListener.Change<? extends DataHandler.BoxDataItem> c) {
@@ -113,7 +123,7 @@ public class FXMLController implements Initializable {
                 for (DataHandler.BoxDataItem boxDataItem : olChecked) {
                     dh.getLoadedTerminals().addAll(boxDataItem.getGens());
                 }
-                if (TerminalsComboBox.equals(TerminalsComboBox)){
+                if (TerminalsComboBox.equals(TerminalsComboBox)) {
                     dh.loadParamsAsTerminals();
                 }
                 m.ClearMessenger();
@@ -121,8 +131,8 @@ public class FXMLController implements Initializable {
             }
         };
 
-        setListenersOnComboBox(FunctionsComboBox, functionCheckComboBoxListener);
-        setListenersOnComboBox(TerminalsComboBox, terminalCheckComboBoxListener);
+        FunctionsComboBox.getCheckModel().getCheckedItems().addListener(functionCheckComboBoxListener);
+        TerminalsComboBox.getCheckModel().getCheckedItems().addListener(terminalCheckComboBoxListener);
 
         // updateOutput();
     }
@@ -225,8 +235,8 @@ public class FXMLController implements Initializable {
             }
             ir.ReadFile(selectedFile);
             dh.parseData(ir.GetData());
-                   
-            updateOutput();
+
+            Clear(null);
         }
     }
 
@@ -237,21 +247,44 @@ public class FXMLController implements Initializable {
         m.GetAllMesseages();
     }
 
-    private void setListenersOnComboBox(CheckComboBox<DataHandler.BoxDataItem> checkComboBox, ListChangeListener<DataHandler.BoxDataItem> listener) {
-        checkComboBox.getCheckModel().getCheckedItems().addListener(functionCheckComboBoxListener);
-    }
-
     @FXML
     private void ShowGraph(ActionEvent event) {
+/*
+        if (dh.getBestChromosome() == null) {
+            JOptionPane.showMessageDialog(null, "Missing chromosome for rendering");
+            return;
+        }
+*/
         Parent root;
         try {
             root = FXMLLoader.load(getClass().getResource("/fxml/Graph.fxml"));
             Stage stage = new Stage();
             stage.setTitle("TreeGraph");
-            stage.setScene(new Scene(root, 450, 450));
+            Scene scene = new Scene(root, 450, 450);
+
+            TextInBox rootT = new TextInBox("root", 40, 20);
+            TextInBox n1 = new TextInBox("n1", 30, 20);
+            TextInBox n1_1 = new TextInBox("n1.1\n(first node)", 80, 36);
+            TextInBox n1_2 = new TextInBox("n1.2", 40, 20);
+            TextInBox n1_3 = new TextInBox("n1.3\n(last node)", 80, 36);
+            TextInBox n2 = new TextInBox("n2", 30, 20);
+            TextInBox n2_1 = new TextInBox("n2", 30, 20);
+            DefaultTreeForTreeLayout<TextInBox> tree = new DefaultTreeForTreeLayout<TextInBox>(rootT);
+            tree.addChild(rootT, n1);
+            tree.addChild(n1, n1_1);
+            tree.addChild(n1, n1_2);
+            tree.addChild(n1, n1_3);
+            tree.addChild(rootT, n2);
+            tree.addChild(n2, n2_1);
+            
+            stage.setScene(scene);
+            // Init Graf
+            //Graph graph;
+            //graph.setChromosome(dh.getBestChromosome());
+            //graph.draw();
+
             stage.show();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -281,20 +314,33 @@ public class FXMLController implements Initializable {
     private void Clear(ActionEvent event) {
         m.ClearMessenger();
         dh.getLoadedTerminals().clear();
-        uncheckCheckComboBox(FunctionsComboBox, functionCheckComboBoxListener);
+        FunctionsComboBox.getCheckModel().getCheckedItems().removeListener(functionCheckComboBoxListener);
         dh.getLoadedFunctions().clear();
-        uncheckCheckComboBox(TerminalsComboBox, terminalCheckComboBoxListener);
+        TerminalsComboBox.getCheckModel().getCheckedItems().removeListener(terminalCheckComboBoxListener);
         dh.loadParamsAsTerminals();
         updateOutput();
-        
+
         //
         FunctionsComboBox.getCheckModel().clearChecks();
         TerminalsComboBox.getCheckModel().clearChecks();
+
+        FunctionsComboBox.getCheckModel().getCheckedItems().addListener(functionCheckComboBoxListener);
+        TerminalsComboBox.getCheckModel().getCheckedItems().addListener(terminalCheckComboBoxListener);
     }
 
-    
-    private void uncheckCheckComboBox(CheckComboBox<BoxDataItem> FunctionsComboBox1, ListChangeListener<BoxDataItem> functionCheckComboBoxListener1){
-        FunctionsComboBox1.getCheckModel().getCheckedItems().removeListener(functionCheckComboBoxListener1);
+    class TextInBox{
+        String text;
+        int width;
+        int height;
+
+        public TextInBox(String text, int width, int height) {
+            this.text = text;
+            this.width = width;
+            this.height = height;
+        }
+        
+        
     }
+    
     
 }

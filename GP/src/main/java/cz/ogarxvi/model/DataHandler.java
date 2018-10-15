@@ -5,17 +5,16 @@
  */
 package cz.ogarxvi.model;
 
+import cz.ogarxvi.genetic.Chromosome;
 import cz.ogarxvi.genetic.Function;
 import cz.ogarxvi.genetic.Gen;
 import cz.ogarxvi.genetic.Terminal;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.ComboBox;
 
 /**
  *
@@ -24,15 +23,15 @@ import javafx.scene.control.ComboBox;
 public class DataHandler {
 
     private String[] params;
-    private double[][] mathData;
-    private double[] expectedResults;
+    private BigDecimal[][] mathData;
+    private BigDecimal[] expectedResults;
     private boolean loaded;
 
     private List<Gen> loadedFunctions;
     private List<Gen> loadedTerminals;
 
-    //MAYBE: BEST GEN FOR GRAPH
     private boolean gpStop;
+    private Chromosome bestChromosome;
 
     public DataHandler() {
         loaded = false;
@@ -45,15 +44,15 @@ public class DataHandler {
         params = data[0];
         params = Arrays.copyOf(params, params.length - 1);
         //Get mathData for calculation(without results), 
-        mathData = new double[data.length - 1][params.length];
+        mathData = new BigDecimal[data.length - 1][params.length];
         //Get Results (F columm)
-        expectedResults = new double[data.length - 1];
+        expectedResults = new BigDecimal[data.length - 1];
         //Parse data for MathData and Results
         for (int i = 0; i < mathData.length; i++) {
             for (int j = 0; j < mathData[i].length; j++) {
-                mathData[i][j] = Double.valueOf(data[i + 1][j]);
+                mathData[i][j] = BigDecimal.valueOf(Double.valueOf(data[i + 1][j]));
             }
-            expectedResults[i] = Double.valueOf(data[i + 1][mathData[i].length]);
+            expectedResults[i] = BigDecimal.valueOf(Double.valueOf(data[i + 1][mathData[i].length]));
         }
         loaded = true;
 
@@ -62,7 +61,7 @@ public class DataHandler {
         System.out.println("PARAM:");
         System.out.println(Arrays.toString(params));
         System.out.println("MATHDATA:");
-        for (double[] math : mathData) {
+        for (BigDecimal[] math : mathData) {
             System.out.println(Arrays.toString(math));
         }
         System.out.println("RESULTS:");
@@ -78,19 +77,19 @@ public class DataHandler {
         this.params = params;
     }
 
-    public double[][] getMathData() {
+    public BigDecimal[][] getMathData() {
         return mathData;
     }
 
-    public void setMathData(double[][] mathData) {
+    public void setMathData(BigDecimal[][] mathData) {
         this.mathData = mathData;
     }
 
-    public double[] getExpectedResults() {
+    public BigDecimal[] getExpectedResults() {
         return expectedResults;
     }
 
-    public void setMathResults(double[] expectedResults) {
+    public void setMathResults(BigDecimal[] expectedResults) {
         this.expectedResults = expectedResults;
     }
 
@@ -114,6 +113,14 @@ public class DataHandler {
         this.gpStop = gpStop;
     }
 
+    public Chromosome getBestChromosome() {
+        return bestChromosome;
+    }
+
+    public void setBestChromosome(Chromosome bestChromosome) {
+        this.bestChromosome = bestChromosome;
+    }
+    
     public void loadParamsAsTerminals() {
         if (isLoaded()) {
             //VARIABLES

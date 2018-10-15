@@ -1,29 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import java.net.URL?>
-<?import javafx.scene.control.CheckMenuItem?>
-<?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.SplitMenuButton?>
-<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import org.controlsfx.control.CheckListView?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/10.0.1" fx:controller="cz.ogarxvi.model.GraphController">
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.ogarxvi.model.GraphController">
     <stylesheets>
         <URL value="@/styles/graph.css" />
     </stylesheets>
-   <children>
-      <CheckListView layoutX="14.0" layoutY="14.0" prefHeight="98.0" prefWidth="206.0" />
-      <ChoiceBox layoutX="242.0" layoutY="14.0" prefWidth="150.0" />
-      <SplitMenuButton layoutX="235.0" layoutY="87.0" mnemonicParsing="false" text="SplitMenuButton">
-        <items>
-          <MenuItem mnemonicParsing="false" text="Action 1" />
-          <MenuItem mnemonicParsing="false" text="Action 2" />
-            <CheckMenuItem mnemonicParsing="false" text="Unspecified Action" />
-            <CheckMenuItem mnemonicParsing="false" text="Unspecified Action" />
-        </items>
-      </SplitMenuButton>
-      <ToggleButton layoutX="29.0" layoutY="142.0" mnemonicParsing="false" text="ToggleButton" />
-   </children>
 </AnchorPane>

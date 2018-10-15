@@ -2,6 +2,7 @@ package cz.ogarxvi.genetic;
 
 import cz.ogarxvi.model.DataHandler;
 import cz.ogarxvi.model.Messenger;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +15,9 @@ public class GeneticAlgorithm {
     private Messenger messenger;
     private List<Chromosome> population;
     private Editation editation = new Editation();
-    private double probabilityOfCrossoverFunctionsInNodes = 0.00;
+    private double probabilityOfCrossoverFunctionsInNodes;
+    private double lastBestChromosomeInGenerationFitness;
+    private int lastIteration;
 
     public GeneticAlgorithm(Messenger m, DataHandler dh) {
         messenger = m;
@@ -23,24 +26,23 @@ public class GeneticAlgorithm {
 
     public void runGP(int numberOfGenerations, int initSizeOfPopulation, int initTreeMaxDepth, int treeMaxDepthAfterOperation, double reproductionProbability, double crossoverProbability, double mutationProbability, double crossoverInFunctionNodes, boolean elitismus, boolean decimation, boolean editable, int numberOfSteps, int selectionMethod) {
 
-        dataHandler.setGpStop(false); 
+        dataHandler.setGpStop(false);
         probabilityOfCrossoverFunctionsInNodes = crossoverInFunctionNodes;
 
         List<Gen> setOfTerminals = new ArrayList<Gen>();
         List<Gen> setOfFunctions = new ArrayList<Gen>();
 
-        
-        if (dataHandler!=null){
+        if (dataHandler != null) {
             //TERMINALS
-            setOfTerminals.addAll(dataHandler.getLoadedTerminals());           
+            setOfTerminals.addAll(dataHandler.getLoadedTerminals());
             //FUNCTIONS
             setOfFunctions.addAll(dataHandler.getLoadedFunctions());
         }
-        
+
         population = new ArrayList<Chromosome>(initSizeOfPopulation);
 
         int numberOfReproduction = (int) (reproductionProbability * initSizeOfPopulation);
-        int numberOfCrossover = (int) (crossoverProbability * initSizeOfPopulation) / 2;		
+        int numberOfCrossover = (int) (crossoverProbability * initSizeOfPopulation) / 2;
         int numberOfMutation = (int) (mutationProbability * initSizeOfPopulation);
 
         while ((numberOfReproduction + (numberOfCrossover * 2) + numberOfMutation) < initSizeOfPopulation) {
@@ -51,7 +53,6 @@ public class GeneticAlgorithm {
             numberOfReproduction = numberOfReproduction - 1;
         }
 
-     
         int generationOfDecimation = 10;
         int numberOfProgramBeforeDecimation = 10 * initSizeOfPopulation;
 
@@ -59,7 +60,7 @@ public class GeneticAlgorithm {
             population = new ArrayList<>(numberOfProgramBeforeDecimation);
 
             numberOfReproduction = (int) (reproductionProbability * numberOfProgramBeforeDecimation);
-            numberOfCrossover = (int) (crossoverProbability * numberOfProgramBeforeDecimation) / 2;		
+            numberOfCrossover = (int) (crossoverProbability * numberOfProgramBeforeDecimation) / 2;
             numberOfMutation = (int) (mutationProbability * numberOfProgramBeforeDecimation);
 
             while ((numberOfReproduction + (numberOfCrossover * 2) + numberOfMutation) < numberOfProgramBeforeDecimation) {
@@ -78,61 +79,59 @@ public class GeneticAlgorithm {
 
         Chromosome bestChromosome = new Chromosome(population.get(0));
 
-        for (int i = 0; i < numberOfGenerations; i++) {	
+        for (int i = 0; i < numberOfGenerations; i++) {
             if (dataHandler.isGpStop()) {
                 break;
             }
 
             Chromosome bestChromosomeInGeneration = new Chromosome(population.get(0));
 
-            for (int j = 0; j < population.size(); j++) {	
+            for (int j = 0; j < population.size(); j++) {
 
                 if (editable) {
-                    population.get(j).setRoot(editation.editRoot(population.get(j).getRoot()));	
+                    population.get(j).setRoot(editation.editRoot(population.get(j).getRoot()));
                 }
-                    
-                List<Double> results = new ArrayList<>();
-                Map<String, Double> values = new HashMap<>();
+
+                List<BigDecimal> results = new ArrayList<>();
+                Map<String, BigDecimal> values = new HashMap<>();
                 for (int k = 0; k < dataHandler.getMathData().length; k++) {
                     for (int l = 0; l < dataHandler.getMathData()[k].length; l++) {
                         values.put(dataHandler.getParams()[l], dataHandler.getMathData()[k][l]);
                     }
                 }
                 for (int m = 0; m < dataHandler.getLoadedTerminals().size(); m++) {
-                    if (! Character.isLetter(dataHandler.getLoadedTerminals().get(m).command.charAt(0))) {
-                        values.put(dataHandler.getLoadedTerminals().get(m).command, Double.valueOf(dataHandler.getLoadedTerminals().get(m).command));
+                    if (!Character.isLetter(dataHandler.getLoadedTerminals().get(m).command.charAt(0))) {
+                        values.put(dataHandler.getLoadedTerminals().get(m).command, BigDecimal.valueOf(Double.valueOf(dataHandler.getLoadedTerminals().get(m).command)));
                     }
                 }
-                
+
                 for (int k = 0; k < dataHandler.getMathData().length; k++) {
                     results.add(population.get(j).getRoot().resolveCommand(values));
                 }
-                
-                
+
                 population.get(j).getFitness().calculate(results, dataHandler.getExpectedResults());
-                
-                if (Math.abs(population.get(j).getFitness().getValue()) < Math.abs(bestChromosome.getFitness().getValue())) {
+
+                if (population.get(j).getFitness().getValue().abs().compareTo(bestChromosome.getFitness().getValue().abs()) < 0) {
                     bestChromosome = new Chromosome(population.get(j));
                 }
-                
-                if (Math.abs(population.get(j).getFitness().getValue()) < Math.abs(bestChromosomeInGeneration.getFitness().getValue())) {
+
+                if (population.get(j).getFitness().getValue().abs().compareTo(bestChromosomeInGeneration.getFitness().getValue().abs()) < 0) {
                     bestChromosomeInGeneration = new Chromosome(population.get(j));
                 }
             }
-            messenger.AddMesseage(bestChromosomeInGeneration.getFitness().getValue() + "  " + bestChromosomeInGeneration.getRoot().print() );
+            messenger.AddMesseage(bestChromosomeInGeneration.getFitness().getValue() + "  " + bestChromosomeInGeneration.getRoot().print());
             messenger.GetMesseage();
-            //END
-            if (bestChromosomeInGeneration.getFitness().getValue() == 0.00 ||
-                i-1==numberOfGenerations) {
+            //END //TODO::
+            if ((bestChromosomeInGeneration.getFitness().getValue().compareTo(BigDecimal.ZERO) == 0)
+                    || (numberOfGenerations == i + 1)) {
                 dataHandler.setGpStop(true);
-                messenger.AddMesseage("The Best:  " +  bestChromosomeInGeneration.getRoot().print());
+                dataHandler.setBestChromosome(bestChromosome);
+                messenger.AddMesseage("The Best:  " + bestChromosomeInGeneration.getRoot().print());
                 messenger.GetMesseage();
                 return;
             }
-            
-            
 
-            if (decimation && (i == (generationOfDecimation - 1))) {				
+            if (decimation && (i == (generationOfDecimation - 1))) {
 
                 List<Chromosome> populationAfterDecimation = new ArrayList<Chromosome>(initSizeOfPopulation);
                 for (int k = 0; k < initSizeOfPopulation; k++) {
@@ -142,7 +141,7 @@ public class GeneticAlgorithm {
                 }
 
                 numberOfReproduction = (int) (reproductionProbability * initSizeOfPopulation);
-                numberOfCrossover = (int) (crossoverProbability * initSizeOfPopulation) / 2;		
+                numberOfCrossover = (int) (crossoverProbability * initSizeOfPopulation) / 2;
                 numberOfMutation = (int) (mutationProbability * initSizeOfPopulation);
 
                 while ((numberOfReproduction + (numberOfCrossover * 2) + numberOfMutation) < initSizeOfPopulation) {
@@ -220,7 +219,7 @@ public class GeneticAlgorithm {
 
                 Gen gen = selectedGen.getGenAbove().gens.get(selectedGen.genIndex());
 
-                if ((gen.depth - 1) == treeMaxDepthAfterOperation) {	
+                if ((gen.depth - 1) == treeMaxDepthAfterOperation) {
                     gen = setOfTerminals.get(getRandomNumber(setOfTerminals.size()));
                 } else {
                     Gen f = setOfFunctions.get(getRandomNumber(setOfFunctions.size()));
@@ -233,20 +232,17 @@ public class GeneticAlgorithm {
                 newPopulation.add(selectedChromosome);
             }
 
-            
-            
-            population = newPopulation;			
+            population = newPopulation;
         }
         messenger.GetAllMesseages();
     }
 
     private SelectedGen randomGen(Chromosome chromosome) {
 
-        Gen gen = chromosome.getRoot();	
+        Gen gen = chromosome.getRoot();
         gen.setMaxDepth(gen);
         double p = 1.0 / Gen.maxDepth;
 
-        
         if (Gen.maxDepth == 1) {
             SelectedGen vg = new SelectedGen();
             vg.setGenAbove(gen);
@@ -260,8 +256,8 @@ public class GeneticAlgorithm {
         }
 
         while (p <= 1) {
-            if (getRandomDouble(1) < p) {							
-                if (!isFunction) {												
+            if (getRandomDouble(1) < p) {
+                if (!isFunction) {
                     List<Integer> indexs = new ArrayList<Integer>(0);
                     for (int i = 0; i < gen.gens.size(); i++) {
                         if (!gen.gens.get(i).isFunction()) {
@@ -278,7 +274,7 @@ public class GeneticAlgorithm {
                     p = p + p;
 
                     gen = gen.gens.get(getRandomNumber(gen.gens.size()));
-                } else {														
+                } else {
                     List<Integer> indexs = new ArrayList<Integer>(0);
                     for (int i = 0; i < gen.gens.size(); i++) {
                         if (gen.gens.get(i).isFunction()) {
@@ -305,9 +301,9 @@ public class GeneticAlgorithm {
         return vg;
 
     }
-    
-    private Chromosome chooseSelectionMethod(int selectionMethod){
-        switch(selectionMethod){
+
+    private Chromosome chooseSelectionMethod(int selectionMethod) {
+        switch (selectionMethod) {
             case 0: // tournament
                 return tournamentSelection3();
             case 1: //roulette
@@ -316,60 +312,59 @@ public class GeneticAlgorithm {
         return null;
     }
 
-    private Chromosome rouletteSelection(){
-        double sumFitness = 0;
+    private Chromosome rouletteSelection() {
+        BigDecimal sumFitness = BigDecimal.ZERO;
         for (int i = 0; i < population.size(); i++) {
             sumFitness = population.get(i).getFitness().getValue();
         }
         Random r = new Random();
-        double randomNumber = (double) ((r.nextDouble()% 1000 / 9999.0f) * sumFitness);
-        
+        BigDecimal randomNumber = sumFitness.multiply(BigDecimal.valueOf((r.nextDouble() % 1000 / 9999.0f)));
+
         int memberIndex = 0;
-        double partialSum = 0d;
-        while (randomNumber > partialSum){
-            partialSum+=population.get(memberIndex).getFitness().getValue();
+        BigDecimal partialSum = BigDecimal.ZERO;
+        while (randomNumber.compareTo(partialSum) > 0) {
+            partialSum.add(population.get(memberIndex).getFitness().getValue());
             memberIndex++;
         }
         return population.get(memberIndex);
     }
 
     private Chromosome tournamentSelection3() {
-        int pocet = 3;
-        int[] poleIndexu = new int[pocet];
+        int number = 3;
+        int[] indexOfArray = new int[number];
 
-        for (int i = 0; i < pocet; i++) {
-            poleIndexu[i] = getRandomNumber(population.size());
+        for (int i = 0; i < number; i++) {
+            indexOfArray[i] = getRandomNumber(population.size());
 
             for (int j = 0; j < i; j++) {
-                if (poleIndexu[j] == poleIndexu[i]) {
-                    poleIndexu[i] = getRandomNumber(population.size());
+                if (indexOfArray[j] == indexOfArray[i]) {
+                    indexOfArray[i] = getRandomNumber(population.size());
                     j = 0;
                 }
             }
         }
 
-        Chromosome vitez = population.get(poleIndexu[0]);
+        Chromosome winner = population.get(indexOfArray[0]);
 
-        for (int i = 0; i < pocet; i++) {
-            if (Math.abs(vitez.getFitness().getValue()) > Math.abs(population.get(poleIndexu[i]).getFitness().getValue())) {
-                vitez = population.get(poleIndexu[i]);
+        for (int i = 0; i < number; i++) {
+            if (winner.getFitness().getValue().abs().compareTo(population.get(indexOfArray[i]).getFitness().getValue().abs()) > 0) {
+                winner = population.get(indexOfArray[i]);
             }
         }
 
-        return new Chromosome(vitez);
+        return new Chromosome(winner);
     }
-
 
     private void InitStartPopulate(List<Gen> mnozinaTerminalu, List<Gen> mnozinaFunkci, int maximalniHloubka, int velikostPopulace) {
 
         for (int i = 0; i < velikostPopulace; i++) {
-            Chromosome genotyp = new Chromosome(maximalniHloubka, mnozinaTerminalu, mnozinaFunkci);
-            population.add(genotyp);
+            Chromosome chromosome = new Chromosome(maximalniHloubka, mnozinaTerminalu, mnozinaFunkci);
+            population.add(chromosome);
         }
 
     }
 
-    public int getRandomNumber(int horniHranice) {	
+    public int getRandomNumber(int horniHranice) {
         return (int) (Math.random() * horniHranice);
     }
 
@@ -377,17 +372,17 @@ public class GeneticAlgorithm {
         return Math.random() * horniHranice;
     }
 
-    public static void quicksort(List<Chromosome> populace, int left, int right) {
+    public static void quicksort(List<Chromosome> population, int left, int right) {
         if (left < right) {
             int boundary = left;
             for (int i = left + 1; i < right; i++) {
-                if (populace.get(i).getFitness().getValue() > populace.get(left).getFitness().getValue()) {
-                    swap(populace, i, ++boundary);
+                if (population.get(i).getFitness().getValue().compareTo(population.get(left).getFitness().getValue()) > 0) {
+                    swap(population, i, ++boundary);
                 }
             }
-            swap(populace, left, boundary);
-            quicksort(populace, left, boundary);
-            quicksort(populace, boundary + 1, right);
+            swap(population, left, boundary);
+            quicksort(population, left, boundary);
+            quicksort(population, boundary + 1, right);
         }
     }
 

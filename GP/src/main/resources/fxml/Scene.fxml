@@ -12,15 +12,15 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
 
-<AnchorPane id="AnchorPane" prefHeight="650" prefWidth="800" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.ogarxvi.model.FXMLController">
+<AnchorPane id="AnchorPane" prefHeight="656" prefWidth="800" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.ogarxvi.model.FXMLController">
    <children>
       <MenuBar layoutY="14.0" prefHeight="26.0" prefWidth="829.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
                   <MenuItem mnemonicParsing="false" onAction="#LoadFile" text="Load Data" />
-                  <MenuItem mnemonicParsing="false" text="Save Output" />
               <MenuItem mnemonicParsing="false" onAction="#CloseFromMenuItem" text="Exit" />
             </items>
           </Menu>
@@ -38,7 +38,8 @@
       </MenuBar>
       <TableView fx:id="TableView" editable="true" layoutX="14.0" layoutY="52.0" prefHeight="246.0" prefWidth="600.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="216.0" />
       <TextArea fx:id="ConsoleOutput" editable="false" layoutX="15.0" layoutY="305.0" prefHeight="330.0" prefWidth="600.0" promptText="Program started..." AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="215.0" AnchorPane.topAnchor="305.0" />
-      <AnchorPane layoutX="591.0" layoutY="52.0" prefHeight="574.0" prefWidth="194.0">
+      <AnchorPane layoutX="591.0" layoutY="52.0" prefHeight="574.0" prefWidth="194.0" AnchorPane.topAnchor="48.0" AnchorPane.rightAnchor="18.0" AnchorPane.bottomAnchor="5.0">
+         <!-- <BorderPane prefHeight="574.0" prefWidth="194.0" > -->
          <children>
             <Label layoutX="15.0" text="Population size:" />
             <Label layoutX="15.0" layoutY="50.0" text="Number of generations:" />
@@ -69,6 +70,8 @@
             <Button fx:id="StartButton" layoutX="14.0" layoutY="561.0" mnemonicParsing="false" onAction="#StartCalculation" text="Start" />
             <Button fx:id="ClearButton" layoutX="79.0" layoutY="561.0" mnemonicParsing="false" onAction="#Clear" text="Clear" />
             <Button fx:id="StopButton" layoutX="143.0" layoutY="561.0" mnemonicParsing="false" onAction="#StopCalculation" text="Stop" />
-         </children></AnchorPane>
+         </children>
+         <!-- </BorderPane> -->
+      </AnchorPane>
    </children>
 </AnchorPane>

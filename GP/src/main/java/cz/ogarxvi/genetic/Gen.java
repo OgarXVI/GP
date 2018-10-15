@@ -1,9 +1,12 @@
 package cz.ogarxvi.genetic;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.collections4.list.TreeList;
+import ch.obermuhlner.math.big.BigDecimalMath;
+import java.math.MathContext;
 
 /**
  * Třída představující geny. Každý uzel stromu je genem (fukncí nebo
@@ -84,38 +87,47 @@ public class Gen {
         }
     }
 
-    public double resolveCommand(Map<String, Double> values) {
+    public BigDecimal resolveCommand(Map<String, BigDecimal> values) {
         switch (command) {
             case "+":
-                return gens.get(0).resolveCommand(values) + gens.get(1).resolveCommand(values);
+                return gens.get(0).resolveCommand(values).add(gens.get(1).resolveCommand(values));
 
             case "-":
-                return gens.get(0).resolveCommand(values) - gens.get(1).resolveCommand(values);
+                return gens.get(0).resolveCommand(values).subtract(gens.get(1).resolveCommand(values));
 
             case "*":
-                return gens.get(0).resolveCommand(values) * gens.get(1).resolveCommand(values);
+                return gens.get(0).resolveCommand(values).multiply(gens.get(1).resolveCommand(values));
 
             case "/":
-                return gens.get(0).resolveCommand(values) / gens.get(1).resolveCommand(values);
+                BigDecimal bg = gens.get(1).resolveCommand(values);
+                if (bg.compareTo(BigDecimal.ZERO) == 0) {
+                    return BigDecimal.ZERO;
+                }
+
+                return gens.get(0).resolveCommand(values).divide(gens.get(1).resolveCommand(values), 6, RoundingMode.HALF_UP);
 
             case "sin":
-                return Math.sin(gens.get(0).resolveCommand(values));
+                
+                return BigDecimalMath.sin(gens.get(0).resolveCommand(values), new MathContext(6));
             case "cos":
-                return Math.cos(gens.get(0).resolveCommand(values));
+                
+                return BigDecimalMath.cos(gens.get(0).resolveCommand(values), new MathContext(6));
             case "tan":
-                return Math.tan(gens.get(0).resolveCommand(values));
+                return BigDecimalMath.tan(gens.get(0).resolveCommand(values), new MathContext(6));
             case "sqrt":
-                return Math.sqrt(gens.get(0).resolveCommand(values));
+                return BigDecimalMath.sqrt(gens.get(0).resolveCommand(values), new MathContext(6));
             case "abs":
-                return Math.abs(gens.get(0).resolveCommand(values));
+                return gens.get(0).resolveCommand(values).abs();
             case "exp":
-                return Math.exp(gens.get(0).resolveCommand(values));
+                return BigDecimalMath.exp(gens.get(0).resolveCommand(values), new MathContext(6));
             case "log":
-                return Math.log(gens.get(0).resolveCommand(values));
+                BigDecimal bgLog = gens.get(0).resolveCommand(values);
+                if (bgLog.compareTo(BigDecimal.ZERO) <= 0) return BigDecimal.ZERO;
+                return BigDecimalMath.log(gens.get(0).resolveCommand(values), new MathContext(6));
             case "log10":
-                return Math.log10(gens.get(0).resolveCommand(values));
+                return BigDecimalMath.log(gens.get(0).resolveCommand(values), new MathContext(6));
             case "!":
-                return -gens.get(0).resolveCommand(values);
+                return gens.get(0).resolveCommand(values).negate();
             default:
                 return values.get(command);
         }
