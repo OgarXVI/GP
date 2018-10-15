@@ -185,7 +185,7 @@ public class FXMLController implements Initializable {
                         ? MutationProbabilityTextField.getPromptText() : MutationProbabilityTextField.getText());
         double crossoverInFunctionNode = 0.0f;
         boolean elitism = ElitistToogleButton.isSelected();
-        boolean decimation = false;
+        boolean decimation = true;
         boolean editation = EditationButton.isSelected();
         int numberOfSteps = 1;
 

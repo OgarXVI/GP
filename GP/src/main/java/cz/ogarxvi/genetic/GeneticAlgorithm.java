@@ -100,6 +100,11 @@ public class GeneticAlgorithm {
                     for (int l = 0; l < dataHandler.getMathData()[k].length; l++) {
                         values.put(dataHandler.getParams()[l], dataHandler.getMathData()[k][l]);
                     }
+                    for (int m = 0; m < dataHandler.getLoadedTerminals().size(); m++) {
+                    if (! Character.isLetter(dataHandler.getLoadedTerminals().get(m).command.charAt(0))) {
+                            values.put(dataHandler.getLoadedTerminals().get(m).command, BigDecimal.valueOf(Double.valueOf(dataHandler.getLoadedTerminals().get(m).command)));
+                        }
+                    }
                     results.add(population.get(j).getRoot().resolveCommand(values));
                 }
                 
