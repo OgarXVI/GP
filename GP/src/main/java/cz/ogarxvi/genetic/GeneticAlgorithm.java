@@ -4,6 +4,7 @@ import cz.ogarxvi.model.DataHandler;
 import cz.ogarxvi.model.Messenger;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,7 @@ public class GeneticAlgorithm {
     private DataHandler dataHandler;
     private Messenger messenger;
     private List<Chromosome> population;
-    private Editation editation = new Editation();
+    private Editation editation;
     private double probabilityOfCrossoverFunctionsInNodes;
     private double lastBestChromosomeInGenerationFitness;
     private int lastIteration;
@@ -22,6 +23,7 @@ public class GeneticAlgorithm {
     public GeneticAlgorithm(Messenger m, DataHandler dh) {
         messenger = m;
         dataHandler = dh;
+        editation = new Editation(dh);
     }
 
     public void runGP(int numberOfGenerations, int initSizeOfPopulation, int initTreeMaxDepth, int treeMaxDepthAfterOperation, double reproductionProbability, double crossoverProbability, double mutationProbability, double crossoverInFunctionNodes, boolean elitismus, boolean decimation, boolean editable, int numberOfSteps, int selectionMethod) {
@@ -91,24 +93,16 @@ public class GeneticAlgorithm {
                 if (editable) {
                     population.get(j).setRoot(editation.editRoot(population.get(j).getRoot()));
                 }
-
+                
                 List<BigDecimal> results = new ArrayList<>();
                 Map<String, BigDecimal> values = new HashMap<>();
                 for (int k = 0; k < dataHandler.getMathData().length; k++) {
                     for (int l = 0; l < dataHandler.getMathData()[k].length; l++) {
                         values.put(dataHandler.getParams()[l], dataHandler.getMathData()[k][l]);
                     }
-                }
-                for (int m = 0; m < dataHandler.getLoadedTerminals().size(); m++) {
-                    if (!Character.isLetter(dataHandler.getLoadedTerminals().get(m).command.charAt(0))) {
-                        values.put(dataHandler.getLoadedTerminals().get(m).command, BigDecimal.valueOf(Double.valueOf(dataHandler.getLoadedTerminals().get(m).command)));
-                    }
-                }
-
-                for (int k = 0; k < dataHandler.getMathData().length; k++) {
                     results.add(population.get(j).getRoot().resolveCommand(values));
                 }
-
+                
                 population.get(j).getFitness().calculate(results, dataHandler.getExpectedResults());
 
                 if (population.get(j).getFitness().getValue().abs().compareTo(bestChromosome.getFitness().getValue().abs()) < 0) {
@@ -264,7 +258,7 @@ public class GeneticAlgorithm {
                             indexs.add(i);
                         }
                     }
-                    if (indexs.size() != 0) {
+                    if (!indexs.isEmpty()) {
                         int i = indexs.get(getRandomNumber(indexs.size()));
                         SelectedGen vg = new SelectedGen();
                         vg.setGenAbove(gen);

@@ -83,7 +83,7 @@ public class FXMLController implements Initializable {
     @FXML
     private MenuItem RouleteMenuItem;
     @FXML
-    private ToggleButton ElitistToogleButton1;
+    private ToggleButton EditationButton;
     @FXML
     private Button ClearButton;
 
@@ -185,8 +185,8 @@ public class FXMLController implements Initializable {
                         ? MutationProbabilityTextField.getPromptText() : MutationProbabilityTextField.getText());
         double crossoverInFunctionNode = 0.0f;
         boolean elitism = ElitistToogleButton.isSelected();
-        boolean decimation = true;
-        boolean editation = true;
+        boolean decimation = false;
+        boolean editation = EditationButton.isSelected();
         int numberOfSteps = 1;
 
         GPController demo = new GPController(

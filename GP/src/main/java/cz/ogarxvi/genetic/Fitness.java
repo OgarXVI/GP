@@ -32,7 +32,6 @@ public class Fitness {
             val = val.add(calcResult.get(i).subtract(expectedResults[i]));
         }
         val = val.divide(BigDecimal.valueOf(calcResult.size()));
-
         value = val;
     }
 

@@ -6,10 +6,6 @@
 package cz.ogarxvi.model;
 
 import cz.ogarxvi.genetic.GeneticAlgorithm;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import javafx.scene.control.Button;
 
 /**
  *
@@ -60,7 +56,7 @@ public class GPController extends Thread {
         try {
             GeneticAlgorithm ga = new GeneticAlgorithm(m, dh);
             ga.runGP(numberOfGeneration, sizeOfInitPopulation, maximalniInicializacniHloubkaStromu, maximalniHloubkaStromuPoKrizeni, reprodukce, krizeni, mutace, krizeniVUzluFunkce, zachovavatNejzdatnejsihoJedince, decimace, editace, pocetKroku, selectionMethod);
-        } catch (Exception e) {
+        } catch (NullPointerException e) {
             e.printStackTrace();
         }
 
