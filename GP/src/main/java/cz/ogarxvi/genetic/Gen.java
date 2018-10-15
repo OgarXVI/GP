@@ -91,10 +91,8 @@ public class Gen {
         switch (command) {
             case "+":
                 return gens.get(0).resolveCommand(values).add(gens.get(1).resolveCommand(values));
-
             case "-":
                 return gens.get(0).resolveCommand(values).subtract(gens.get(1).resolveCommand(values));
-
             case "*":
                 return gens.get(0).resolveCommand(values).multiply(gens.get(1).resolveCommand(values));
 
@@ -103,29 +101,47 @@ public class Gen {
                 if (bg.compareTo(BigDecimal.ZERO) == 0) {
                     return BigDecimal.ZERO;
                 }
-
                 return gens.get(0).resolveCommand(values).divide(gens.get(1).resolveCommand(values), 6, RoundingMode.HALF_UP);
-
             case "sin":
-                
-                return BigDecimalMath.sin(gens.get(0).resolveCommand(values), new MathContext(6));
+                try{
+                    return BigDecimalMath.sin(gens.get(0).resolveCommand(values), new MathContext(6));
+                }catch(Exception e){
+                    return  BigDecimal.ZERO;
+                }
             case "cos":
+                try{
+                    return BigDecimalMath.cos(gens.get(0).resolveCommand(values), new MathContext(6));
+                }catch(Exception e){
+                    return  BigDecimal.ZERO;
+                }
                 
-                return BigDecimalMath.cos(gens.get(0).resolveCommand(values), new MathContext(6));
             case "tan":
-                return BigDecimalMath.tan(gens.get(0).resolveCommand(values), new MathContext(6));
+                try{
+                   return BigDecimalMath.tan(gens.get(0).resolveCommand(values), new MathContext(6));
+                }catch(Exception e){
+                    return  BigDecimal.ZERO;
+                }
+                
             case "sqrt":
-                return BigDecimalMath.sqrt(gens.get(0).resolveCommand(values), new MathContext(6));
+                BigDecimal bgSqrt = gens.get(0).resolveCommand(values);
+                if (bgSqrt.compareTo(BigDecimal.ZERO) <= 0) {
+                    return BigDecimal.ZERO;
+                }
+                return BigDecimalMath.sqrt(bgSqrt, new MathContext(6));
             case "abs":
                 return gens.get(0).resolveCommand(values).abs();
             case "exp":
-                return BigDecimalMath.exp(gens.get(0).resolveCommand(values), new MathContext(6));
+                try{
+                    return BigDecimalMath.exp(gens.get(0).resolveCommand(values), new MathContext(6));
+                }catch(java.lang.ArithmeticException e){
+                    return gens.get(0).resolveCommand(values);
+                }
             case "log":
                 BigDecimal bgLog = gens.get(0).resolveCommand(values);
-                if (bgLog.compareTo(BigDecimal.ZERO) <= 0) return BigDecimal.ZERO;
-                return BigDecimalMath.log(gens.get(0).resolveCommand(values), new MathContext(6));
-            case "log10":
-                return BigDecimalMath.log(gens.get(0).resolveCommand(values), new MathContext(6));
+                if (bgLog.compareTo(BigDecimal.ZERO) <= 0) {
+                    return BigDecimal.ZERO;
+                }
+                return BigDecimalMath.log(bgLog, new MathContext(6));
             case "!":
                 return gens.get(0).resolveCommand(values).negate();
             default:

@@ -179,7 +179,6 @@ public class DataHandler {
             ol.add(new DataHandler.BoxDataItem(Function.getSet("abs", 1), 1));
             ol.add(new DataHandler.BoxDataItem(Function.getSet("exp", 1), 1));
             ol.add(new DataHandler.BoxDataItem(Function.getSet("log", 1), 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("log10", 1), 1));
             ol.add(new DataHandler.BoxDataItem(Function.getSet("!", 1), 1));
 
             return FXCollections.observableArrayList(ol);

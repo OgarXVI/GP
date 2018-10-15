@@ -56,7 +56,7 @@
             <TextField fx:id="TreeMaxDepthAfterOperationTextField" layoutX="15.0" layoutY="270.0" promptText="8" />
             <TextField fx:id="TreeMaxInicializationDepthTextField" layoutX="15.0" layoutY="320.0" promptText="5" />
             <ToggleButton fx:id="ElitistToogleButton" layoutX="15.0" layoutY="365.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="63.0" text="Elitism" />
-            <ToggleButton fx:id="ElitistToogleButton1" layoutX="109.0" layoutY="365.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="92.0" text="Editation" />
+            <ToggleButton fx:id="EditationButton" layoutX="109.0" layoutY="365.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="92.0" text="Editation" />
             <MenuButton fx:id="SelectionMenu" contentDisplay="CENTER" layoutX="14.0" layoutY="408.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="186.0" text="Selection: Tournament">
               <items>
                 <MenuItem fx:id="tournamentMenuItem" mnemonicParsing="false" onAction="#TournamentSelected" text="Tournament" />
