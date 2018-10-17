@@ -2,7 +2,7 @@
 
 CZ:
 Verze 1.0:
-Program umožňuje načíst data ze souborů xlsx či cvs na základě zadaných parametrů uživatele nalézt odpovídající popisnou funkci v datech, tedy provede symbolickou regresi.
+Program umožňuje načíst data ze souborů xlsx či cvs a na základě zadaných parametrů uživatele nalézt odpovídající popisnou funkci v datech, tedy provede symbolickou regresi.
 
 Příklad vstupních dat:
 - X | Y | F
