@@ -15,9 +15,9 @@ Výsledkem programu je co nejpřesnější odpovídající funkce, která se rov
 
 
 Mezi podporované terminály patří:
-<-5, 5> + proměnné z dat
+ - <-5, 5> + proměnné z dat
 Mezi podporované funkce patří:
-+, -, *, /, sin(), cos(), tg(), abs(), sqrt(), log(), exp(), negation().
+- +, -, *, /, sin(), cos(), tg(), abs(), sqrt(), log(), exp(), negation().
 
 
 
