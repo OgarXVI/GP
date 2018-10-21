@@ -1,89 +1,127 @@
 package cz.ogarxvi.model;
 
-import cz.ogarxvi.model.DataHandler.BoxDataItem;
 import java.io.File;
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
-import javafx.stage.Stage;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import org.abego.treelayout.TreeLayout;
-import org.abego.treelayout.netbeans.demo.AbegoTreeLayoutForNetbeansDemo;
-import org.abego.treelayout.netbeans.demo.AbegoTreeLayoutForNetbeansDemo.TreeScene;
-import org.abego.treelayout.util.DefaultTreeForTreeLayout;
 import org.apache.commons.io.FilenameUtils;
 import org.controlsfx.control.CheckComboBox;
-import org.netbeans.api.visual.graph.GraphScene;
-import org.netbeans.api.visual.graph.layout.GraphLayout;
-import org.netbeans.api.visual.graph.layout.GraphLayoutFactory;
-import org.netbeans.api.visual.graph.layout.GraphLayoutSupport;
-import org.netbeans.api.visual.layout.LayoutFactory;
-import org.netbeans.api.visual.layout.SceneLayout;
-
+import org.controlsfx.control.ToggleSwitch;
+/**
+ * Ovladací třída pro GUI hlavního okna.
+ * Užívá knihovny třetí strany (ConstrolsFX) pro větší funkcionalitu GUI
+ * @author OgarXVI
+ */
 public class FXMLController implements Initializable {
-
+    /**
+     * Data pro GP
+     */
     private DataHandler dh;
+    /**
+     * Záznamník zpráv
+     */
     private Messenger m;
+    /**
+     * Vybraná selekční metoda
+     */
     private int selectionMethod = 0;
+    /**
+     * Tabulka pro ovládání a zobrazení
+     */
     @FXML
     private TableView<String[]> TableView;
+    /**
+     * Textové pole pro zadání velikosti populace
+     */
     @FXML
     private TextField PopulationSIzeTextField;
+    /**
+     * Textové pole pro zadání počtu generací
+     */
     @FXML
     private TextField NumberOfGenerationsTextField;
+    /**
+     * Textové pole pro zadání šance na reprodukci
+     */
     @FXML
     private TextField ReproductionProbabilityTextField;
+    /**
+     * Textové pole pro zadání šance na mutaci
+     */
     @FXML
     private TextField MutationProbabilityTextField;
+    /**
+     * Textové pole pro zadání šance na křížení
+     */
     @FXML
     private TextField CrossoverProbabilityTextField;
+    /**
+     * Textové pole pro zadání maximální hloubky stromu po operaci
+     */
     @FXML
     private TextField TreeMaxDepthAfterOperationTextField;
+    /**
+     * Textové pole pro zadání maximální hloubky stromu při inicializaci
+     */
     @FXML
     private TextField TreeMaxInicializationDepthTextField;
+    /**
+     * Toogle pro zapnutí/vypnutí elitismu
+     */
     @FXML
-    private ToggleButton ElitistToogleButton;
+    private ToggleSwitch ElitistToogleButton;
+    /**
+     * Selekční menu pro výběr selekční metody
+     */
     @FXML
     private MenuButton SelectionMenu;
+    /**
+     * CheckBomboBox s funkcemi
+     */
     @FXML
     private CheckComboBox<DataHandler.BoxDataItem> FunctionsComboBox;
+    /**
+     * CheckComboBox s terminály
+     */
     @FXML
     private CheckComboBox<DataHandler.BoxDataItem> TerminalsComboBox;
+    /**
+     * Tlačítko pro spuštění výpočtu GA
+     */
     @FXML
     private Button StartButton;
+    /**
+     * Tlačítko pro zastavení výpočtu GA
+     */
     @FXML
     private Button StopButton;
+    /**
+     * TextArea pro textový výstup
+     */
     @FXML
     private TextArea ConsoleOutput;
+    /**
+     * Toggle pro zapnutí/vypnutí decimace
+     */
     @FXML
-    private MenuItem tournamentMenuItem;
-    @FXML
-    private MenuItem RouleteMenuItem;
-    @FXML
-    private ToggleButton EditationButton;
+    private ToggleSwitch DecimationButton;
+    /**
+     * Tlačítko pro vyčištění textové oblasti
+     */
     @FXML
     private Button ClearButton;
 
@@ -93,12 +131,13 @@ public class FXMLController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        //Init
         m = new Messenger(ConsoleOutput);
         dh = new DataHandler();
-
+        //Vytvoření předmětů v CheckComboBoxexh
         FunctionsComboBox.getItems().addAll(DataHandler.BoxDataItem.generateFunctionBoxItems());
         TerminalsComboBox.getItems().addAll(DataHandler.BoxDataItem.generateTerminalsBoxItems());
-
+        //Inicializace posluchačů
         functionCheckComboBoxListener = new ListChangeListener<DataHandler.BoxDataItem>() {
             @Override
             public void onChanged(ListChangeListener.Change<? extends DataHandler.BoxDataItem> c) {
@@ -114,7 +153,7 @@ public class FXMLController implements Initializable {
                 updateOutput();
             }
         };
-
+        //Incializace posluchačů
         terminalCheckComboBoxListener = new ListChangeListener<DataHandler.BoxDataItem>() {
             @Override
             public void onChanged(ListChangeListener.Change<? extends DataHandler.BoxDataItem> c) {
@@ -130,65 +169,82 @@ public class FXMLController implements Initializable {
                 updateOutput();
             }
         };
-
+        
+        //přižazení posluchačů
         FunctionsComboBox.getCheckModel().getCheckedItems().addListener(functionCheckComboBoxListener);
         TerminalsComboBox.getCheckModel().getCheckedItems().addListener(terminalCheckComboBoxListener);
 
-        // updateOutput();
     }
 
+    /**
+     * Zavření aplikace
+     * @param event Událost, která vedla k ukončení
+     */
     @FXML
     private void CloseFromMenuItem(ActionEvent event) {
-        //CLOSE APPLICATION, BUT NOT LIKE THIS!! TODO:
         Platform.exit();
-
     }
-
+    /**
+     * Kliknutí START tlačítka
+     * @param event 
+     */
     @FXML
     private void StartCalculation(ActionEvent event) {
-
+        // ošetření nevyplněných parametrů
         if (!dh.isLoaded()) {
-            JOptionPane.showMessageDialog(null, "Load any data, please.");
+            JOptionPane.showMessageDialog(null, "Load data.");
             event.consume();
             return;
         }
         if (dh.getLoadedFunctions().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Select any function, please.");
+            JOptionPane.showMessageDialog(null, "Select function.");
             event.consume();
             return;
         }
 
         if (dh.getLoadedTerminals().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Running without any terminals.");
+            JOptionPane.showMessageDialog(null, "Running without terminals.");
         }
-
-        int numberOfGenerations
+        // založení bezpečných parametrů
+        int numberOfGenerations = Integer.valueOf(NumberOfGenerationsTextField.getPromptText());
+        int sizeOfInitPopulation = Integer.valueOf(PopulationSIzeTextField.getPromptText());
+        int treeMaxInitDepth = Integer.valueOf(TreeMaxInicializationDepthTextField.getPromptText());
+        int treeMaxDepthAfterOperation  = Integer.valueOf(TreeMaxDepthAfterOperationTextField.getPromptText());
+        double crossover = Double.valueOf(CrossoverProbabilityTextField.getPromptText());
+        double reproduction = Double.valueOf(ReproductionProbabilityTextField.getPromptText());
+        double mutation = Double.valueOf(MutationProbabilityTextField.getPromptText());
+        boolean elitism = ElitistToogleButton.isSelected();
+        boolean decimation = DecimationButton.isSelected();
+        boolean editation = false;
+        // zkontrolování uživatelských vstupů
+        try{
+        numberOfGenerations
                 = Integer.valueOf(NumberOfGenerationsTextField.getText().isEmpty()
                         ? NumberOfGenerationsTextField.getPromptText() : NumberOfGenerationsTextField.getText());
-        int sizeOfInitPopulation
+        sizeOfInitPopulation
                 = Integer.valueOf(PopulationSIzeTextField.getText().isEmpty()
                         ? PopulationSIzeTextField.getPromptText() : PopulationSIzeTextField.getText());
-        int treeMaxInitDepth
+        treeMaxInitDepth
                 = Integer.valueOf(TreeMaxInicializationDepthTextField.getText().isEmpty()
                         ? TreeMaxInicializationDepthTextField.getPromptText() : TreeMaxInicializationDepthTextField.getText());
-        int treeMaxDepthAfterOperation
+        treeMaxDepthAfterOperation
                 = Integer.valueOf(TreeMaxDepthAfterOperationTextField.getText().isEmpty()
                         ? TreeMaxDepthAfterOperationTextField.getPromptText() : TreeMaxDepthAfterOperationTextField.getText());
-        double crossover
+        crossover
                 = Double.valueOf(CrossoverProbabilityTextField.getText().isEmpty()
                         ? CrossoverProbabilityTextField.getPromptText() : CrossoverProbabilityTextField.getText());
-        double reproduction
+        reproduction
                 = Double.valueOf(ReproductionProbabilityTextField.getText().isEmpty()
                         ? ReproductionProbabilityTextField.getPromptText() : ReproductionProbabilityTextField.getText());
-        double mutation
+        mutation
                 = Double.valueOf(MutationProbabilityTextField.getText().isEmpty()
                         ? MutationProbabilityTextField.getPromptText() : MutationProbabilityTextField.getText());
-        double crossoverInFunctionNode = 0.0f;
-        boolean elitism = ElitistToogleButton.isSelected();
-        boolean decimation = true;
-        boolean editation = EditationButton.isSelected();
-        int numberOfSteps = 1;
-
+        elitism = ElitistToogleButton.isSelected();
+        decimation = DecimationButton.isSelected();
+        }catch(NumberFormatException nfe){
+            JOptionPane.showMessageDialog(null, "Wrong format, setting default values...");
+        }
+        //puštění GP výpočtu
         GPController demo = new GPController(
                 m,
                 dh,
@@ -199,101 +255,103 @@ public class FXMLController implements Initializable {
                 crossover,
                 reproduction,
                 mutation,
-                crossoverInFunctionNode,
                 elitism,
                 decimation,
                 editation,
-                numberOfSteps,
                 selectionMethod);
         demo.start();
 
     }
-
+    /**
+     * Ukončení výpočtu
+     * @param event 
+     */
     @FXML
     private void StopCalculation(ActionEvent event) {
         dh.setGpStop(true);
     }
-
+    /**
+     * Načtení souboru
+     * @param event
+     * @throws URISyntaxException 
+     */
     @FXML
     private void LoadFile(ActionEvent event) throws URISyntaxException {
+        //Výběr souboru
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI()));
         int returnValue = fileChooser.showOpenDialog(null);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
+            // užití knihovny třetí strany - pro zjištění typu souboru
             String extension = FilenameUtils.getExtension(selectedFile.getName());
             IReader ir;
             switch (extension) {
                 case "xlsx":
-                    ir = new XLSXReader(m, TableView);
+                    ir = new XLSXReader(TableView);
                     break;
                 case "csv":
-                    ir = new CSVReader(m, TableView);
+                    ir = new CSVReader(TableView);
                     break;
                 default:
                     return;
             }
+            //načtení a zpracování dat
             ir.ReadFile(selectedFile);
             dh.parseData(ir.GetData());
-
+            // vyčištění prostoru
             Clear(null);
         }
     }
-
+    /**
+     * Aktulizování textového výstupu
+     */
     private void updateOutput() {
         m.ClearMessenger();
         m.AddMesseage("Terminals: " + dh.getLoadedTerminals());
         m.AddMesseage("Functions: " + dh.getLoadedFunctions());
         m.GetAllMesseages();
     }
-
+    /**
+     * Zobrazení grafu nejlepšího jedince
+     * @param event 
+     */
     @FXML
     private void ShowGraph(ActionEvent event) {
-/*
+
         if (dh.getBestChromosome() == null) {
             JOptionPane.showMessageDialog(null, "Missing chromosome for rendering");
             return;
         }
-*/
+
         Parent root;
         try {
+            
+            /*
             root = FXMLLoader.load(getClass().getResource("/fxml/Graph.fxml"));
             Stage stage = new Stage();
             stage.setTitle("TreeGraph");
             Scene scene = new Scene(root, 450, 450);
-
-            TextInBox rootT = new TextInBox("root", 40, 20);
-            TextInBox n1 = new TextInBox("n1", 30, 20);
-            TextInBox n1_1 = new TextInBox("n1.1\n(first node)", 80, 36);
-            TextInBox n1_2 = new TextInBox("n1.2", 40, 20);
-            TextInBox n1_3 = new TextInBox("n1.3\n(last node)", 80, 36);
-            TextInBox n2 = new TextInBox("n2", 30, 20);
-            TextInBox n2_1 = new TextInBox("n2", 30, 20);
-            DefaultTreeForTreeLayout<TextInBox> tree = new DefaultTreeForTreeLayout<TextInBox>(rootT);
-            tree.addChild(rootT, n1);
-            tree.addChild(n1, n1_1);
-            tree.addChild(n1, n1_2);
-            tree.addChild(n1, n1_3);
-            tree.addChild(rootT, n2);
-            tree.addChild(n2, n2_1);
-            
             stage.setScene(scene);
-            // Init Graf
-            //Graph graph;
-            //graph.setChromosome(dh.getBestChromosome());
-            //graph.draw();
-
             stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
+            */
+            throw new UnsupportedOperationException();
+        } catch (UnsupportedOperationException e) {
+            JOptionPane.showMessageDialog(null, "Not implemented yet");
         }
     }
-
+    /**
+     * Zobraz o programu
+     * @param event 
+     */
     @FXML
     private void ShowAbout(ActionEvent event) {
         JOptionPane.showMessageDialog(null, "Autor: Jaroslav Dibitanzl ");
     }
-
+    /**
+     * Nastavení výběru turnajové selekce
+     * @param event 
+     */
     @FXML
     private void TournamentSelected(ActionEvent event) {
         m.AddMesseage("Tournament selection selected!");
@@ -301,7 +359,10 @@ public class FXMLController implements Initializable {
         selectionMethod = 0;
         m.GetMesseage();
     }
-
+    /**
+     * Nastavení výběru ruletové selekce
+     * @param event 
+     */
     @FXML
     private void RouleteSelected(ActionEvent event) {
         m.AddMesseage("Roulete selection selected!");
@@ -309,7 +370,10 @@ public class FXMLController implements Initializable {
         selectionMethod = 1;
         m.GetMesseage();
     }
-
+    /**
+     * Vyčistí záznamník, správně ošetří odstranění posluchačů, načtení dat a opětovné nastavení posluchačů
+     * @param event 
+     */
     @FXML
     private void Clear(ActionEvent event) {
         m.ClearMessenger();
@@ -328,19 +392,4 @@ public class FXMLController implements Initializable {
         TerminalsComboBox.getCheckModel().getCheckedItems().addListener(terminalCheckComboBoxListener);
     }
 
-    class TextInBox{
-        String text;
-        int width;
-        int height;
-
-        public TextInBox(String text, int width, int height) {
-            this.text = text;
-            this.width = width;
-            this.height = height;
-        }
-        
-        
-    }
-    
-    
 }

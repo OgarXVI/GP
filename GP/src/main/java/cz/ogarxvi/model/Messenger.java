@@ -6,33 +6,26 @@
 package cz.ogarxvi.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
 import javafx.scene.control.TextArea;
 
 /**
- * Class for saving reports and printing them.
- *
+ * Třída pro ukládání a posílání zpráv
  * @author OgarXVI
  */
 public class Messenger {
-    
-    
+    /**
+     * List zpráv
+     */
     private ArrayList<String> messages;
     /**
-     * *
-     *
+     * TextArea, kde se zprávy zobrazují
      */
     private TextArea textArea;
 
     
     /**
-     * *
-     *
-     * @param textArea
+     * Vytvoří instanci pro ukládání a vypisování zpráv
+     * @param textArea Vypisovací zóna
      */
     public Messenger(TextArea textArea) {
         this.messages = new ArrayList<>();
@@ -40,8 +33,7 @@ public class Messenger {
     }
 
     /**
-     * *
-     *
+     * Vyčistí list od všech zpráv v listu a smaže text vevypisované oblasti
      */
     public void ClearMessenger() {
         this.messages.clear();
@@ -49,10 +41,8 @@ public class Messenger {
     }
 
     /**
-     * *
-     * Return first messeage
-     *
-     * @return
+     * Vrátí posledně přidánou zprávu
+     * @return Vrátí posledně přidáný string
      */
     public String GetMesseage() {
         if (messages.isEmpty()) {
@@ -71,10 +61,8 @@ public class Messenger {
     }
 
     /**
-     * *
-     * Add messeage
-     *
-     * @param s
+     * Přidá do listu zprávu, pokud není NULL
+     * @param s NO-NULL string
      */
     public void AddMesseage(String s) {
         if (s == null) {
@@ -84,71 +72,21 @@ public class Messenger {
     }
 
     /**
-     * *
-     * Append text to Text Area
-     *
-     * @param s
+     * Přidá vybranou zprávu do textové oblasti
+     * @param s Vybraná zpráva
      */
-    public void AppendMesseage(String s) {
+    private void AppendMesseage(String s) {
         if (textArea != null) {
             javafx.application.Platform.runLater(() -> textArea.appendText(s));
         }
     }
-
+    /**
+     * Zavolá metodi "GetMesseage" na všechny zaznamenané zprávy.
+     */
     public void GetAllMesseages() {
         while (!messages.isEmpty()) {
             GetMesseage();
         }
     }
-
-// function to check if character is operator or not
-    public boolean isOperator(char x) {
-        switch (x) {
-            case '+':
-            case '-':
-            case '/':
-            case '*':
-                return true;
-        }
-        return false;
-    }
-
-// Convert prefix to Infix expression
-    public String preToInfix(String pre_exp) {
-        Stack<String> s = new Stack<>();
-
-// length of expression
-        int length = pre_exp.length();
-
-// reading from right to left
-        for (int i = length - 1; i >= 0; i--) {
-
-            // check if symbol is operator
-            if (isOperator(pre_exp.charAt(i))) {
-
-                // pop two operands from stack
-                String op1 = s.lastElement();
-                s.pop();
-                String op2 = s.lastElement();
-                s.pop();
-
-                // concat the operands and operator
-                String temp = "(" + op1 + pre_exp.charAt(i) + op2 + ")";
-
-                // Push string temp back to stack
-                s.push(temp);
-            } // if symbol is an operand
-            else {
-
-                // push the operand to the stack
-                s.push(String.valueOf(pre_exp.charAt(i)));
-            }
-        }
-
-// Stack now contains the Infix expression
-        return s.lastElement();
-    }
-
-    
 
 }

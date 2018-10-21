@@ -10,21 +10,34 @@ import java.math.BigInteger;
 import java.util.List;
 
 /**
- *
+ * Prezentuje hodnotu jedince
  * @author OgarXVI
  */
 public class Fitness {
-
+    /**
+     * Hodnota jedince
+     */
     private BigDecimal value;
-
+    /**
+     * Vytvoří Fitness, na začátku jí nastaví na velmi vysokou a necžádoucí 
+     * hodnotu, aby nemohlo dojít k ovlivnění výpočtu
+     */
     public Fitness() {
         this.value = new BigDecimal(Long.MAX_VALUE);
     }
-
+    /**
+     * Kopírovací konstruktor
+     * @param f Originální Fitness
+     */
     public Fitness(BigDecimal f) {
         this.value = f;
     }
-
+    /**
+     * Vypočítá průměrnou odchylku vypočtených výsledků od žádoucích výsledků.
+     * 
+     * @param calcResult List výsledků programu
+     * @param expectedResults Pole výsledků dat 
+     */
     public void calculate(List<BigDecimal> calcResult, BigDecimal[] expectedResults) {
         BigDecimal val = new BigDecimal(BigInteger.ZERO);        
         
@@ -34,12 +47,14 @@ public class Fitness {
         val = val.divide(BigDecimal.valueOf(calcResult.size()));
         value = val;
     }
-
+    /**
+     * Vrátí hodnotu fitness
+     * @return Hodnota Fitness
+     */
     public BigDecimal getValue() {
         return value;
     }
 
-   
     @Override
     public String toString() {
         return String.valueOf(this.value);

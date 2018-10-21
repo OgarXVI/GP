@@ -3,45 +3,72 @@ package cz.ogarxvi.genetic;
 import java.util.List;
 
 /**
- * Třída pro uchování jedince (programuú.
+ * Třída pro uchování jedince (programu).
  * Každý chromozon má vypočtenou vlastní zdatnost a obsahuje kořen stromu.
  */
 public class Chromosome {
-
+    /**
+     * Kořen jedince, gen na vrcholu stromu
+     */
     private Gen root;
+    /**
+     * Vypočtená fitness jedince, tedy hodnota programu
+     */
     private Fitness fitness;
-
-    public Chromosome(int maxDepth, List<Gen> setOfTerminals, List<Gen> setOfFunctions) {
-        int randomNumber = (int) (Math.random() * (setOfFunctions.size()));
-        root = new Function(setOfFunctions.get(randomNumber).getCommand(), setOfFunctions.get(randomNumber).getArita(), 0, maxDepth, setOfTerminals, setOfFunctions);
+    /**
+     * Vytvoří instanci Chromosomu
+     * @param maxDepth Maximální hloubka jedince
+     * @param listOfTerminals List možných terimnálů
+     * @param listOfFunctions List možných funkcí
+     */
+    public Chromosome(int maxDepth, List<Gen> listOfTerminals, List<Gen> listOfFunctions) {
+        //Nalezení možné funkce
+        int randomNumber = (int) (Math.random() * (listOfFunctions.size()));
+        // kořen nikdy nebude terminál, založení hlavy jedince
+        root = new Function(listOfFunctions.get(randomNumber).getCommand(), listOfFunctions.get(randomNumber).getArita(), 0, maxDepth, listOfTerminals, listOfFunctions);
+        // přiřazení fitness
         fitness = new Fitness();
     }
-
-    public Chromosome(Chromosome genotyp) {	
-        this.root = new Gen(genotyp.root);
-        this.fitness = new Fitness(genotyp.fitness.getValue());
+    /**
+     * Kopírovací konstruktor
+     * @param chromosome Chromosome na kopírování
+     */
+    public Chromosome(Chromosome chromosome) {	
+        this.root = new Gen(chromosome.root);
+        this.fitness = new Fitness(chromosome.fitness.getValue());
     }
-
+    /**
+     * Vrátí fitness
+     * @return Fitness
+     */
     public Fitness getFitness() {
         return fitness;
     }
-
+    /**
+     * Nastaví Fitness
+     * @param fitness Fitness
+     */
     public void setFitness(Fitness fitness) {
         this.fitness = fitness;
     }
-    /*
-    public int nahodneKladneCislo(int horniHranice) {		
-        return (int) (Math.random() * horniHranice);
-    }
-    */
+    /**
+     * Vrátí kořen chromosomu
+     * @return Kořen
+     */
     public Gen getRoot() {
         return root;
     }
-
+    /**
+     * Nastaví kořen 
+     * @param root Funkce 
+     */
     public void setRoot(Function root) {
         this.root = root;
     }
-
+    /**
+     * Nastaví kořen
+     * @param koren Gen
+     */
     public void setRoot(Gen koren) {
         this.root = koren;
     }
