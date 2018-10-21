@@ -7,16 +7,24 @@ import java.util.List;
  * Třída prezentující funkci, tedy gen s určitou aritou.
  */
 public class Function extends Gen {
+    /**
+     * Vytvoří funkci, aplikuje se v případech naprosto jisté funkce a známých listů terminálů a funkcí (tedy hlavně při založení)
+     * @param command Příkaz
+     * @param arita Arita
+     * @param depth Hloubka
+     * @param maxDepth Maximální hloubka
+     * @param listOfTerminals List terminálů
+     * @param listOfFunctions List Funkcí
+     */
+    public Function(String command, int arita, int depth, int maxDepth, List<Gen> listOfTerminals, List<Gen> listOfFunctions) {
 
-    public Function(String command, int arita, int depth, int maxDepth, List<Gen> setOfTerminals, List<Gen> setOfFunctions) {
-
-        this.gens = new ArrayList<Gen>();
+        this.gens = new ArrayList<>();
         this.command = command;
         this.arita = arita;
         this.depth = depth;
         this.isFunction = true;
 
-        grow(maxDepth, setOfTerminals, setOfFunctions);
+        grow(maxDepth, listOfTerminals, listOfFunctions);
 
     }
 
@@ -36,39 +44,45 @@ public class Function extends Gen {
         if (depth < maxDepth) {
             for (int i = 0; i < arita; i++) {
 
-                int nahodneCisloF = getRandomNumber(setOfFunctions.size());
-                int nahodneCisloT = getRandomNumber(setOfTerminals.size());
-                int druhGenu = getRandomNumber(2);
-                if (druhGenu == 0) {
-                    gens.add(new Function(setOfFunctions.get(nahodneCisloF).getCommand(), setOfFunctions.get(nahodneCisloF).getArita(), depth + 1, maxDepth, setOfTerminals, setOfFunctions));
+                int randomF = getRandomNumber(setOfFunctions.size());
+                int randomT = getRandomNumber(setOfTerminals.size());
+                int typeG = getRandomNumber(2);
+                if (typeG == 0) {
+                    gens.add(new Function(setOfFunctions.get(randomF).getCommand(), setOfFunctions.get(randomF).getArita(), depth + 1, maxDepth, setOfTerminals, setOfFunctions));
                 } else {
-                    gens.add(new Terminal(setOfTerminals.get(nahodneCisloT).getCommand(), depth + 1));
+                    gens.add(new Terminal(setOfTerminals.get(randomT).getCommand(), depth + 1));
                 }
             }
 
         } else {
             for (int i = 0; i < arita; i++) {
-
                 int nahodneCislo = getRandomNumber(setOfTerminals.size());
                 gens.add(new Terminal(setOfTerminals.get(nahodneCislo).getCommand(), depth + 1));
             }
 
         }
     }
-
+    /**
+     * Vrátí náhodné číslo v intervalu
+     * @param limit limita
+     * @return Náhodné číslo v intervalu
+     */
     private int getRandomNumber(int limit) {
         return (int) (Math.random() * limit);
     }
-
-    private double getRandomDouble(int limit) {
-        return Math.random() * limit;
-    }
-
+    /**
+     * Vytvoří list genů podle zadaných parametrů
+     * @param command String příkazů
+     * @param arita Arita genů
+     * @return List vytvořených genů
+     */
     public static List<Gen> getSet(String command, int arita) {
         List<Gen> pomListGens = new ArrayList<>();
         String[] functions = command.split(",");
         for (String f : functions) {
-            pomListGens.add(new Gen(f, arita));
+            Gen gF = new Gen(f, arita);
+            gF.setIsFunction(true);
+            pomListGens.add(gF);
         }
         return pomListGens;
 

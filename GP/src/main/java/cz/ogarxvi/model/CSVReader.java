@@ -17,41 +17,48 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
+import javax.swing.JOptionPane;
 
 /**
- *
+ * Třída pro načtení .CSV souboru a jeho zpracování do tabulky
+ * Implementuje IReader
  * @author OgarXVI
  */
 public class CSVReader implements IReader {
-
+    /**
+     * Tabulka dat
+     */
     private String[][] csvData;
-
-    private Messenger m;
+    /**
+     * Tabulka na zobrazení a ovládání
+     */
     private TableView<String[]> tv;
-
-    public CSVReader(Messenger m, TableView<String[]> tv) {
-        this.m = m;
+    /**
+     * Načítač souboru a jeho zpracování na tabulku
+     * @param tv Tabulka nazobrazení
+     */
+    public CSVReader(TableView<String[]> tv) {
         this.tv = tv;
         csvData = new String[3][3];
 
-        tv.getItems().clear();
-        tv.getSelectionModel().clearSelection();
     }
 
-    
+    @Override
     public void ReadFile(File file) {
         String line = null;
-
+        // Načítá počet řádků
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             int coll = ((line = br.readLine()) != null) ? line.split(",").length : 0;
             int row = 1;
             while ((line = br.readLine()) != null) {
                 row++;
             }
+            // založení prostoru pro data
             csvData = new String[row][coll];
         } catch (IOException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Cannot load file. Ex: " + e.getMessage());
         }
+        // vložení dat do připravené tabulky
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             int row = 0;
             while ((line = br.readLine()) != null) {
@@ -61,13 +68,13 @@ public class CSVReader implements IReader {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Cannot load file. Ex: " + e.getMessage());
         }
 
         tv.getColumns().clear();
         tv.getItems().clear();
         tv.getSelectionModel().clearSelection();
-
+        // načtení dat do tabulky pro zobrazení a ovládání
         ObservableList<String[]> data = FXCollections.observableArrayList();
         data.addAll(Arrays.asList(csvData));
         data.remove(0);

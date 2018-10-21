@@ -5,9 +5,9 @@
  */
 package cz.ogarxvi.model;
 
-import cz.ogarxvi.model.Messenger;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
@@ -17,23 +17,31 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
+import javax.swing.JOptionPane;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
- *
+ * Třída implemetující IReader, umožňuje načítat soubory typu .XLSX
+ * Načte tabulku dat a nastaví potřebné hlavičky
  * @author OgarXVI
  */
 public class XLSXReader implements IReader {
-
+    /**
+     * Tabulka dat
+     */
     private String[][] xlsxData;
-    private Messenger m;
+    /**
+     * Tabulka na zobrazení a ovládání
+     */
     private TableView<String[]> tv;
-
-    public XLSXReader(Messenger m, TableView<String[]> tv) {
-        this.m = m;
+    /**
+     * Načítač souboru a jeho zpracování na tabulku
+     * @param tv 
+     */
+    public XLSXReader(TableView<String[]> tv) {
         this.tv = tv;
         this.xlsxData = new String[3][3];
     }
@@ -41,10 +49,9 @@ public class XLSXReader implements IReader {
     @Override
     public void ReadFile(File file) {
         try {
+            //Připravení potřebných proměnných pro zpracování souboru
             FileInputStream fis = new FileInputStream(file);
-            // Finds the workbook instance for XLSX file
             XSSFWorkbook myWorkBook = new XSSFWorkbook(fis);
-            // Return first sheet from the XLSX workbook
             XSSFSheet sheet = myWorkBook.getSheetAt(0);
             XSSFRow row;
             XSSFCell cell;
@@ -54,7 +61,7 @@ public class XLSXReader implements IReader {
 
             int cols = 0;
             int tmp = 0;
-
+            // Zjištění počtu sloupců
             for (int i = 0; i < 10 || i < rows; i++) {
                 row = sheet.getRow(i);
                 if (row != null) {
@@ -64,8 +71,9 @@ public class XLSXReader implements IReader {
                     }
                 }
             }
+            // vytvoření prostoru pro data
             xlsxData = new String[rows][cols];
-
+            // naplnění tabulky datys
             for (int r = 0; r < rows; r++) {
                 row = sheet.getRow(r);
                 if (row != null) {
@@ -77,11 +85,11 @@ public class XLSXReader implements IReader {
                     }
                 }
             }
-
+            // vyčištění tabulky pro případ předchozího naplnění
             tv.getColumns().clear();
             tv.getItems().clear();
             tv.getSelectionModel().clearSelection();
-
+            // Naplnění tabulky
             ObservableList<String[]> data = FXCollections.observableArrayList();
             data.addAll(Arrays.asList(xlsxData));
             data.remove(0);
@@ -98,9 +106,8 @@ public class XLSXReader implements IReader {
                 tv.getColumns().add(tc);
             }
             tv.setItems(data);
-        } catch (Exception ioe) {
-            ioe.printStackTrace();
-
+        } catch (IOException ioe) {
+            JOptionPane.showMessageDialog(null, "Cannot load file");
         }
     }
 
