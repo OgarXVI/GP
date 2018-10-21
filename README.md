@@ -26,5 +26,4 @@ Mezi podporované funkce patří:
 Nedostatky:
  - Chybí zobrazení stromového grafu výsledného programu
  - GUI - pravý sloupec s parametry se nesprávně škáluje vůči různým rozlišením
- - Chybí javadoc
 
