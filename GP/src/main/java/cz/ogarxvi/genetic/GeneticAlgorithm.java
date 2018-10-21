@@ -435,9 +435,9 @@ public class GeneticAlgorithm {
     }
     /**
      * Úprava quicksortu na vlastní porovnání 
-     * @param population
-     * @param left 
-     * @param right 
+     * @param population Populace
+     * @param left Pohyb vlevo
+     * @param right Pohyb vpravo
      */
     public static void quicksort(List<Chromosome> population, int left, int right) {
         if (left < right) {
