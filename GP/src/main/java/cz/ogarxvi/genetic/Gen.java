@@ -56,7 +56,7 @@ public class Gen {
     }
     /**
      * Kopírovací konstruktor
-     * @param gen 
+     * @param gen Originální gen
      */
     public Gen(Gen gen) {
         this.command = gen.command;
@@ -75,7 +75,7 @@ public class Gen {
     }
     /**
      * Rekurzivní výpis genu
-     * @return 
+     * @return Dlouhý string popisující tento gen
      */
     public String print() {
         switch (arita) {
@@ -114,7 +114,7 @@ public class Gen {
     }
     /**
      * Rekurzivní výpočet hodnoty genu
-     * @param values mapa klíče a hodnoty, například <X -> 4>
+     * @param values mapa klíče a hodnoty, například "X - 4"
      * Obsahuje užití knihovny třetí strany (BigDecimalMath) na práci s BigDecimal
      * @return Vrátí vypočtený kus pro další vyhodnocení
      */
@@ -207,7 +207,7 @@ public class Gen {
     }
     /**
      * Nastaví maximální hloubku genů
-     * @param gen 
+     * @param gen Gen, kterému je nastavena maximální hloubka
      */
     public void setMaxDepth(Gen gen) {
         Gen.maxDepth = 0;

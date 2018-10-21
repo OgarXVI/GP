@@ -39,7 +39,7 @@ public class XLSXReader implements IReader {
     private TableView<String[]> tv;
     /**
      * Načítač souboru a jeho zpracování na tabulku
-     * @param tv 
+     * @param tv Tabulka pro ovládání a zobrazení
      */
     public XLSXReader(TableView<String[]> tv) {
         this.tv = tv;

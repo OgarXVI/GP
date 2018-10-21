@@ -87,9 +87,9 @@ public class Editation {
 
     }
     /**
-     * 
-     * @param g
-     * @return 
+     * Upraví kořen genu
+     * @param g Kořen
+     * @return Vrátí upravený kořen
      */
     public Gen editRoot(Gen g) {
         this.gen = g;
@@ -97,11 +97,16 @@ public class Editation {
         this.gen.fixDepth();
         return this.gen;
     }
-
+    /**
+     * Upraví znova opakovatelný kořen
+     */
     private void editReapeable() {
         editGen(this.gen);
     }
-
+    /**
+     * Zjistí, zda je gen editovatelný a ano, jestli opakovatelně
+     * @param g Gen na editaci
+     */
     private void editGen(Gen g) {
 
         repeat = false;
@@ -119,7 +124,11 @@ public class Editation {
             editGen(g.gens.get(i));
         }
     }
-
+    /**
+     * Edituje gen
+     * @param gen Gen na editaci
+     * @return Vrátí editovaný gen
+     */
     public Gen edit(Gen gen) {
 
         for (int d = 0; d < gen.arita; d++) {
