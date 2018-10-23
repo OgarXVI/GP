@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 /**
  * Třída pro výpočet GA
  * @author OgarXVI
@@ -112,6 +111,7 @@ public class GeneticAlgorithm {
         // Iterace přes generace
         for (int i = 0; i < numberOfGenerations; i++) {
             if (dataHandler.isGpStop()) {
+                messenger.AddMesseage("The last best: "  + bestChromosome.getRoot().print());
                 break;
             }
             // Nejlepší jedinec je vždy první v generaci
@@ -127,7 +127,7 @@ public class GeneticAlgorithm {
                     population.get(j).setRoot(g);
                 }
                 */
-                //Namapování hodnot na klíče (X->4, 2->2...)
+                //Namapování hodnot na klíče (X->4...)
                 List<BigDecimal> results = new ArrayList<>();
                 Map<String, BigDecimal> values = new HashMap<>();
                 for (int k = 0; k < dataHandler.getMathData().length; k++) {
@@ -362,8 +362,8 @@ public class GeneticAlgorithm {
         for (int i = 0; i < population.size(); i++) {
             sumFitness = population.get(i).getFitness().getValue();
         }
-        Random r = new Random();
-        BigDecimal randomNumber = sumFitness.multiply(BigDecimal.valueOf((r.nextDouble() % 1000 / 9999.0f)));
+        int random = getRandomNumber(sumFitness.intValue());
+        BigDecimal randomNumber = sumFitness.multiply(BigDecimal.valueOf(random % 1000 / 9999.0f));
 
         int memberIndex = 0;
         BigDecimal partialSum = BigDecimal.ZERO;

@@ -1,5 +1,8 @@
 package cz.ogarxvi.model;
 
+import com.graphbuilder.math.func.RandFunction;
+import cz.ogarxvi.model.Graph.Layout;
+import cz.ogarxvi.model.Graph.RandomLayout;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -11,22 +14,31 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Cell;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import org.apache.commons.io.FilenameUtils;
 import org.controlsfx.control.CheckComboBox;
 import org.controlsfx.control.ToggleSwitch;
+
 /**
- * Ovladací třída pro GUI hlavního okna.
- * Užívá knihovny třetí strany (ConstrolsFX) pro větší funkcionalitu GUI
+ * Ovladací třída pro GUI hlavního okna. Užívá knihovny třetí strany
+ * (ConstrolsFX) pro větší funkcionalitu GUI
+ *
  * @author OgarXVI
  */
 public class FXMLController implements Initializable {
+
     /**
      * Data pro GP
      */
@@ -124,10 +136,12 @@ public class FXMLController implements Initializable {
      */
     @FXML
     private Button ClearButton;
-
     //Listeners
     private ListChangeListener<DataHandler.BoxDataItem> functionCheckComboBoxListener;
     private ListChangeListener<DataHandler.BoxDataItem> terminalCheckComboBoxListener;
+
+    //
+    Graph graph;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -169,7 +183,7 @@ public class FXMLController implements Initializable {
                 updateOutput();
             }
         };
-        
+
         //přižazení posluchačů
         FunctionsComboBox.getCheckModel().getCheckedItems().addListener(functionCheckComboBoxListener);
         TerminalsComboBox.getCheckModel().getCheckedItems().addListener(terminalCheckComboBoxListener);
@@ -178,15 +192,18 @@ public class FXMLController implements Initializable {
 
     /**
      * Zavření aplikace
+     *
      * @param event Událost, která vedla k ukončení
      */
     @FXML
     private void CloseFromMenuItem(ActionEvent event) {
         Platform.exit();
     }
+
     /**
      * Kliknutí START tlačítka
-     * @param event 
+     *
+     * @param event
      */
     @FXML
     private void StartCalculation(ActionEvent event) {
@@ -209,7 +226,7 @@ public class FXMLController implements Initializable {
         int numberOfGenerations = Integer.valueOf(NumberOfGenerationsTextField.getPromptText());
         int sizeOfInitPopulation = Integer.valueOf(PopulationSIzeTextField.getPromptText());
         int treeMaxInitDepth = Integer.valueOf(TreeMaxInicializationDepthTextField.getPromptText());
-        int treeMaxDepthAfterOperation  = Integer.valueOf(TreeMaxDepthAfterOperationTextField.getPromptText());
+        int treeMaxDepthAfterOperation = Integer.valueOf(TreeMaxDepthAfterOperationTextField.getPromptText());
         double crossover = Double.valueOf(CrossoverProbabilityTextField.getPromptText());
         double reproduction = Double.valueOf(ReproductionProbabilityTextField.getPromptText());
         double mutation = Double.valueOf(MutationProbabilityTextField.getPromptText());
@@ -217,31 +234,31 @@ public class FXMLController implements Initializable {
         boolean decimation = DecimationButton.isSelected();
         boolean editation = false;
         // zkontrolování uživatelských vstupů
-        try{
-        numberOfGenerations
-                = Integer.valueOf(NumberOfGenerationsTextField.getText().isEmpty()
-                        ? NumberOfGenerationsTextField.getPromptText() : NumberOfGenerationsTextField.getText());
-        sizeOfInitPopulation
-                = Integer.valueOf(PopulationSIzeTextField.getText().isEmpty()
-                        ? PopulationSIzeTextField.getPromptText() : PopulationSIzeTextField.getText());
-        treeMaxInitDepth
-                = Integer.valueOf(TreeMaxInicializationDepthTextField.getText().isEmpty()
-                        ? TreeMaxInicializationDepthTextField.getPromptText() : TreeMaxInicializationDepthTextField.getText());
-        treeMaxDepthAfterOperation
-                = Integer.valueOf(TreeMaxDepthAfterOperationTextField.getText().isEmpty()
-                        ? TreeMaxDepthAfterOperationTextField.getPromptText() : TreeMaxDepthAfterOperationTextField.getText());
-        crossover
-                = Double.valueOf(CrossoverProbabilityTextField.getText().isEmpty()
-                        ? CrossoverProbabilityTextField.getPromptText() : CrossoverProbabilityTextField.getText());
-        reproduction
-                = Double.valueOf(ReproductionProbabilityTextField.getText().isEmpty()
-                        ? ReproductionProbabilityTextField.getPromptText() : ReproductionProbabilityTextField.getText());
-        mutation
-                = Double.valueOf(MutationProbabilityTextField.getText().isEmpty()
-                        ? MutationProbabilityTextField.getPromptText() : MutationProbabilityTextField.getText());
-        elitism = ElitistToogleButton.isSelected();
-        decimation = DecimationButton.isSelected();
-        }catch(NumberFormatException nfe){
+        try {
+            numberOfGenerations
+                    = Integer.valueOf(NumberOfGenerationsTextField.getText().isEmpty()
+                            ? NumberOfGenerationsTextField.getPromptText() : NumberOfGenerationsTextField.getText());
+            sizeOfInitPopulation
+                    = Integer.valueOf(PopulationSIzeTextField.getText().isEmpty()
+                            ? PopulationSIzeTextField.getPromptText() : PopulationSIzeTextField.getText());
+            treeMaxInitDepth
+                    = Integer.valueOf(TreeMaxInicializationDepthTextField.getText().isEmpty()
+                            ? TreeMaxInicializationDepthTextField.getPromptText() : TreeMaxInicializationDepthTextField.getText());
+            treeMaxDepthAfterOperation
+                    = Integer.valueOf(TreeMaxDepthAfterOperationTextField.getText().isEmpty()
+                            ? TreeMaxDepthAfterOperationTextField.getPromptText() : TreeMaxDepthAfterOperationTextField.getText());
+            crossover
+                    = Double.valueOf(CrossoverProbabilityTextField.getText().isEmpty()
+                            ? CrossoverProbabilityTextField.getPromptText() : CrossoverProbabilityTextField.getText());
+            reproduction
+                    = Double.valueOf(ReproductionProbabilityTextField.getText().isEmpty()
+                            ? ReproductionProbabilityTextField.getPromptText() : ReproductionProbabilityTextField.getText());
+            mutation
+                    = Double.valueOf(MutationProbabilityTextField.getText().isEmpty()
+                            ? MutationProbabilityTextField.getPromptText() : MutationProbabilityTextField.getText());
+            elitism = ElitistToogleButton.isSelected();
+            decimation = DecimationButton.isSelected();
+        } catch (NumberFormatException nfe) {
             JOptionPane.showMessageDialog(null, "Wrong format, setting default values...");
         }
         //puštění GP výpočtu
@@ -262,18 +279,22 @@ public class FXMLController implements Initializable {
         demo.start();
 
     }
+
     /**
      * Ukončení výpočtu
-     * @param event 
+     *
+     * @param event
      */
     @FXML
     private void StopCalculation(ActionEvent event) {
         dh.setGpStop(true);
     }
+
     /**
      * Načtení souboru
+     *
      * @param event
-     * @throws URISyntaxException 
+     * @throws URISyntaxException
      */
     @FXML
     private void LoadFile(ActionEvent event) throws URISyntaxException {
@@ -303,6 +324,7 @@ public class FXMLController implements Initializable {
             Clear(null);
         }
     }
+
     /**
      * Aktulizování textového výstupu
      */
@@ -312,45 +334,58 @@ public class FXMLController implements Initializable {
         m.AddMesseage("Functions: " + dh.getLoadedFunctions());
         m.GetAllMesseages();
     }
+
     /**
      * Zobrazení grafu nejlepšího jedince
-     * @param event 
+     *
+     * @param event
      */
     @FXML
     private void ShowGraph(ActionEvent event) {
-
+        
         if (dh.getBestChromosome() == null) {
             JOptionPane.showMessageDialog(null, "Missing chromosome for rendering");
             return;
         }
 
-        Parent root;
+        BorderPane root;
         try {
-            
-            /*
-            root = FXMLLoader.load(getClass().getResource("/fxml/Graph.fxml"));
-            Stage stage = new Stage();
-            stage.setTitle("TreeGraph");
-            Scene scene = new Scene(root, 450, 450);
-            stage.setScene(scene);
-            stage.show();
-            */
-            throw new UnsupportedOperationException();
+            root = new BorderPane();
+
+            graph = new Graph();
+
+            root.setCenter(graph.getScrollPane());
+
+            Scene scene = new Scene(root, 800, 800);
+            Stage primaryStage = new Stage();
+            primaryStage.setScene(scene);
+            primaryStage.show();
+
+            graph.addGraphComponents();
+
+            RandomLayout rL = graph.new RandomLayout(graph);
+            Layout layout = rL;
+            layout.execute();
+            //throw new UnsupportedOperationException();
         } catch (UnsupportedOperationException e) {
             JOptionPane.showMessageDialog(null, "Not implemented yet");
         }
     }
+
     /**
      * Zobraz o programu
-     * @param event 
+     *
+     * @param event
      */
     @FXML
     private void ShowAbout(ActionEvent event) {
-        JOptionPane.showMessageDialog(null, "Autor: Jaroslav Dibitanzl ");
+        JOptionPane.showMessageDialog(null, "Autor: Jaroslav Dibitanzl \nVersion: 0.9");
     }
+
     /**
      * Nastavení výběru turnajové selekce
-     * @param event 
+     *
+     * @param event
      */
     @FXML
     private void TournamentSelected(ActionEvent event) {
@@ -359,9 +394,11 @@ public class FXMLController implements Initializable {
         selectionMethod = 0;
         m.GetMesseage();
     }
+
     /**
      * Nastavení výběru ruletové selekce
-     * @param event 
+     *
+     * @param event
      */
     @FXML
     private void RouleteSelected(ActionEvent event) {
@@ -370,9 +407,12 @@ public class FXMLController implements Initializable {
         selectionMethod = 1;
         m.GetMesseage();
     }
+
     /**
-     * Vyčistí záznamník, správně ošetří odstranění posluchačů, načtení dat a opětovné nastavení posluchačů
-     * @param event 
+     * Vyčistí záznamník, správně ošetří odstranění posluchačů, načtení dat a
+     * opětovné nastavení posluchačů
+     *
+     * @param event
      */
     @FXML
     private void Clear(ActionEvent event) {
