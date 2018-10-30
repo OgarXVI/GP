@@ -87,21 +87,17 @@ public class GeneticAlgorithm {
         //Reset STOP 
         dataHandler.setGpStop(false);
 
-        List<Gen> setOfTerminals = null;
-        List<Gen> setOfFunctions = null;
+        List<Gen> setOfTerminals = new ArrayList<>();
+        List<Gen> setOfFunctions = new ArrayList<>();
 
-        if (listOfFunctions == null) {
-            setOfFunctions = new ArrayList<>();
-
-        } else {
+        if (listOfFunctions != null) {
             setOfFunctions = listOfFunctions;
-        }
-        if (listOfTerminals == null) {
-            listOfTerminals = new ArrayList<>();
-
-        } else {
+        } 
+        if (listOfTerminals != null) {
             setOfTerminals = listOfTerminals;
-        }
+
+        } 
+        
         if (dataHandler != null) {
             if (dataHandler.getLoadedTerminals() != null) //TERMINALS
             {

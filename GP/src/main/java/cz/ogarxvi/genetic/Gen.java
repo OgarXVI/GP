@@ -166,9 +166,9 @@ public class Gen {
                 if (bgSqrt.compareTo(BigDecimal.ZERO) <= 0) {
                     return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity
                 }
-                try{
+                try {
                     return BigDecimalMath.sqrt(bgSqrt, new MathContext(6));
-                }catch(ArithmeticException e){
+                } catch (ArithmeticException e) {
                     return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity
                 }
             case "abs":
@@ -187,6 +187,10 @@ public class Gen {
                 return BigDecimalMath.log(bgLog, new MathContext(6));
             case "!":
                 return gens.get(0).resolveCommand(values).negate();
+            case "max":
+                return gens.get(0).resolveCommand(values).max(gens.get(1).resolveCommand(values));
+            case "min":
+                return gens.get(0).resolveCommand(values).min(gens.get(1).resolveCommand(values));
             default:
                 return values.get(command);
         }
@@ -203,13 +207,14 @@ public class Gen {
             list.add(this);
         }
         if (this.gens != null) {
-                if (this.gens.get(0) != null) {
-                    list.addAll(gens.get(0).getAll());
-                }
-                if (gens.size()>1)
+            if (this.gens.get(0) != null) {
+                list.addAll(gens.get(0).getAll());
+            }
+            if (gens.size() > 1) {
                 if (this.gens.get(1) != null) {
                     list.addAll(gens.get(1).getAll());
                 }
+            }
         }
 
         return list;

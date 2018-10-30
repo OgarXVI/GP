@@ -8,45 +8,40 @@ package cz.ogarxvi.model;
 import cz.ogarxvi.genetic.Chromosome;
 import cz.ogarxvi.genetic.Gen;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import javafx.event.EventHandler;
-import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Polygon;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
 import javafx.scene.transform.Scale;
-import javax.swing.JButton;
 
 public class Graph {
-
-    private Model model;
-
-    private Group canvas;
-
-    private ZoomableScrollPane scrollPane;
-
     /**
-     * the pane wrapper is necessary or else the scrollpane would always align
-     * the top-most and left-most child to the top and left eg when you drag the
-     * top child down, the entire scrollpane would move down
+     * Model pro držení všech buněk a linek
+     */
+    private Model model;
+    /**
+     * Vykreslovací prostor
+     */
+    private Group canvas;
+    /**
+     * Zoomable prostor 
+     */
+    private ZoomableScrollPane scrollPane;
+    /**
+     * Layer buňky
      */
     CellLayer cellLayer;
-
+    /**
+     * Vytvoří Graf
+     */
     public Graph() {
 
         this.model = new Model();
@@ -62,53 +57,59 @@ public class Graph {
         scrollPane.setFitToHeight(true);
 
     }
-
+    /**
+     * Vrátí ScrollPane
+     * @return ScrollPane
+     */
     public ScrollPane getScrollPane() {
         return this.scrollPane;
     }
-
+    /**
+     * Vrátí CellLayer
+     * @return CellLayer
+     */
     public Pane getCellLayer() {
         return this.cellLayer;
     }
-
+    /**
+     * Vrátí Model  
+     * @return Model
+     */
     public Model getModel() {
         return model;
     }
-
-    public void beginUpdate() {
-    }
-
+    /**
+     * Ukončí nahrávání kompoment a uloží je do modelu do prostoru
+     */
     public void endUpdate() {
 
-        // add components to graph pane
+        // Přidat kompomenty
         getCellLayer().getChildren().addAll(model.getAddedEdges());
         getCellLayer().getChildren().addAll(model.getAddedCells());
 
-        // remove components from graph pane
+        // Odstranit kompomenty 
         getCellLayer().getChildren().removeAll(model.getRemovedCells());
         getCellLayer().getChildren().removeAll(model.getRemovedEdges());
 
-        // every cell must have a parent, if it doesn't, then the graphParent is
-        // the parent
-        getModel().attachOrphansToGraphParent(model.getAddedCells());
-
-        // remove reference to graphParent
-        getModel().disconnectFromGraphParent(model.getRemovedCells());
-
-        // merge added & removed cells with all cells
+        // Sloučit model
         getModel().merge();
 
     }
-
+    /**
+     * Vrátit Scale Value
+     * @return Scale
+     */
     public double getScale() {
         return this.scrollPane.getScaleValue();
     }
-
+    /**
+     * Přidá chromosome do modelu
+     * @param chromosome 
+     */
     public void addGraphComponents(Chromosome chromosome) {
-
+        //Získá model
         Model model = this.getModel();
 
-        this.beginUpdate();
         //Získej celý strom jako jeden list genů
         Gen root = chromosome.getRoot();
         List<Gen> tree = root.getAll();
@@ -127,7 +128,7 @@ public class Graph {
         //dle hloubky je zařad do buněk
         arraysByDepth.forEach((list) -> {
             list.forEach((gen) -> {
-                model.addCell(gen, gen.getCommand(), CellType.GEN, arraysByDepth.indexOf(list));
+                model.addCell(gen, gen.getCommand(), arraysByDepth.indexOf(list), 20);
             });
         });
 
@@ -149,85 +150,121 @@ public class Graph {
         this.endUpdate();
 
     }
-
+    /**
+     * Model obalující buňky a linky
+     */
     public class Model {
-
+        /**
+         * Rodič všech buněk, který němají rodiče
+         */
         Cell graphParent;
-
+        /**
+         * Všechny buňky
+         */
         List<Cell> allCells;
+        /**
+         * Přidané buňky
+         */
         List<Cell> addedCells;
+        /**
+         * Odstraněné buňky
+         */
         List<Cell> removedCells;
-
+        /**
+         * Všechny linky
+         */
         List<Edge> allEdges;
+        /**
+         *  Přidané linky
+         */
         List<Edge> addedEdges;
+        /**
+         *  Odstraněné linky
+         */
         List<Edge> removedEdges;
-
-        Map<Object, Cell> cellMap; // <id,cell>
-
+        /**
+         * Mapa návazností buňěk
+         */
+        Map<Object, Cell> cellMap; 
+        /**
+         * Vytvoří model
+         */
         public Model() {
-
             graphParent = new Cell("_ROOT_");
-
-            // clear model, create lists
             clear();
         }
-
+        /**
+         * Vyčistí kolekce
+         */
         public void clear() {
-
             allCells = new ArrayList<>();
             addedCells = new ArrayList<>();
             removedCells = new ArrayList<>();
-
             allEdges = new ArrayList<>();
             addedEdges = new ArrayList<>();
             removedEdges = new ArrayList<>();
-
-            cellMap = new HashMap<>(); // <id,cell>
-
+            cellMap = new HashMap<>();
         }
-
-        public void clearAddedLists() {
-            addedCells.clear();
-            addedEdges.clear();
-        }
-
+        /**
+         * Vrátí přidané buňky
+         * @return AddedCells
+         */
         public List<Cell> getAddedCells() {
             return addedCells;
         }
-
+        /**
+         * Vrátí odstraněné buňky
+         * @return RemovedCells
+         */
         public List<Cell> getRemovedCells() {
             return removedCells;
         }
-
+        /**
+         * Vrátí všechny buňky
+         * @return AllCells
+         */
         public List<Cell> getAllCells() {
             return allCells;
         }
-
+        /**
+         * Vrátí přidané linky
+         * @return AddedEdges
+         */
         public List<Edge> getAddedEdges() {
             return addedEdges;
         }
-
+        /**
+         * Vrátí odstraněné linky
+         * @return RemovedEdges
+         */
         public List<Edge> getRemovedEdges() {
             return removedEdges;
         }
-
+        /**
+         * Vrátí všechny linky
+         * @return AllEdges
+         */
         public List<Edge> getAllEdges() {
             return allEdges;
         }
-
-        public Cell addCell(Object id, String command, CellType type, int depth) {
-
-            switch (type) {
-
-                case GEN:
-                    GenCell circleCell = new GenCell(id, command, depth);
+        /**
+         * Přidá buňku dle typu
+         * @param id Reference objektu
+         * @param command Příkaz objektu
+         * @param type typ objektu
+         * @param depth hloubka objektu
+         * @param width šířka písma objektu
+         * @return Buňka
+         */
+        public Cell addCell(Object id, String command, int depth, int width) {
+                    GenCell circleCell = new GenCell(id, command, depth, width);
                     addCell(circleCell);
                     return circleCell;
-                default:
-                    throw new UnsupportedOperationException("Unsupported type: " + type);
-            }
         }
-
+        /**
+         * Přidá buňku do modelu a přidá vztah
+         * @param cell Buňka na přidání
+         */
         private void addCell(Cell cell) {
 
             addedCells.add(cell);
@@ -235,7 +272,11 @@ public class Graph {
             cellMap.put(cell.getCellId(), cell);
 
         }
-
+        /**
+         * Přidá link mezi buňky
+         * @param sourceId Start
+         * @param targetId Cíl
+         */
         public void addEdge(Object sourceId, Object targetId) {
 
             Cell sourceCell = cellMap.get(sourceId);
@@ -246,69 +287,44 @@ public class Graph {
             addedEdges.add(edge);
 
         }
-
         /**
-         * Attach all cells which don't have a parent to graphParent
-         *
-         * @param cellList
+         * Sloucí prvky
          */
-        public void attachOrphansToGraphParent(List<Cell> cellList) {
-
-            for (Cell cell : cellList) {
-                if (cell.getCellParents().size() == 0) {
-                    graphParent.addCellChild(cell);
-                }
-            }
-
-        }
-
-        /**
-         * Remove the graphParent reference if it is set
-         *
-         * @param cellList
-         */
-        public void disconnectFromGraphParent(List<Cell> cellList) {
-
-            for (Cell cell : cellList) {
-                graphParent.removeCellChild(cell);
-            }
-        }
-
         public void merge() {
-
-            // cells
             allCells.addAll(addedCells);
             allCells.removeAll(removedCells);
-
             addedCells.clear();
             removedCells.clear();
-
-            // edges
             allEdges.addAll(addedEdges);
             allEdges.removeAll(removedEdges);
-
             addedEdges.clear();
             removedEdges.clear();
 
         }
     }
-
+    /**
+     * ABstrakce Layoutu pro pozicování buněk
+     */
     public abstract class Layout {
-
+        /**
+         * Vykoná rozmístění buněk
+         */
         public abstract void execute();
-
     }
-
-    public class RandomLayout extends Layout {
-
+    /**
+     * Stromový Layout
+     */
+    public class TreeLayout extends Layout {
+        /**
+         * Odkaz na Graf
+         */
         Graph graph;
-
-        Random rnd = new Random();
-
-        public RandomLayout(Graph graph) {
-
+        /**
+         * Vytvoří stromový layout
+         * @param graph Graf
+         */
+        public TreeLayout(Graph graph) {
             this.graph = graph;
-
         }
 
         @Override
@@ -347,28 +363,65 @@ public class Graph {
             }
         }
     }
-
+    /**
+     * Buňka popisující obecný Gen
+     */
     public class GenCell extends Cell {
-
+        /**
+         * Hloubka genu
+         */
         int depth;
-
-        public GenCell(Object id, String command, int depth) {
+        /**
+         * Grafická prezentace genu
+         */
+        Button button;
+        /**
+         * Šířka buňky
+         */
+        int width;
+        /**
+         * Vytvoří GenCell
+         * @param id reference objektu
+         * @param command příkaz objektu
+         * @param depth hloubka genu
+         * @param width šířka genu
+         */
+        public GenCell(Object id, String command, int depth, int width) {
             super(id);
             this.depth = depth;
-            Button view = new Button(command);
-
-            setView(view);
+            this.width = width;
+            button = new Button(command);
+            setView(button);
         }
     }
-
+    /**
+     * Zoomovatelný prostor
+     */
     public class ZoomableScrollPane extends ScrollPane {
-
+        /**
+         * Vykreslovací skupina
+         */
         Group zoomGroup;
+        /**
+         * Škálování
+         */
         Scale scaleTransform;
+        /**
+         * Obsah na vykreslení
+         */
         Node content;
+        /**
+         * Výchozí hodnota
+         */
         double scaleValue = 1.0;
+        /**
+         * Hodnota delta
+         */
         double delta = 0.1;
-
+        /**
+         * Vytvoří zoom prostor
+         * @param content Obsah
+         */
         public ZoomableScrollPane(Node content) {
             this.content = content;
             Group contentGroup = new Group();
@@ -381,15 +434,23 @@ public class Graph {
 
             zoomGroup.setOnScroll(new ZoomHandler());
         }
-
+        /**
+         * Vrátí Scale
+         * @return Scale
+         */
         public double getScaleValue() {
             return scaleValue;
         }
-
+        /**
+         * Nastaví zoom na aktuální
+         */
         public void zoomToActual() {
             zoomTo(1.0);
         }
-
+        /**
+         * Upraví škálu
+         * @param scaleValue nová hodnota škály
+         */
         public void zoomTo(double scaleValue) {
 
             this.scaleValue = scaleValue;
@@ -398,14 +459,18 @@ public class Graph {
             scaleTransform.setY(scaleValue);
 
         }
-
+        /**
+         * Přiblíží aktuální
+         */
         public void zoomActual() {
 
             scaleValue = 1;
             zoomTo(scaleValue);
 
         }
-
+        /**
+         * Oddálí
+         */
         public void zoomOut() {
             scaleValue -= delta;
 
@@ -415,7 +480,9 @@ public class Graph {
 
             zoomTo(scaleValue);
         }
-
+        /**
+         * Přiblíží
+         */
         public void zoomIn() {
 
             scaleValue += delta;
@@ -429,66 +496,63 @@ public class Graph {
         }
 
         /**
-         *
-         * @param minimizeOnly If the content fits already into the viewport,
-         * then we don't zoom if this parameter is true.
+         * Přiblíží, pokud je to povoleno
+         * @param minimizeOnly povolení přibližovat
          */
         public void zoomToFit(boolean minimizeOnly) {
 
             double scaleX = getViewportBounds().getWidth() / getContent().getBoundsInLocal().getWidth();
             double scaleY = getViewportBounds().getHeight() / getContent().getBoundsInLocal().getHeight();
-
-            // consider current scale (in content calculation)
             scaleX *= scaleValue;
             scaleY *= scaleValue;
-
-            // distorted zoom: we don't want it => we search the minimum scale
-            // factor and apply it
             double scale = Math.min(scaleX, scaleY);
-
-            // check precondition
             if (minimizeOnly) {
-
-                // check if zoom factor would be an enlargement and if so, just set
-                // it to 1
                 if (Double.compare(scale, 1) > 0) {
                     scale = 1;
                 }
             }
-
-            // apply zoom
             zoomTo(scale);
-
         }
-
+        /**
+         * Ovládá zoom 
+         */
         private class ZoomHandler implements EventHandler<ScrollEvent> {
 
             @Override
             public void handle(ScrollEvent scrollEvent) {
-                // if (scrollEvent.isControlDown())
                 {
-
                     if (scrollEvent.getDeltaY() < 0) {
                         scaleValue -= delta;
                     } else {
                         scaleValue += delta;
                     }
-
                     zoomTo(scaleValue);
-
                     scrollEvent.consume();
                 }
             }
         }
     }
-
+    /**
+     * Představuje linku
+     */
     public class Edge extends Group {
-
+        /**
+         * Zdrojová buňka
+         */
         protected Cell source;
+        /**
+         * Cílová buňka
+         */
         protected Cell target;
-
+        /**
+         * Samotná linka
+         */
         Line line;
-
+        /**
+         * Vytvoří linka
+         * @param source zdroj
+         * @param target cíl
+         */
         public Edge(Cell source, Cell target) {
 
             this.source = source;
@@ -499,16 +563,19 @@ public class Graph {
 
             line = new Line();
 
-            line.startXProperty().bind(source.layoutXProperty().add(source.getBoundsInParent().getWidth() / 2.0));
-            line.startYProperty().bind(source.layoutYProperty().add(source.getBoundsInParent().getHeight() / 2.0));
+            line.startXProperty().bind((source.layoutXProperty().add(source.getBoundsInParent().getWidth() / 2.0)).add(((GenCell)source).width/2));
+            line.startYProperty().bind((source.layoutYProperty().add(source.getBoundsInParent().getHeight() / 2.0)));
 
-            line.endXProperty().bind(target.layoutXProperty().add(target.getBoundsInParent().getWidth() / 2.0));
-            line.endYProperty().bind(target.layoutYProperty().add(target.getBoundsInParent().getHeight() / 2.0));
+            line.endXProperty().bind((target.layoutXProperty().add(target.getBoundsInParent().getWidth() / 2.0)).add(((GenCell)source).width/2));
+            line.endYProperty().bind((target.layoutYProperty().add(target.getBoundsInParent().getHeight() / 2.0)));
 
             getChildren().add(line);
 
         }
-
+        /**
+         * Vrátí 
+         * @return 
+         */
         public Cell getSource() {
             return source;
         }
@@ -518,66 +585,68 @@ public class Graph {
         }
 
     }
-
+    /**
+     * Layer pro buňku
+     */
     public class CellLayer extends Pane {
 
     }
-
+    /**
+     * Základní třída buňky
+     */
     public class Cell extends Pane {
-
+        /**
+         * Odkaz na objekt
+         */
         Object cellId;
-
+        /**
+         * Seznam potomků
+         */
         List<Cell> children = new ArrayList<>();
+        /**
+         * Seznam rodičů
+         */
         List<Cell> parents = new ArrayList<>();
-
+        /**
+         * Vzhled buňky
+         */
         Node view;
-
+        /**
+         * Vytvoří buňku
+         * @param cellId Reference objektu
+         */
         public Cell(Object cellId) {
             this.cellId = cellId;
         }
-
+        /**
+         * Přidá potomka
+         * @param cell potomek
+         */
         public void addCellChild(Cell cell) {
             children.add(cell);
         }
-
-        public List<Cell> getCellChildren() {
-            return children;
-        }
-
+        /**
+         * Přidá rodiče
+         * @param cell rodič
+         */
         public void addCellParent(Cell cell) {
             parents.add(cell);
         }
-
-        public List<Cell> getCellParents() {
-            return parents;
-        }
-
-        public void removeCellChild(Cell cell) {
-            children.remove(cell);
-        }
-
+        /**
+         * Nastaví vzhled
+         * @param view Vzhled
+         */
         public void setView(Node view) {
-
             this.view = view;
             getChildren().add(view);
-
         }
-
-        public Node getView() {
-            return this.view;
-        }
-
+        /**
+         * Vrátí odkaz na objekt
+         * @return Odkat objektu
+         */
         public Object getCellId() {
             return cellId;
         }
-    }
-
-    public enum CellType {
-
-        GEN,
-        FUNCTION,
-        TERMINAL;
-
     }
 
 }

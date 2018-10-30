@@ -7,7 +7,7 @@ import cz.ogarxvi.genetic.Gen;
 import cz.ogarxvi.genetic.GeneticAlgorithm;
 import cz.ogarxvi.genetic.Terminal;
 import cz.ogarxvi.model.Graph.Layout;
-import cz.ogarxvi.model.Graph.RandomLayout;
+import cz.ogarxvi.model.Graph.TreeLayout;
 import java.io.File;
 import java.io.FileReader;
 import java.math.BigDecimal;
@@ -48,6 +48,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -326,6 +327,72 @@ public class FXMLController implements Initializable {
     }
 
     /**
+     * Načte soubor a zpracuje z něho tabulku, kterou zobrazí
+     *
+     * @param event
+     */
+    /*@FXML
+    private void OpenOutput(ActionEvent event) throws URISyntaxException, XMLStreamException {
+        //Výběr souboru
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI()));
+        int returnValue = fileChooser.showOpenDialog(null);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            //Získat ze xml data
+            XMLInputFactory factory = XMLInputFactory.newInstance();
+            XMLStreamReader xsr = null;
+            Map<BigDecimal, Integer> results = new HashMap<>();
+
+            try {
+                xsr = factory.createXMLStreamReader(new FileReader(selectedFile));
+                String element = "";
+                BigDecimal fitness = null;
+                int quantity = 0;
+
+                while (xsr.hasNext()) {
+                    // načítáme element
+                    if (xsr.getEventType() == XMLStreamConstants.START_ELEMENT) {
+                        element = xsr.getName().getLocalPart();
+                        if (element.equals("Result")) {
+                            //
+                        }
+                    } // načítáme hodnotu elementu
+                    else if (xsr.getEventType() == XMLStreamConstants.CHARACTERS) {
+                        switch (element) {
+                            case "Fitness":
+                                fitness = BigDecimal.valueOf(Double.valueOf(xsr.getText()));
+                                break;
+                            case "Quantity":
+                                quantity = Integer.valueOf(xsr.getText());
+                                break;
+                        }
+                        element = "";
+                    } // načítáme konec elementu
+                    else if ((xsr.getEventType() == XMLStreamConstants.END_ELEMENT)) {
+                        if ((xsr.getName().getLocalPart().equals("Result"))) {                           
+                            if (results.containsKey(fitness)) {
+                                results.put(fitness, results.get(fitness) + 1);
+                            } else {
+                                results.put(fitness, 1);
+                            }
+                        }
+                    }
+                    xsr.next();
+                }
+            } catch (Exception e) {
+                m.AddMesseage("Error: " + e.getMessage());
+                m.GetMesseage();
+            }
+            
+            m.AddMesseage(results.toString());
+            m.GetMesseage();
+            
+        }
+
+    }*/
+
+    /**
      * Načtení souboru
      *
      * @param event
@@ -391,15 +458,15 @@ public class FXMLController implements Initializable {
 
             root.setCenter(graph.getScrollPane());
 
+            graph.addGraphComponents(dh.getBestChromosome());
+
             Scene scene = new Scene(root, 800, 800);
             Stage primaryStage = new Stage();
             primaryStage.setTitle("Tree Graph");
             primaryStage.setScene(scene);
             primaryStage.show();
 
-            graph.addGraphComponents(dh.getBestChromosome());
-
-            RandomLayout rL = graph.new RandomLayout(graph);
+            TreeLayout rL = graph.new TreeLayout(graph);
             Layout layout = rL;
             layout.execute();
             //throw new UnsupportedOperationException();
@@ -472,8 +539,8 @@ public class FXMLController implements Initializable {
     private void RunCofiguration(ActionEvent event) throws URISyntaxException, TransformerConfigurationException, TransformerException {
         //LOAD XML CONFIGURATION
         List<Configuration> configurations = new ArrayList<>();
-        Map<Output, Integer> outputs = new HashMap<>();
-        Map<BigDecimal, Integer> finalOutputs = new HashMap<>();
+        List<Map<Output, Integer>> outputs = new ArrayList<>();
+        List<Map<BigDecimal, Integer>> finalOutputs = new ArrayList<>();
 
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI()));
@@ -588,6 +655,10 @@ public class FXMLController implements Initializable {
             for (int i = 0; i < numberOfConfi; i++) {
                 GeneticAlgorithm ga = new GeneticAlgorithm(m, dh, true);
                 Configuration loadedConfi = configurations.get(i);
+
+                outputs.add(i, new HashMap<>());
+                finalOutputs.add(i, new HashMap<>());
+
                 for (int j = 0; j < loadedConfi.NumberOfStarts; j++) {
                     Chromosome bestChromosome = ga.runGP(
                             loadedConfi.NumberOfGenerations,
@@ -607,16 +678,16 @@ public class FXMLController implements Initializable {
                     // Zde je čas zapsat si výsledek
                     BigDecimal item = bestChromosome.getFitness().getValue();
                     Output output = new Output(item, bestChromosome.getRoot().print());
-                    if (outputs.containsKey(output)) {
-                        outputs.put(output, outputs.get(output) + 1);
+                    if (outputs.get(i).containsKey(output)) {
+                        outputs.get(i).put(output, outputs.get(i).get(output) + 1);
 
                     } else {
-                        outputs.put(output, 1);
+                        outputs.get(i).put(output, 1);
                     }
-                    if (finalOutputs.containsKey(item)) {
-                        finalOutputs.put(item, finalOutputs.get(item) + 1);
+                    if (finalOutputs.get(i).containsKey(item)) {
+                        finalOutputs.get(i).put(item, finalOutputs.get(i).get(item) + 1);
                     } else {
-                        finalOutputs.put(item, 1);
+                        finalOutputs.get(i).put(item, 1);
                     }
 
                 }
@@ -643,41 +714,40 @@ public class FXMLController implements Initializable {
                     Element confi = doc.createElement("Configuration");
                     rootElement.appendChild(confi);
                     confi.setAttribute("id", String.valueOf(i));
-                    
-                    
+
                     Element wrapOutputsElement = doc.createElement("Outputs");
                     confi.appendChild(wrapOutputsElement);
-                    
-                    for (Map.Entry<Output, Integer> entry : outputs.entrySet()) {
+
+                    for (Map.Entry<Output, Integer> entry : outputs.get(i).entrySet()) {
                         Output key = entry.getKey();
                         Integer value = entry.getValue();
-                        
+
                         Element outputElement = doc.createElement("Output");
                         wrapOutputsElement.appendChild(outputElement);
-                        
+
                         Element outputFitnessElement = doc.createElement("Fitness");
                         outputFitnessElement.appendChild(doc.createTextNode(key.Fitness.toString()));
                         outputElement.appendChild(outputFitnessElement);
-                        
+
                         Element outputFormulaElement = doc.createElement("Formula");
                         outputFormulaElement.appendChild(doc.createTextNode(key.formula));
                         outputElement.appendChild(outputFormulaElement);
                     }
-                    
+
                     Element wrapResultsElement = doc.createElement("Results");
                     confi.appendChild(wrapResultsElement);
-                    
-                    for (Map.Entry<BigDecimal, Integer> entry : finalOutputs.entrySet()) {
+
+                    for (Map.Entry<BigDecimal, Integer> entry : finalOutputs.get(i).entrySet()) {
                         BigDecimal key = entry.getKey();
                         Integer value = entry.getValue();
-                        
+
                         Element resultElement = doc.createElement("Result");
                         wrapResultsElement.appendChild(resultElement);
-                        
+
                         Element resultFitnessElement = doc.createElement("Fitness");
                         resultFitnessElement.appendChild(doc.createTextNode(key.toString()));
                         resultElement.appendChild(resultFitnessElement);
-                        
+
                         Element resultQuantityElement = doc.createElement("Quantity");
                         resultQuantityElement.appendChild(doc.createTextNode(String.valueOf(value)));
                         resultElement.appendChild(resultQuantityElement);

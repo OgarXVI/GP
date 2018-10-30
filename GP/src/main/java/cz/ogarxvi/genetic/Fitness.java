@@ -7,6 +7,7 @@ package cz.ogarxvi.genetic;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.List;
 
 /**
@@ -44,7 +45,7 @@ public class Fitness {
         for (int i = 0; i < expectedResults.length; i++) {
             val = val.add(calcResult.get(i).subtract(expectedResults[i]));
         }
-        val = val.divide(BigDecimal.valueOf(calcResult.size()));
+        val = val.divide(BigDecimal.valueOf(calcResult.size()), 6, RoundingMode.HALF_UP);
         value = val;
     }
     /**
