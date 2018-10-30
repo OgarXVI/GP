@@ -104,7 +104,7 @@ public class GPController extends Thread {
     public void run() {
         try {
             GeneticAlgorithm ga = new GeneticAlgorithm(this);
-            ga.runGP(numberOfGeneration, sizeOfInitPopulation, maxDepthTreeInit, maxDepthTreeAfterCrossover, reproduction, crossover, mutation, elitism, decimation, editation, selectionMethod);
+            ga.runGP(numberOfGeneration, sizeOfInitPopulation, maxDepthTreeInit, maxDepthTreeAfterCrossover, reproduction, crossover, mutation, elitism, decimation, editation, selectionMethod, null, null);
         } catch (NullPointerException e) {
             JOptionPane.showMessageDialog(null, "Exception: " + e.getMessage());
         }

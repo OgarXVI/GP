@@ -5,14 +5,20 @@
  */
 package cz.ogarxvi.model;
 
+import cz.ogarxvi.genetic.Chromosome;
+import cz.ogarxvi.genetic.Gen;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import javafx.event.EventHandler;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
@@ -21,7 +27,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.scene.transform.Scale;
+import javax.swing.JButton;
 
 public class Graph {
 
@@ -30,8 +39,6 @@ public class Graph {
     private Group canvas;
 
     private ZoomableScrollPane scrollPane;
-
-    MouseGestures mouseGestures;
 
     /**
      * the pane wrapper is necessary or else the scrollpane would always align
@@ -48,8 +55,6 @@ public class Graph {
         cellLayer = new CellLayer();
 
         canvas.getChildren().add(cellLayer);
-
-        mouseGestures = new MouseGestures(this);
 
         scrollPane = new ZoomableScrollPane(canvas);
 
@@ -83,11 +88,6 @@ public class Graph {
         getCellLayer().getChildren().removeAll(model.getRemovedCells());
         getCellLayer().getChildren().removeAll(model.getRemovedEdges());
 
-        // enable dragging of cells
-        for (Cell cell : model.getAddedCells()) {
-            mouseGestures.makeDraggable(cell);
-        }
-
         // every cell must have a parent, if it doesn't, then the graphParent is
         // the parent
         getModel().attachOrphansToGraphParent(model.getAddedCells());
@@ -104,26 +104,48 @@ public class Graph {
         return this.scrollPane.getScaleValue();
     }
 
-    public void addGraphComponents() {
+    public void addGraphComponents(Chromosome chromosome) {
 
         Model model = this.getModel();
 
         this.beginUpdate();
+        //Získej celý strom jako jeden list genů
+        Gen root = chromosome.getRoot();
+        List<Gen> tree = root.getAll();
 
-        //Zde namontovat model dle nejlepšího chromosomu
-        //To znamená, že se zde initne CellType
-        //Jaký problém nastane v případě nastavení 
-        model.addCell("+", CellType.TRIANGLE);
-        model.addCell("1", CellType.TRIANGLE);
-        model.addCell("-", CellType.TRIANGLE);
-        model.addCell("2", CellType.TRIANGLE);
-        model.addCell("3", CellType.TRIANGLE);
+        //Připrav listy jako pole hloubek
+        List<List<Gen>> arraysByDepth = new ArrayList<>(20);
+        for (int i = 0; i < 20; i++) {
+            arraysByDepth.add(i, new ArrayList<>());
+        }
 
-        model.addEdge("+", "1");
-        model.addEdge("+", "-");
-        model.addEdge("-", "2");
-        model.addEdge("-", "3");
+        //Pro každý gen dle jeho hloubky ho dosat do jeho listu hloubky
+        tree.forEach((gen) -> {
+            arraysByDepth.get(gen.getDepth()).add(gen);
+        });
 
+        //dle hloubky je zařad do buněk
+        arraysByDepth.forEach((list) -> {
+            list.forEach((gen) -> {
+                model.addCell(gen, gen.getCommand(), CellType.GEN, arraysByDepth.indexOf(list));
+            });
+        });
+
+        //Pak zařaď bunkám jejich čáry
+        arraysByDepth.forEach((list) -> {
+            for (Gen gen : list) {
+                if (gen.getArita() == 0) {
+                    continue;
+                }
+                if (gen.getArita() == 1) {
+                    model.addEdge(gen, gen.getGens().get(0));
+                }
+                if (gen.getArita() == 2) {
+                    model.addEdge(gen, gen.getGens().get(0));
+                    model.addEdge(gen, gen.getGens().get(1));
+                }
+            }
+        });
         this.endUpdate();
 
     }
@@ -140,7 +162,7 @@ public class Graph {
         List<Edge> addedEdges;
         List<Edge> removedEdges;
 
-        Map<String, Cell> cellMap; // <id,cell>
+        Map<Object, Cell> cellMap; // <id,cell>
 
         public Model() {
 
@@ -193,24 +215,14 @@ public class Graph {
             return allEdges;
         }
 
-        public void addCell(String id, CellType type) {
+        public Cell addCell(Object id, String command, CellType type, int depth) {
 
             switch (type) {
 
-                /* case RECTANGLE:
-            RectangleCell rectangleCell = new RectangleCell(id);
-            addCell(rectangleCell);
-            break;
-                 */
-                case TRIANGLE:
-                    TriangleCell circleCell = new TriangleCell(id);
+                case GEN:
+                    GenCell circleCell = new GenCell(id, command, depth);
                     addCell(circleCell);
-                    break;
-                case CIRCLE:
-                    CircleCell circleCell2 = new CircleCell(id);
-                    addCell(circleCell2);
-                    break;
-
+                    return circleCell;
                 default:
                     throw new UnsupportedOperationException("Unsupported type: " + type);
             }
@@ -224,7 +236,7 @@ public class Graph {
 
         }
 
-        public void addEdge(String sourceId, String targetId) {
+        public void addEdge(Object sourceId, Object targetId) {
 
             Cell sourceCell = cellMap.get(sourceId);
             Cell targetCell = cellMap.get(targetId);
@@ -281,76 +293,6 @@ public class Graph {
         }
     }
 
-    public class MouseGestures {
-
-        final DragContext dragContext = new DragContext();
-
-        Graph graph;
-
-        public MouseGestures(Graph graph) {
-            this.graph = graph;
-        }
-
-        public void makeDraggable(final Node node) {
-
-            node.setOnMousePressed(onMousePressedEventHandler);
-            node.setOnMouseDragged(onMouseDraggedEventHandler);
-            node.setOnMouseReleased(onMouseReleasedEventHandler);
-
-        }
-
-        EventHandler<MouseEvent> onMousePressedEventHandler = new EventHandler<MouseEvent>() {
-
-            @Override
-            public void handle(MouseEvent event) {
-
-                Node node = (Node) event.getSource();
-
-                double scale = graph.getScale();
-
-                dragContext.x = node.getBoundsInParent().getMinX() * scale - event.getScreenX();
-                dragContext.y = node.getBoundsInParent().getMinY() * scale - event.getScreenY();
-
-            }
-        };
-
-        EventHandler<MouseEvent> onMouseDraggedEventHandler = new EventHandler<MouseEvent>() {
-
-            @Override
-            public void handle(MouseEvent event) {
-
-                Node node = (Node) event.getSource();
-
-                double offsetX = event.getScreenX() + dragContext.x;
-                double offsetY = event.getScreenY() + dragContext.y;
-
-                // adjust the offset in case we are zoomed
-                double scale = graph.getScale();
-
-                offsetX /= scale;
-                offsetY /= scale;
-
-                node.relocate(offsetX, offsetY);
-
-            }
-        };
-
-        EventHandler<MouseEvent> onMouseReleasedEventHandler = new EventHandler<MouseEvent>() {
-
-            @Override
-            public void handle(MouseEvent event) {
-
-            }
-        };
-
-        class DragContext {
-
-            double x;
-            double y;
-
-        }
-    }
-
     public abstract class Layout {
 
         public abstract void execute();
@@ -374,36 +316,49 @@ public class Graph {
 
             List<Cell> cells = graph.getModel().getAllCells();
 
-            for (Cell cell : cells) {
+            int fDepth = 80;
+            int pX = 400;
+            int pY = 50;
 
-                double x = rnd.nextDouble() * 500;
-                double y = rnd.nextDouble() * 500;
+            double x = 0;
+            double y = 0;
 
-                cell.relocate(x, y);
-
+            //Připrav listy jako pole hloubek
+            List<List<GenCell>> arraysByDepth = new ArrayList<>(20);
+            for (int j = 0; j < 20; j++) {
+                arraysByDepth.add(j, new ArrayList<>());
             }
 
-        }
+            //Pro každý gen dle jeho hloubky ho dosat do jeho listu hloubky
+            for (Cell cell : cells) {
+                GenCell cellP = (GenCell) cell;
+                arraysByDepth.get(cellP.depth).add(cellP);
+            }
 
+            //dle hloubky je zařad do buněk
+            //J = délka
+            for (int j = 0; j < arraysByDepth.size(); j++) {
+                // K = šířka
+                for (int k = 0; k < arraysByDepth.get(j).size(); k++) {
+                    x = (k * fDepth) + pX - ((arraysByDepth.get(j).size() * fDepth) / 2);
+                    y = (j * fDepth) + pY;
+                    arraysByDepth.get(j).get(k).relocate(x, y);
+                }
+            }
+        }
     }
 
-    public class TriangleCell extends Cell {
+    public class GenCell extends Cell {
 
-        public TriangleCell(String id) {
+        int depth;
+
+        public GenCell(Object id, String command, int depth) {
             super(id);
-
-            double width = 50;
-            double height = 50;
-
-            Polygon view = new Polygon(width / 2, 0, width, height, 0, height);
-
-            view.setStroke(Color.RED);
-            view.setFill(Color.RED);
+            this.depth = depth;
+            Button view = new Button(command);
 
             setView(view);
-
         }
-
     }
 
     public class ZoomableScrollPane extends ScrollPane {
@@ -538,7 +493,7 @@ public class Graph {
 
             this.source = source;
             this.target = target;
-
+            
             source.addCellChild(target);
             target.addCellParent(source);
 
@@ -570,14 +525,14 @@ public class Graph {
 
     public class Cell extends Pane {
 
-        String cellId;
+        Object cellId;
 
         List<Cell> children = new ArrayList<>();
         List<Cell> parents = new ArrayList<>();
 
         Node view;
 
-        public Cell(String cellId) {
+        public Cell(Object cellId) {
             this.cellId = cellId;
         }
 
@@ -612,32 +567,17 @@ public class Graph {
             return this.view;
         }
 
-        public String getCellId() {
+        public Object getCellId() {
             return cellId;
         }
     }
 
     public enum CellType {
 
-        RECTANGLE,
-        TRIANGLE,
-        CIRCLE;
+        GEN,
+        FUNCTION,
+        TERMINAL;
 
     }
 
-    public class CircleCell extends Cell {
-
-        public CircleCell(String id) {
-            super(id);
-
-            Circle view = new Circle(50);
-
-            view.setStroke(Color.DODGERBLUE);
-            view.setFill(Color.DODGERBLUE);
-
-            setView(view);
-
-        }
-
-    }
 }

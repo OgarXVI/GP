@@ -8,11 +8,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 /**
  * Třída pro výpočet GA
+ *
  * @author OgarXVI
  */
 public class GeneticAlgorithm {
+
     /**
      * Odkaz na data
      */
@@ -30,7 +33,13 @@ public class GeneticAlgorithm {
      */
     private Editation editation;
     /**
-     * Založení GA 
+     * Zda je puštěn program kongigurací
+     */
+    private boolean isAutomat;
+
+    /**
+     * Založení GA
+     *
      * @param gpC Kontroler s potřebnými parametry
      */
     public GeneticAlgorithm(GPController gpC) {
@@ -38,11 +47,27 @@ public class GeneticAlgorithm {
         dataHandler = gpC.getDh();
         editation = new Editation();
     }
+
     /**
-     * Spustí celý proces výpočtu a vyhodnocenování populací.
-     * Založí na začátku populace a nechává na na nich vypočítávat fitness.
-     * Na základě zadaných parametrů a fitness se snaží dosáhnout co nejblíže k nule.
-     * Proces je ukončen nalezením ideálního řešení nebo dovršením maximálního počtu generací.
+     *
+     * @param m
+     * @param dh
+     * @param isAutomat
+     */
+    public GeneticAlgorithm(Messenger m, DataHandler dh, boolean isAutomat) {
+        messenger = m;
+        dataHandler = dh;
+        editation = new Editation();
+        this.isAutomat = isAutomat;
+    }
+
+    /**
+     * Spustí celý proces výpočtu a vyhodnocenování populací. Založí na začátku
+     * populace a nechává na na nich vypočítávat fitness. Na základě zadaných
+     * parametrů a fitness se snaží dosáhnout co nejblíže k nule. Proces je
+     * ukončen nalezením ideálního řešení nebo dovršením maximálního počtu
+     * generací.
+     *
      * @param numberOfGenerations Počet generací
      * @param initSizeOfPopulation Velikost populace
      * @param initTreeMaxDepth Maximální hloubka stromu
@@ -54,20 +79,41 @@ public class GeneticAlgorithm {
      * @param decimation Rozšíření parametrů a následné smrštění populací
      * @param editable Puštění optimalizace stromů
      * @param selectionMethod Vybraná selekční metoda
+     * @param listOfFunctions
+     * @param listOfTerminals
+     * @return Vrátí nejlepší nalezené řešení
      */
-    public void runGP(int numberOfGenerations, int initSizeOfPopulation, int initTreeMaxDepth, int treeMaxDepthAfterOperation, double reproductionProbability, double crossoverProbability, double mutationProbability, boolean elitismus, boolean decimation, boolean editable, int selectionMethod) {
+    public Chromosome runGP(int numberOfGenerations, int initSizeOfPopulation, int initTreeMaxDepth, int treeMaxDepthAfterOperation, double reproductionProbability, double crossoverProbability, double mutationProbability, boolean elitismus, boolean decimation, boolean editable, int selectionMethod, List<Gen> listOfFunctions, List<Gen> listOfTerminals) {
+        //Reset STOP 
+        dataHandler.setGpStop(false);
 
-        //dataHandler.setGpStop(false);
+        List<Gen> setOfTerminals = null;
+        List<Gen> setOfFunctions = null;
 
-        List<Gen> setOfTerminals = new ArrayList<Gen>();
-        List<Gen> setOfFunctions = new ArrayList<Gen>();
-        //Načtení terminů a funkcí
-        if (dataHandler != null) {
-            //TERMINALS
-            setOfTerminals.addAll(dataHandler.getLoadedTerminals());
-            //FUNCTIONS
-            setOfFunctions.addAll(dataHandler.getLoadedFunctions());
+        if (listOfFunctions == null) {
+            setOfFunctions = new ArrayList<>();
+
+        } else {
+            setOfFunctions = listOfFunctions;
         }
+        if (listOfTerminals == null) {
+            listOfTerminals = new ArrayList<>();
+
+        } else {
+            setOfTerminals = listOfTerminals;
+        }
+        if (dataHandler != null) {
+            if (dataHandler.getLoadedTerminals() != null) //TERMINALS
+            {
+                setOfTerminals.addAll(dataHandler.getLoadedTerminals());
+            }
+            //FUNCTIONS
+            if (dataHandler.getLoadedFunctions() != null) {
+                setOfFunctions.addAll(dataHandler.getLoadedFunctions());
+            }
+
+        }
+
         // Založení populace
         population = new ArrayList<Chromosome>(initSizeOfPopulation);
         // Vyhodnocení šancí
@@ -111,7 +157,9 @@ public class GeneticAlgorithm {
         // Iterace přes generace
         for (int i = 0; i < numberOfGenerations; i++) {
             if (dataHandler.isGpStop()) {
-                messenger.AddMesseage("The last best: "  + bestChromosome.getRoot().print());
+                if (!isAutomat) {
+                    messenger.AddMesseage("The last best: " + bestChromosome.getRoot().print());
+                }
                 break;
             }
             // Nejlepší jedinec je vždy první v generaci
@@ -126,7 +174,7 @@ public class GeneticAlgorithm {
                     System.out.println("Za tento strom: " + g.print());
                     population.get(j).setRoot(g);
                 }
-                */
+                 */
                 //Namapování hodnot na klíče (X->4...)
                 List<BigDecimal> results = new ArrayList<>();
                 Map<String, BigDecimal> values = new HashMap<>();
@@ -134,9 +182,9 @@ public class GeneticAlgorithm {
                     for (int l = 0; l < dataHandler.getMathData()[k].length; l++) {
                         values.put(dataHandler.getParams()[l], dataHandler.getMathData()[k][l]);
                     }
-                    for (int m = 0; m < dataHandler.getLoadedTerminals().size(); m++) {
-                        if (!Character.isLetter(dataHandler.getLoadedTerminals().get(m).command.charAt(0))) {
-                            values.put(dataHandler.getLoadedTerminals().get(m).command, BigDecimal.valueOf(Double.valueOf(dataHandler.getLoadedTerminals().get(m).command)));
+                    for (int m = 0; m < setOfTerminals.size(); m++) {
+                        if (!Character.isLetter(setOfTerminals.get(m).command.charAt(0))) {
+                            values.put(setOfTerminals.get(m).command, BigDecimal.valueOf(Double.valueOf(setOfTerminals.get(m).command)));
                         }
                     }
                     results.add(population.get(j).getRoot().resolveCommand(values));
@@ -153,16 +201,21 @@ public class GeneticAlgorithm {
                 }
             }
             // dát zprávu o nejlepším jedinci v populaci
-            messenger.AddMesseage(bestChromosomeInGeneration.getFitness().getValue() + "  " + bestChromosomeInGeneration.getRoot().print());
-            messenger.GetMesseage();
+            if (!isAutomat) {
+                messenger.AddMesseage(bestChromosomeInGeneration.getFitness().getValue() + "  " + bestChromosomeInGeneration.getRoot().print());
+                messenger.GetMesseage();
+            }
             // Ukončovací podmínka
             if ((bestChromosomeInGeneration.getFitness().getValue().compareTo(BigDecimal.ZERO) == 0)
                     || (numberOfGenerations == i + 1)) {
                 dataHandler.setGpStop(true);
                 dataHandler.setBestChromosome(bestChromosome);
-                messenger.AddMesseage("The Best:  " + bestChromosomeInGeneration.getRoot().print());
-                messenger.GetMesseage();
-                return;
+                if (!isAutomat) {
+                    messenger.AddMesseage("The Best:  " + bestChromosome.getRoot().print());
+                    messenger.GetMesseage();
+                }
+
+                return bestChromosome;
             }
             // zmenšení populace
             if (decimation && (i == (generationOfDecimation - 1))) {
@@ -268,9 +321,13 @@ public class GeneticAlgorithm {
 
             population = newPopulation;
         }
+        return bestChromosome;
+
     }
+
     /**
      * Vybere náhodný gen v chromosomu
+     *
      * @param chromosome Chromosome
      * @return Náhodný gen
      */
@@ -338,8 +395,10 @@ public class GeneticAlgorithm {
         return vg;
 
     }
+
     /**
      * Rozhodne o selekční metodě
+     *
      * @param selectionMethod Selekční metoda
      * @return Vybraný Chromosom dle vybrané selekční mechaniky
      */
@@ -352,9 +411,11 @@ public class GeneticAlgorithm {
         }
         return null;
     }
+
     /**
-     * Ruletová selekční metoda. Na základě celkové fitness rozvrhne plochu na 
+     * Ruletová selekční metoda. Na základě celkové fitness rozvrhne plochu na
      * které bude vybírat a pak dle zvyšující se šance bude vybírat
+     *
      * @return Vybraný Chromosome
      */
     private Chromosome rouletteSelection() {
@@ -373,8 +434,10 @@ public class GeneticAlgorithm {
         }
         return population.get(memberIndex);
     }
+
     /**
      * Turnajová selekce. Vybere náhodně tři prvky a na nich provede porovnání.
+     *
      * @return Vybraný Chromosome
      */
     private Chromosome tournamentSelection3() {
@@ -402,8 +465,10 @@ public class GeneticAlgorithm {
 
         return new Chromosome(winner);
     }
+
     /**
      * Založí populaci
+     *
      * @param listOfTerminals Povolené terminály
      * @param listOfFunctions Povolené funkce
      * @param maxDepth Maximální povolená hloubka
@@ -417,27 +482,33 @@ public class GeneticAlgorithm {
         }
 
     }
+
     /**
      * Vrací náhodné číslo do limity
+     *
      * @param limit Limit
      * @return Náhodné číslo do limity
      */
     public int getRandomNumber(int limit) {
         return (int) (Math.random() * limit);
     }
+
     /**
      * Vrací náhodné číslo do limity
+     *
      * @param limit Limit
      * @return Náhodné číslo do limity
      */
     public double getRandomDouble(int limit) {
         return Math.random() * limit;
     }
+
     /**
-     * Úprava quicksortu na vlastní porovnání 
+     * Úprava quicksortu na vlastní porovnání
+     *
      * @param population
-     * @param left 
-     * @param right 
+     * @param left
+     * @param right
      */
     public static void quicksort(List<Chromosome> population, int left, int right) {
         if (left < right) {
@@ -452,8 +523,10 @@ public class GeneticAlgorithm {
             quicksort(population, boundary + 1, right);
         }
     }
+
     /**
      * Prohození jedinců
+     *
      * @param populace Populace na prohození
      * @param left Posun vlevo
      * @param right Posun vpravo
