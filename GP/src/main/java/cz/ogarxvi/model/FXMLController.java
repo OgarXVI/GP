@@ -1,6 +1,5 @@
 package cz.ogarxvi.model;
 
-import com.graphbuilder.math.func.RandFunction;
 import cz.ogarxvi.genetic.Chromosome;
 import cz.ogarxvi.genetic.Function;
 import cz.ogarxvi.genetic.Gen;
@@ -577,7 +576,7 @@ public class FXMLController implements Initializable {
                     // načítáme element
                     if (xsr.getEventType() == XMLStreamConstants.START_ELEMENT) {
                         element = xsr.getName().getLocalPart();
-                        if (element.equals("configuration")) {
+                        if (element.equals("Configuration")) {
                             // ID configurace
                             Id = Integer.parseInt(xsr.getAttributeValue(0));
                         }
@@ -630,7 +629,7 @@ public class FXMLController implements Initializable {
                         element = "";
                     } // načítáme konec elementu
                     else if ((xsr.getEventType() == XMLStreamConstants.END_ELEMENT)) {
-                        if ((xsr.getName().getLocalPart().equals("configuration"))) {
+                        if ((xsr.getName().getLocalPart().equals("Configuration"))) {
                             configurations.add(new Configuration(Id, NumberOfStarts, PopulationSize, NumberOfGenerations, MaxDepthTreeInit, MaxDepthTreeAfterCrossover, ReproductionProbability, MutationProbability, CrossingProbability, Selection, Elitism, Decimation, Functions, Terminals));
                         }
                     }

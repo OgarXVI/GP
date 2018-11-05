@@ -45,7 +45,7 @@ public class GeneticAlgorithm {
     public GeneticAlgorithm(GPController gpC) {
         messenger = gpC.getM();
         dataHandler = gpC.getDh();
-        editation = new Editation();
+        editation = new Editation(dataHandler);
     }
 
     /**
@@ -57,7 +57,7 @@ public class GeneticAlgorithm {
     public GeneticAlgorithm(Messenger m, DataHandler dh, boolean isAutomat) {
         messenger = m;
         dataHandler = dh;
-        editation = new Editation();
+        editation = new Editation(dh);
         this.isAutomat = isAutomat;
     }
 

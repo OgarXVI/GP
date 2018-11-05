@@ -33,9 +33,72 @@ public class Editation {
     /**
      * Vytvoří instanci pro editaci stromů
      */
-    public Editation() {
+
+    public Editation(DataHandler dh) {
         treesForReplace = new ArrayList<Gen>();
         substituteTrees = new ArrayList<Gen>();
+        
+        String[] params = dh.getParams();
+        
+        for (String param : params) {
+            Gen prog = new Gen("*", 2);
+            prog.gens.add(new Terminal(param));
+            prog.gens.add(new Terminal("1"));
+            prog.setIsFunction(true);
+            treesForReplace.add(prog);
+            Gen replaceProg1 = new Terminal(param);
+            substituteTrees.add(replaceProg1);
+            
+            Gen prog1 = new Gen("*", 2);
+            prog1.gens.add(new Terminal("1"));
+            prog1.gens.add(new Terminal(param));
+            prog1.setIsFunction(true);
+            treesForReplace.add(prog1);
+            Gen replaceProg2 = new Terminal(param);
+            substituteTrees.add(replaceProg2);
+            
+            Gen prog3 = new Gen("+", 2);
+            prog3.gens.add(new Terminal(param));
+            prog3.gens.add(new Terminal("0"));
+            prog3.setIsFunction(true);
+            treesForReplace.add(prog3);
+            Gen replaceProg3 = new Terminal(param);
+            substituteTrees.add(replaceProg3);
+            
+            Gen prog4 = new Gen("+", 2);
+            prog4.gens.add(new Terminal("0"));
+            prog4.gens.add(new Terminal(param));
+            prog4.setIsFunction(true);
+            treesForReplace.add(prog4);
+            Gen replaceProg4 = new Terminal(param);
+            substituteTrees.add(replaceProg4);
+            
+            Gen prog5 = new Gen("-", 2);
+            prog5.gens.add(new Terminal(param));
+            prog5.gens.add(new Terminal(param));
+            prog5.setIsFunction(true);
+            treesForReplace.add(prog5);
+            Gen replaceProg5 = new Terminal("0");
+            substituteTrees.add(replaceProg5);
+            
+            Gen prog6 = new Gen("/", 2);
+            prog6.gens.add(new Terminal(param));
+            prog6.gens.add(new Terminal("1"));
+            prog6.setIsFunction(true);
+            treesForReplace.add(prog6);
+            Gen replaceProg6 = new Terminal(param);
+            substituteTrees.add(replaceProg6);
+            
+            Gen prog7 = new Gen("/", 2);
+            prog7.gens.add(new Terminal(param));
+            prog7.gens.add(new Terminal(param));
+            prog7.setIsFunction(true);
+            treesForReplace.add(prog7);
+            Gen replaceProg7 = new Terminal("1");
+            substituteTrees.add(replaceProg7);
+        }
+        
+        
         //Založení vrchního genu
         Gen prog1 = new Gen("+", 2);
         prog1.gens.add(new Terminal("1"));
@@ -84,6 +147,46 @@ public class Editation {
         treesForReplace.add(prog5);
         Gen replaceProg6 = new Terminal("1");
         substituteTrees.add(replaceProg5);
+        
+        Gen prog7 = new Gen("*", 2);
+        prog7.gens.add(new Terminal("-1"));
+        prog7.gens.add(new Terminal("-1"));
+        prog7.setIsFunction(true);
+        treesForReplace.add(prog7);
+        Gen replaceProg7 = new Terminal("1");
+        substituteTrees.add(replaceProg7);
+        
+        Gen prog8 = new Gen("*", 2);
+        prog8.gens.add(new Terminal("1"));
+        prog8.gens.add(new Terminal("-1"));
+        prog8.setIsFunction(true);
+        treesForReplace.add(prog8);
+        Gen replaceProg8 = new Terminal("-1");
+        substituteTrees.add(replaceProg8);
+        
+        Gen prog9 = new Gen("*", 2);
+        prog9.gens.add(new Terminal("-1"));
+        prog9.gens.add(new Terminal("1"));
+        prog9.setIsFunction(true);
+        treesForReplace.add(prog9);
+        Gen replaceProg9 = new Terminal("-1");
+        substituteTrees.add(replaceProg9);
+        
+        Gen prog10 = new Gen("+", 2);
+        prog10.gens.add(new Terminal("1"));
+        prog10.gens.add(new Terminal("0"));
+        prog10.setIsFunction(true);
+        treesForReplace.add(prog10);
+        Gen replaceProg10 = new Terminal("1");
+        substituteTrees.add(replaceProg10);
+        
+        Gen prog11 = new Gen("+", 2);
+        prog11.gens.add(new Terminal("0"));
+        prog11.gens.add(new Terminal("1"));
+        prog11.setIsFunction(true);
+        treesForReplace.add(prog11);
+        Gen replaceProg11 = new Terminal("1");
+        substituteTrees.add(replaceProg11);
 
     }
     /**

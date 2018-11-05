@@ -14,7 +14,6 @@ import java.math.MathContext;
  * tvaru použitelným při výpočtu vzorce. Je předkem pro Function a Terminal
  */
 public class Gen {
-
     /**
      * Maximální hloubka genu
      */
@@ -39,10 +38,8 @@ public class Gen {
      * Hloubka genu
      */
     protected int depth;
-
     /**
      * Založení genu s příkazem a aritou
-     *
      * @param command příkaz
      * @param arita arita
      */
@@ -57,11 +54,9 @@ public class Gen {
 
     public Gen() {
     }
-
     /**
      * Kopírovací konstruktor
-     *
-     * @param gen
+     * @param gen 
      */
     public Gen(Gen gen) {
         this.command = gen.command;
@@ -78,11 +73,9 @@ public class Gen {
         }
 
     }
-
     /**
      * Rekurzivní výpis genu
-     *
-     * @return
+     * @return 
      */
     public String print() {
         switch (arita) {
@@ -100,7 +93,6 @@ public class Gen {
         }
         return "";
     }
-
     /**
      * Opravení hloubky genu po operaci, která mohla změnit hloubku genu
      */
@@ -120,12 +112,10 @@ public class Gen {
             }
         }
     }
-
     /**
      * Rekurzivní výpočet hodnoty genu
-     *
-     * @param values mapa klíče a hodnoty, například <X -> 4> Obsahuje užití
-     * knihovny třetí strany (BigDecimalMath) na práci s BigDecimal
+     * @param values mapa klíče a hodnoty, například <X -> 4>
+     * Obsahuje užití knihovny třetí strany (BigDecimalMath) na práci s BigDecimal
      * @return Vrátí vypočtený kus pro další vyhodnocení
      */
     public BigDecimal resolveCommand(Map<String, BigDecimal> values) {
@@ -136,140 +126,112 @@ public class Gen {
                 return gens.get(0).resolveCommand(values).subtract(gens.get(1).resolveCommand(values));
             case "*":
                 return gens.get(0).resolveCommand(values).multiply(gens.get(1).resolveCommand(values));
+            case "^":
+                BigDecimal bgPom = gens.get(1).resolveCommand(values);
+                if (bgPom.intValue() > 0 &&  bgPom.intValue() < 999999999){
+                    return gens.get(0).resolveCommand(values).pow(bgPom.intValue());
+                }
             case "/":
                 BigDecimal bDD = gens.get(1).resolveCommand(values);
-                if (bDD.compareTo(BigDecimal.ZERO) == 0) {
+                if (bDD.compareTo(BigDecimal.ZERO) == 0){
                     return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity
-                } else {
+                }else{
                     return gens.get(0).resolveCommand(values).divide(gens.get(1).resolveCommand(values), 6, RoundingMode.HALF_UP);
                 }
             case "sin":
                 try {
                     return BigDecimalMath.sin(gens.get(0).resolveCommand(values), new MathContext(6));
                 } catch (Exception e) {
-                    return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity
+                    return BigDecimal.ZERO;
                 }
             case "cos":
                 try {
                     return BigDecimalMath.cos(gens.get(0).resolveCommand(values), new MathContext(6));
                 } catch (Exception e) {
-                    return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity
+                    return BigDecimal.ZERO;
                 }
             case "tan":
                 try {
                     return BigDecimalMath.tan(gens.get(0).resolveCommand(values), new MathContext(6));
                 } catch (Exception e) {
-                    return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity
+                    return BigDecimal.ZERO;
                 }
             case "sqrt":
                 BigDecimal bgSqrt = gens.get(0).resolveCommand(values);
                 if (bgSqrt.compareTo(BigDecimal.ZERO) <= 0) {
-                    return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity
+                    return BigDecimal.ZERO;
                 }
-                try {
-                    return BigDecimalMath.sqrt(bgSqrt, new MathContext(6));
-                } catch (ArithmeticException e) {
-                    return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity
-                }
+                return BigDecimalMath.sqrt(bgSqrt, new MathContext(6));
             case "abs":
                 return gens.get(0).resolveCommand(values).abs();
             case "exp":
                 try {
                     return BigDecimalMath.exp(gens.get(0).resolveCommand(values), new MathContext(6));
                 } catch (java.lang.ArithmeticException e) {
-                    return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity
+                    return gens.get(0).resolveCommand(values);
                 }
             case "log":
                 BigDecimal bgLog = gens.get(0).resolveCommand(values);
                 if (bgLog.compareTo(BigDecimal.ZERO) <= 0) {
-                    return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity
+                    return BigDecimal.ZERO;
                 }
                 return BigDecimalMath.log(bgLog, new MathContext(6));
             case "!":
+                
                 return gens.get(0).resolveCommand(values).negate();
             case "max":
                 return gens.get(0).resolveCommand(values).max(gens.get(1).resolveCommand(values));
             case "min":
                 return gens.get(0).resolveCommand(values).min(gens.get(1).resolveCommand(values));
+            case "ctg":
+                try{
+                    return BigDecimalMath.cot(gens.get(0).resolveCommand(values), MathContext.UNLIMITED);
+                }catch(ArithmeticException e){
+                    return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity
+                }
             default:
                 return values.get(command);
         }
     }
-
-    /**
-     * Vrátí strom genů od právě volaného uzlu
-     *
-     * @return Strom pod uzlem včetně kořenu
-     */
-    public List<Gen> getAll() {
-        List<Gen> list = new ArrayList<>();
-        if (this != null) {
-            list.add(this);
-        }
-        if (this.gens != null) {
-            if (this.gens.get(0) != null) {
-                list.addAll(gens.get(0).getAll());
-            }
-            if (gens.size() > 1) {
-                if (this.gens.get(1) != null) {
-                    list.addAll(gens.get(1).getAll());
-                }
-            }
-        }
-
-        return list;
-    }
-
     /**
      * Vrátí aritu genu
-     *
      * @return arita
      */
     public int getArita() {
         return arita;
     }
-
     /**
      * Vrátí, zda je gen funkcí
-     *
      * @return Je funkce
      */
     public boolean isFunction() {
         return isFunction;
     }
-
     /**
      * Nastavaví, zda je gen funkcí
-     *
      * @param jeFunkce je Funkce
      */
     public void setIsFunction(boolean jeFunkce) {
         this.isFunction = jeFunkce;
     }
-
     /**
      * Vrátí příkaz genu
-     *
      * @return Příkaz
      */
     public String getCommand() {
         return command;
     }
-
     /**
      * Nastaví maximální hloubku genů
-     *
-     * @param gen
+     * @param gen 
      */
     public void setMaxDepth(Gen gen) {
         Gen.maxDepth = 0;
         getMaxDepth(gen);
     }
-
     /**
      * Vrátí max hloubku genů
-     *
-     * @param gen
+     * @param gen 
      */
     private void getMaxDepth(Gen gen) {
         if (gen.depth > maxDepth) {
@@ -279,25 +241,21 @@ public class Gen {
             gen.gens.get(i).getMaxDepth(gen.gens.get(i));
         }
     }
-
     /**
      * Vrátí hloubku genu
-     *
      * @return hloubka genu
      */
     public int getDepth() {
         return depth;
     }
-
     /**
      * Nastaví hloubku genu
-     *
      * @param depth Hloubka genu
      */
     public void setDepth(int depth) {
         this.depth = depth;
     }
-
+    
     public List<Gen> getGens() {
         return gens;
     }
@@ -305,6 +263,10 @@ public class Gen {
     @Override
     public String toString() {
         return command;
+    }
+
+    public List<Gen> getAll() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }
