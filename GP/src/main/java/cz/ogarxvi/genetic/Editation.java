@@ -207,9 +207,9 @@ public class Editation {
         
     }
     /**
-     * Edituje kořen
-     * @param g kořen editace
-     * @return Zeditovaný kořen
+     * Upraví kořen genu
+     * @param g Kořen
+     * @return Vrátí upravený kořen
      */
     public Gen editRoot(Gen g) {
         this.gen = g;
