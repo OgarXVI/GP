@@ -6,7 +6,7 @@ import java.util.List;
  * Třída pro uchování jedince (programu).
  * Každý chromozon má vypočtenou vlastní zdatnost a obsahuje kořen stromu.
  */
-public class Chromosome {
+public class Chromosome implements Comparable<Chromosome>{
     /**
      * Kořen jedince, gen na vrcholu stromu
      */
@@ -72,5 +72,26 @@ public class Chromosome {
     public void setRoot(Gen koren) {
         this.root = koren;
     }
+    /**
+     * Compare by fitness value
+     * @param o Another Chromosome
+     * @return Compare value
+     */
+    @Override
+    public int compareTo(Chromosome o) {
+        if (this.fitness.getValue().compareTo(o.getFitness().getValue()) > 0){
+            return 1;
+        }
+        if (this.fitness.getValue().compareTo(o.getFitness().getValue()) == 0){
+            return 0;
+        }
+        return -1;
+    }
 
+    @Override
+    public String toString() {
+        return this.getRoot().print();
+    }
+
+    
 }

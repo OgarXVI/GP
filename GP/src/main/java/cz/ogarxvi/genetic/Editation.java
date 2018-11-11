@@ -188,11 +188,28 @@ public class Editation {
         Gen replaceProg11 = new Terminal("1");
         substituteTrees.add(replaceProg11);
 
+        Gen prog12 = new Gen("-", 2);
+        prog12.gens.add(new Terminal("0"));
+        prog12.gens.add(new Terminal("1"));
+        prog12.setIsFunction(true);
+        treesForReplace.add(prog12);
+        Gen replaceProg12 = new Terminal("-1");
+        substituteTrees.add(replaceProg12);
+
+        Gen prog13 = new Gen("+", 2);
+        prog13.gens.add(new Terminal("1"));
+        prog13.gens.add(new Terminal("0"));
+        prog13.setIsFunction(true);
+        treesForReplace.add(prog13);
+        Gen replaceProg13 = new Terminal("1");
+        substituteTrees.add(replaceProg13);
+
+        
     }
     /**
-     * 
-     * @param g
-     * @return 
+     * Edituje kořen
+     * @param g kořen editace
+     * @return Zeditovaný kořen
      */
     public Gen editRoot(Gen g) {
         this.gen = g;
@@ -200,11 +217,16 @@ public class Editation {
         this.gen.fixDepth();
         return this.gen;
     }
-
+    /**
+     * Opakuj editaci
+     */
     private void editReapeable() {
         editGen(this.gen);
     }
-
+    /**
+     * Edituje kořen, vnitřní metoda
+     * @param g Editovaný kořen
+     */
     private void editGen(Gen g) {
 
         repeat = false;
@@ -222,7 +244,11 @@ public class Editation {
             editGen(g.gens.get(i));
         }
     }
-
+    /**
+     * Edituje
+     * @param gen editovaný kořen
+     * @return Vrací editovaný kořen
+     */
     public Gen edit(Gen gen) {
 
         for (int d = 0; d < gen.arita; d++) {

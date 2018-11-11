@@ -102,12 +102,14 @@ public class GPController extends Thread {
 
     @Override
     public void run() {
-        try {
             GeneticAlgorithm ga = new GeneticAlgorithm(this);
             ga.runGP(numberOfGeneration, sizeOfInitPopulation, maxDepthTreeInit, maxDepthTreeAfterCrossover, reproduction, crossover, mutation, elitism, decimation, editation, selectionMethod, null, null);
-        } catch (NullPointerException e) {
-            JOptionPane.showMessageDialog(null, "Exception: " + e.getMessage());
-        }
+    }
+    /***
+     * Způsobí zastavení vlákna
+     */
+    public void myStop(){
+        this.stop();
     }
     /**
      * Vrátí odkaz na DataHandler

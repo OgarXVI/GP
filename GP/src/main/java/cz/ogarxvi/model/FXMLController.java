@@ -7,7 +7,10 @@ import cz.ogarxvi.genetic.GeneticAlgorithm;
 import cz.ogarxvi.genetic.Terminal;
 import cz.ogarxvi.model.Graph.Layout;
 import cz.ogarxvi.model.Graph.TreeLayout;
+import java.awt.BasicStroke;
+import java.awt.Font;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
@@ -41,6 +44,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -61,6 +65,19 @@ import org.controlsfx.control.ToggleSwitch;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.jfree.chart.*;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.AbstractCategoryItemRenderer;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.category.StandardBarPainter;
+import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.data.statistics.HistogramDataset;
+import org.jfree.data.statistics.HistogramType;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.ui.ApplicationFrame;
+import org.jfree.ui.RectangleInsets;
+import org.jfree.ui.RefineryUtilities;
 
 /**
  * Ovladací třída pro GUI hlavního okna. Užívá knihovny třetí strany
@@ -330,7 +347,7 @@ public class FXMLController implements Initializable {
      *
      * @param event
      */
-    /*@FXML
+    @FXML
     private void OpenOutput(ActionEvent event) throws URISyntaxException, XMLStreamException {
         //Výběr souboru
         JFileChooser fileChooser = new JFileChooser();
@@ -369,27 +386,86 @@ public class FXMLController implements Initializable {
                         element = "";
                     } // načítáme konec elementu
                     else if ((xsr.getEventType() == XMLStreamConstants.END_ELEMENT)) {
-                        if ((xsr.getName().getLocalPart().equals("Result"))) {                           
+                        if ((xsr.getName().getLocalPart().equals("Result"))) {
                             if (results.containsKey(fitness)) {
-                                results.put(fitness, results.get(fitness) + 1);
+                                results.put(fitness, results.get(fitness) + quantity);
                             } else {
-                                results.put(fitness, 1);
+                                results.put(fitness, quantity);
                             }
                         }
                     }
                     xsr.next();
                 }
-            } catch (Exception e) {
+            } catch (FileNotFoundException | NumberFormatException | XMLStreamException e) {
                 m.AddMesseage("Error: " + e.getMessage());
                 m.GetMesseage();
             }
+
+            try{
+            HistogramDataset dataset = new HistogramDataset();
+            dataset.setType(HistogramType.FREQUENCY);
             
-            m.AddMesseage(results.toString());
-            m.GetMesseage();
             
+            List<Double> listDouble = new ArrayList();
+            for (Map.Entry<BigDecimal, Integer> entry : results.entrySet()) {
+                BigDecimal key = entry.getKey();
+                Integer value = entry.getValue();
+                for (int i = 0; i < value.intValue(); i++) {
+                    listDouble.add(key.doubleValue());
+                }
+            }
+            double[] pomD = new double[listDouble.size()];
+            for (int i = 0; i < pomD.length; i++) {
+                pomD[i] = listDouble.get(i);
+            }
+            dataset.addSeries("Histogram", pomD, 50, -1, 1);
+  
+            // Dataset
+            DefaultPieDataset dataset2 = new DefaultPieDataset();
+            results.entrySet().forEach((entry) -> {
+                BigDecimal key = entry.getKey();
+                Integer value = entry.getValue();
+                dataset2.setValue(key, value);
+            });
+            //Chart
+            JFreeChart chart2 = ChartFactory.createPieChart("Output Graph", dataset2, true, true, false);
+            //Chart
+            JFreeChart chart = ChartFactory.createHistogram("Histogram", "Value", "Frequency", dataset, PlotOrientation.VERTICAL, true, true, true);
+            
+                        //STYLE
+            StandardChartTheme theme = (StandardChartTheme)org.jfree.chart.StandardChartTheme.createJFreeTheme();
+
+    theme.setTitlePaint( java.awt.Color.decode( "#4572a7" ) );
+    theme.setExtraLargeFont( new Font("Lucida Sans",Font.PLAIN, 16) ); //title
+    theme.setLargeFont( new Font("Lucida Sans",Font.BOLD, 15)); //axis-title
+    theme.setRegularFont( new Font("Lucida Sans",Font.PLAIN, 11));
+    theme.setRangeGridlinePaint( java.awt.Color.decode("#C0C0C0"));
+    theme.setPlotBackgroundPaint( java.awt.Color.white );
+    theme.setChartBackgroundPaint( java.awt.Color.white );
+    theme.setGridBandPaint( java.awt.Color.red );
+    theme.setAxisOffset( new RectangleInsets(0,0,0,0) );
+    theme.setBarPainter(new StandardBarPainter());
+    theme.setAxisLabelPaint( java.awt.Color.decode("#666666")  );
+    theme.apply( chart );
+    
+    chart.getPlot().setOutlineStroke(new BasicStroke(3f));
+            //JPanel
+            JFrame af = new JFrame("Output Graph - Histogram");
+            af.setContentPane(new ChartPanel( chart ));
+            af.setSize( 600 , 600 );
+            RefineryUtilities.centerFrameOnScreen( af );    
+            af.setVisible( true );
+            JFrame af2 = new JFrame("Output Graph - PieChart");
+            af2.setContentPane(new ChartPanel( chart2 ));
+            af2.setSize( 600 , 600 );
+            RefineryUtilities.centerFrameOnScreen( af2 );    
+            af2.setVisible( true ); 
+            }catch(Exception e){
+                System.out.println("ERROR: " + e.getMessage());
+            }
         }
 
-    }*/
+    }
 
     /**
      * Načtení souboru
@@ -645,126 +721,12 @@ public class FXMLController implements Initializable {
                 }
             }
 
-            m.AddMesseage("Probíhá výpočet...");
+            m.AddMesseage("Calculate...");
             m.GetMesseage();
 
             // ČAS to vše pustit
-            Document doc = null;
-            int numberOfConfi = configurations.size();
-            for (int i = 0; i < numberOfConfi; i++) {
-                GeneticAlgorithm ga = new GeneticAlgorithm(m, dh, true);
-                Configuration loadedConfi = configurations.get(i);
-
-                outputs.add(i, new HashMap<>());
-                finalOutputs.add(i, new HashMap<>());
-
-                for (int j = 0; j < loadedConfi.NumberOfStarts; j++) {
-                    Chromosome bestChromosome = ga.runGP(
-                            loadedConfi.NumberOfGenerations,
-                            loadedConfi.PopulationSize,
-                            loadedConfi.MaxDepthTreeInit,
-                            loadedConfi.MaxDepthTreeAfterCrossover,
-                            loadedConfi.ReproductionProbability,
-                            loadedConfi.CrossingProbability,
-                            loadedConfi.MutationProbability,
-                            loadedConfi.Elitism,
-                            loadedConfi.Decimation,
-                            false,
-                            loadedConfi.Selection,
-                            loadedConfi.Functions,
-                            loadedConfi.Terminals
-                    );
-                    // Zde je čas zapsat si výsledek
-                    BigDecimal item = bestChromosome.getFitness().getValue();
-                    Output output = new Output(item, bestChromosome.getRoot().print());
-                    if (outputs.get(i).containsKey(output)) {
-                        outputs.get(i).put(output, outputs.get(i).get(output) + 1);
-
-                    } else {
-                        outputs.get(i).put(output, 1);
-                    }
-                    if (finalOutputs.get(i).containsKey(item)) {
-                        finalOutputs.get(i).put(item, finalOutputs.get(i).get(item) + 1);
-                    } else {
-                        finalOutputs.get(i).put(item, 1);
-                    }
-
-                }
-                //Zpráva o výstupu
-                m.AddMesseage("Výsledek konfigurace " + configurations.get(i).Id + " zpracován");
-                m.GetMesseage();
-            }
-            // Zde je čas zapsat výsledek do xml
-            //Budeme chtít všechny nalezené formule a jejich fitness
-            //A budeme chtít celkový počet nalezených řešení dle fitness bez ohledu na formu řešení
-            DocumentBuilderFactory docFactory;
-            DocumentBuilder docBuilder;
-            try {
-                docFactory = DocumentBuilderFactory.newInstance();
-                docBuilder = docFactory.newDocumentBuilder();
-
-                // root element
-                doc = docBuilder.newDocument();
-                Element rootElement = doc.createElement("Application");
-                doc.appendChild(rootElement);
-
-                for (int i = 0; i < numberOfConfi; i++) {
-                    // confi elements
-                    Element confi = doc.createElement("Configuration");
-                    rootElement.appendChild(confi);
-                    confi.setAttribute("id", String.valueOf(i));
-
-                    Element wrapOutputsElement = doc.createElement("Outputs");
-                    confi.appendChild(wrapOutputsElement);
-
-                    for (Map.Entry<Output, Integer> entry : outputs.get(i).entrySet()) {
-                        Output key = entry.getKey();
-                        Integer value = entry.getValue();
-
-                        Element outputElement = doc.createElement("Output");
-                        wrapOutputsElement.appendChild(outputElement);
-
-                        Element outputFitnessElement = doc.createElement("Fitness");
-                        outputFitnessElement.appendChild(doc.createTextNode(key.Fitness.toString()));
-                        outputElement.appendChild(outputFitnessElement);
-
-                        Element outputFormulaElement = doc.createElement("Formula");
-                        outputFormulaElement.appendChild(doc.createTextNode(key.formula));
-                        outputElement.appendChild(outputFormulaElement);
-                    }
-
-                    Element wrapResultsElement = doc.createElement("Results");
-                    confi.appendChild(wrapResultsElement);
-
-                    for (Map.Entry<BigDecimal, Integer> entry : finalOutputs.get(i).entrySet()) {
-                        BigDecimal key = entry.getKey();
-                        Integer value = entry.getValue();
-
-                        Element resultElement = doc.createElement("Result");
-                        wrapResultsElement.appendChild(resultElement);
-
-                        Element resultFitnessElement = doc.createElement("Fitness");
-                        resultFitnessElement.appendChild(doc.createTextNode(key.toString()));
-                        resultElement.appendChild(resultFitnessElement);
-
-                        Element resultQuantityElement = doc.createElement("Quantity");
-                        resultQuantityElement.appendChild(doc.createTextNode(String.valueOf(value)));
-                        resultElement.appendChild(resultQuantityElement);
-                    }
-                }
-
-                // write the content into xml file
-                TransformerFactory transformerFactory = TransformerFactory.newInstance();
-                Transformer transformer = transformerFactory.newTransformer();
-                DOMSource source = new DOMSource(doc);
-                StreamResult result = new StreamResult(new File("./Output.xml"));
-                transformer.transform(source, result);
-
-                m.AddMesseage("Soubor uložen!");
-                m.GetMesseage();
-            } catch (ParserConfigurationException ex) {
-                Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            AutomatController ac = new AutomatController(configurations, outputs, finalOutputs);
+            ac.start();
         }
     }
 
@@ -845,6 +807,145 @@ public class FXMLController implements Initializable {
             return hash;
         }
 
+    }
+
+    public class AutomatController extends Thread {
+
+        List<Configuration> configurations;
+        List<Map<Output, Integer>> outputs;
+        List<Map<BigDecimal, Integer>> finalOutputs;
+
+        public AutomatController(List<Configuration> configurations, List<Map<Output, Integer>> outputs, List<Map<BigDecimal, Integer>> finalOutputs) {
+            this.configurations = configurations;
+            this.outputs = outputs;
+            this.finalOutputs = finalOutputs;
+        }
+
+        @Override
+        public void run() {
+            Document doc = null;
+            int numberOfConfi = configurations.size();
+            long startTime = System.currentTimeMillis();
+            System.out.println("Start in: " + startTime);
+            GeneticAlgorithm ga = new GeneticAlgorithm(m, dh, true);
+            for (int i = 0; i < numberOfConfi; i++) {
+                Configuration loadedConfi = configurations.get(i);
+
+                outputs.add(i, new HashMap<>());
+                finalOutputs.add(i, new HashMap<>());
+
+                for (int j = 0; j < loadedConfi.NumberOfStarts; j++) {
+                    Chromosome bestChromosome = ga.runGP(
+                            loadedConfi.NumberOfGenerations,
+                            loadedConfi.PopulationSize,
+                            loadedConfi.MaxDepthTreeInit,
+                            loadedConfi.MaxDepthTreeAfterCrossover,
+                            loadedConfi.ReproductionProbability,
+                            loadedConfi.CrossingProbability,
+                            loadedConfi.MutationProbability,
+                            loadedConfi.Elitism,
+                            loadedConfi.Decimation,
+                            false,
+                            loadedConfi.Selection,
+                            loadedConfi.Functions,
+                            loadedConfi.Terminals
+                    );
+                    // Zde je čas zapsat si výsledek
+                    BigDecimal item = bestChromosome.getFitness().getValue();
+                    Output output = new Output(item, bestChromosome.getRoot().print());
+                    System.out.println("Cal.: " + (startTime - System.currentTimeMillis()));
+                    if (outputs.get(i).containsKey(output)) {
+                        outputs.get(i).put(output, outputs.get(i).get(output) + 1);
+
+                    } else {
+                        outputs.get(i).put(output, 1);
+                    }
+                    if (finalOutputs.get(i).containsKey(item)) {
+                        finalOutputs.get(i).put(item, finalOutputs.get(i).get(item) + 1);
+                    } else {
+                        finalOutputs.get(i).put(item, 1);
+                    }
+                }
+                //Zpráva o výstupu
+                m.AddMesseage("Configuration " + configurations.get(i).Id + " done");
+                m.GetMesseage();
+            }
+            // Zde je čas zapsat výsledek do xml
+            //Budeme chtít všechny nalezené formule a jejich fitness
+            //A budeme chtít celkový počet nalezených řešení dle fitness bez ohledu na formu řešení
+            DocumentBuilderFactory docFactory;
+            DocumentBuilder docBuilder;
+            try {
+                docFactory = DocumentBuilderFactory.newInstance();
+                docBuilder = docFactory.newDocumentBuilder();
+
+                // root element
+                doc = docBuilder.newDocument();
+                Element rootElement = doc.createElement("Application");
+                doc.appendChild(rootElement);
+
+                for (int i = 0; i < numberOfConfi; i++) {
+                    // confi elements
+                    Element confi = doc.createElement("Configuration");
+                    rootElement.appendChild(confi);
+                    confi.setAttribute("id", String.valueOf(i));
+
+                    Element wrapOutputsElement = doc.createElement("Outputs");
+                    confi.appendChild(wrapOutputsElement);
+
+                    for (Map.Entry<Output, Integer> entry : outputs.get(i).entrySet()) {
+                        Output key = entry.getKey();
+                        Integer value = entry.getValue();
+
+                        Element outputElement = doc.createElement("Output");
+                        wrapOutputsElement.appendChild(outputElement);
+
+                        Element outputFitnessElement = doc.createElement("Fitness");
+                        outputFitnessElement.appendChild(doc.createTextNode(key.Fitness.toString()));
+                        outputElement.appendChild(outputFitnessElement);
+
+                        Element outputFormulaElement = doc.createElement("Formula");
+                        outputFormulaElement.appendChild(doc.createTextNode(key.formula));
+                        outputElement.appendChild(outputFormulaElement);
+                    }
+
+                    Element wrapResultsElement = doc.createElement("Results");
+                    confi.appendChild(wrapResultsElement);
+
+                    for (Map.Entry<BigDecimal, Integer> entry : finalOutputs.get(i).entrySet()) {
+                        BigDecimal key = entry.getKey();
+                        Integer value = entry.getValue();
+
+                        Element resultElement = doc.createElement("Result");
+                        wrapResultsElement.appendChild(resultElement);
+
+                        Element resultFitnessElement = doc.createElement("Fitness");
+                        resultFitnessElement.appendChild(doc.createTextNode(key.toString()));
+                        resultElement.appendChild(resultFitnessElement);
+
+                        Element resultQuantityElement = doc.createElement("Quantity");
+                        resultQuantityElement.appendChild(doc.createTextNode(String.valueOf(value)));
+                        resultElement.appendChild(resultQuantityElement);
+                    }
+                }
+
+                // write the content into xml file
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                Transformer transformer = transformerFactory.newTransformer();
+                DOMSource source = new DOMSource(doc);
+                StreamResult result = new StreamResult(new File("Output.xml"));
+                transformer.transform(source, result);
+
+                m.AddMesseage("File saved!");
+                m.GetMesseage();
+            } catch (ParserConfigurationException ex) {
+                Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (TransformerConfigurationException ex) {
+                Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (TransformerException ex) {
+                Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
 }

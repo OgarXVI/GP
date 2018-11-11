@@ -104,7 +104,7 @@ public class Graph {
     }
     /**
      * Přidá chromosome do modelu
-     * @param chromosome 
+     * @param chromosome Chromosome
      */
     public void addGraphComponents(Chromosome chromosome) {
         //Získá model
@@ -251,7 +251,6 @@ public class Graph {
          * Přidá buňku dle typu
          * @param id Reference objektu
          * @param command Příkaz objektu
-         * @param type typ objektu
          * @param depth hloubka objektu
          * @param width šířka písma objektu
          * @return Buňka
@@ -573,13 +572,16 @@ public class Graph {
 
         }
         /**
-         * Vrátí 
-         * @return 
+         * Vrátí zdroj
+         * @return Bunka
          */
         public Cell getSource() {
             return source;
         }
-
+        /**
+         * Vrátí cíl
+         * @return Bunka
+         */
         public Cell getTarget() {
             return target;
         }

@@ -24,6 +24,7 @@
             <items>
                   <MenuItem mnemonicParsing="false" onAction="#LoadFile" text="Load Data" />
                   <MenuItem mnemonicParsing="false" onAction="#RunCofiguration" text="Run Configuration" />
+                  <MenuItem mnemonicParsing="false" onAction="#OpenOutput" text="Open Output" />
                 <MenuItem mnemonicParsing="false" onAction="#CloseFromMenuItem" text="Exit" />
             </items>
           </Menu>
