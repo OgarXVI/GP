@@ -226,6 +226,8 @@ public class DataHandler {
             ol.add(new DataHandler.BoxDataItem(Function.getSet("-", 2), 2));
             ol.add(new DataHandler.BoxDataItem(Function.getSet("*", 2), 2));
             ol.add(new DataHandler.BoxDataItem(Function.getSet("/", 2), 2));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("^", 2), 2));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("cotg", 2), 2));
             ol.add(new DataHandler.BoxDataItem(Function.getSet("sin", 1), 1));
             ol.add(new DataHandler.BoxDataItem(Function.getSet("cos", 1), 1));
             ol.add(new DataHandler.BoxDataItem(Function.getSet("tan", 1), 1));

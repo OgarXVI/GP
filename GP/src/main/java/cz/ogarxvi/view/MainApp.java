@@ -22,7 +22,7 @@ public class MainApp extends Application {
         // načte styly
         scene.getStylesheets().add("/styles/Styles.css");
         // načte ikonku 
-        stage.getIcons().add(new Image("/images/icon.png"));
+        stage.getIcons().add(new Image("/images/icon.jpg"));
         // nastaví titulek
         stage.setTitle("Symbolic Regression");
         // nastaví aplikaci scénu 
