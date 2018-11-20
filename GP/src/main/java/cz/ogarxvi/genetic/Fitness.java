@@ -42,7 +42,7 @@ public class Fitness {
     public void calculate(List<BigDecimal> calcResult, BigDecimal[] expectedResults) {
         BigDecimal val = new BigDecimal(BigInteger.ZERO);        
         
-        for (int i = 0; i < expectedResults.length; i++) {
+        for (int i = 0; i < calcResult.size(); i++) {
             val = val.add(calcResult.get(i).subtract(expectedResults[i]));
         }
         val = val.divide(BigDecimal.valueOf(calcResult.size()), 6, RoundingMode.HALF_UP);

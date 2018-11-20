@@ -6,7 +6,6 @@
 package cz.ogarxvi.model;
 
 import cz.ogarxvi.genetic.GeneticAlgorithm;
-import javax.swing.JOptionPane;
 
 /**
  * Vlákno udržující parametry pro výpočet GA

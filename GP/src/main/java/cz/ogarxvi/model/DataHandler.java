@@ -176,6 +176,24 @@ public class DataHandler {
         }
     }
     /**
+     * Vygeneruje terminály dle zadaného řetezce
+     * @param string Terminály
+     * @return List terminálů
+     */
+    public static List<Gen> generateTerminals(String string){
+        return Terminal.getSet(string);
+    }
+    /**
+     * Vygeneruje funkce dle zadaného řetezce
+     * @param string Funkce
+     * @param arita Arita funkcí
+     * @return List fukncí
+     */
+    public static List<Gen> generateFunctions(String string, int arita){
+        return Function.getSet(string, arita);
+    }
+    
+    /**
      * Třída sloužící jako box pro data v checkComboBoxu
      */
     public static class BoxDataItem {
