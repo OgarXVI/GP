@@ -19,11 +19,3 @@ Mezi podporované terminály patří:
  
 Mezi podporované funkce patří:
 - +, -, *, /, sin(), cos(), tg(), abs(), sqrt(), log(), exp(), negation().
-
-
-
-
-Nedostatky:
- - Chybí zobrazení stromového grafu výsledného programu
- - GUI - pravý sloupec s parametry se nesprávně škáluje vůči různým rozlišením
-
