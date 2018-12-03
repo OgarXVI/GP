@@ -5,13 +5,11 @@
  */
 package cz.ogarxvi.model;
 
-import cz.ogarxvi.genetic.Chromosome;
 import cz.ogarxvi.genetic.Gen;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -104,14 +102,14 @@ public class Graph {
     }
     /**
      * Přidá chromosome do modelu
-     * @param chromosome Chromosome
+     * @param rootG Root gen
      */
-    public void addGraphComponents(Chromosome chromosome) {
+    public void addGraphComponents(Gen rootG) {
         //Získá model
         Model model = this.getModel();
 
         //Získej celý strom jako jeden list genů
-        Gen root = chromosome.getRoot();
+        Gen root = rootG;
         List<Gen> tree = root.getAll();
 
         //Připrav listy jako pole hloubek

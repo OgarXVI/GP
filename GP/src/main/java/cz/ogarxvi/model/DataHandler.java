@@ -176,6 +176,24 @@ public class DataHandler {
         }
     }
     /**
+     * Vygeneruje terminály dle zadaného řetezce
+     * @param string Terminály
+     * @return List terminálů
+     */
+    public static List<Gen> generateTerminals(String string){
+        return Terminal.getSet(string);
+    }
+    /**
+     * Vygeneruje funkce dle zadaného řetezce
+     * @param string Funkce
+     * @param arita Arita funkcí
+     * @return List fukncí
+     */
+    public static List<Gen> generateFunctions(String string, int arita){
+        return Function.getSet(string, arita, false);
+    }
+    
+    /**
      * Třída sloužící jako box pro data v checkComboBoxu
      */
     public static class BoxDataItem {
@@ -222,20 +240,24 @@ public class DataHandler {
          */
         public static ObservableList<DataHandler.BoxDataItem> generateFunctionBoxItems() {
             List ol = new ArrayList<>();
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("+", 2), 2));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("-", 2), 2));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("*", 2), 2));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("/", 2), 2));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("^", 2), 2));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("cotg", 2), 2));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("sin", 1), 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("cos", 1), 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("tan", 1), 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("sqrt", 1), 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("abs", 1), 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("exp", 1), 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("log", 1), 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("!", 1), 1));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("+", 2, false), 2));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("-", 2, false), 2));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("*", 2, false), 2));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("/", 2, false), 2));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("^", 2, false), 2));
+            //ol.add(new DataHandler.BoxDataItem(Function.getSet("min", 2, true), 2));
+            //ol.add(new DataHandler.BoxDataItem(Function.getSet("max", 2, true), 2));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("cotg", 1, false), 1));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("sin", 1, false), 1));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("cos", 1, false), 1));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("tan", 1, false), 1));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("sqrt", 1, false), 1));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("abs", 1, false), 1));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("exp", 1, false), 1));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("log2", 1, false), 1));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("log10", 1, false), 1));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("ln", 1, false), 1));
+            ol.add(new DataHandler.BoxDataItem(Function.getSet("!", 1, false), 1));
 
             return FXCollections.observableArrayList(ol);
         }

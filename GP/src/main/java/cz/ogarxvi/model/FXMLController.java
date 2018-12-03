@@ -1,10 +1,8 @@
 package cz.ogarxvi.model;
 
 import cz.ogarxvi.genetic.Chromosome;
-import cz.ogarxvi.genetic.Function;
 import cz.ogarxvi.genetic.Gen;
 import cz.ogarxvi.genetic.GeneticAlgorithm;
-import cz.ogarxvi.genetic.Terminal;
 import cz.ogarxvi.model.Graph.Layout;
 import cz.ogarxvi.model.Graph.TreeLayout;
 import java.awt.BasicStroke;
@@ -12,11 +10,11 @@ import java.awt.Font;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,19 +27,17 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Cell;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -62,20 +58,14 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.io.FilenameUtils;
 import org.controlsfx.control.CheckComboBox;
 import org.controlsfx.control.ToggleSwitch;
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.jfree.chart.*;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.renderer.category.AbstractCategoryItemRenderer;
-import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.StandardBarPainter;
 import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.RectangleInsets;
 import org.jfree.ui.RefineryUtilities;
 
@@ -187,9 +177,19 @@ public class FXMLController implements Initializable {
     //Listeners
     private ListChangeListener<DataHandler.BoxDataItem> functionCheckComboBoxListener;
     private ListChangeListener<DataHandler.BoxDataItem> terminalCheckComboBoxListener;
-
-    //
-    Graph graph;
+    /**
+     * *
+     * Načtený soubor s daty
+     */
+    private File loadedDataFile;
+    /**
+     * Graf na vykreslení outputu
+     */
+    private Graph graph;
+    /**
+     * Ovladač vlákna pro manuálně puštěný výpočet
+     */
+    private GPController gpC;
     @FXML
     private MenuItem tournamentMenuItem;
     @FXML
@@ -249,7 +249,22 @@ public class FXMLController implements Initializable {
      */
     @FXML
     private void CloseFromMenuItem(ActionEvent event) {
-        Platform.exit();
+        //Platform.exit();
+        showFunctionWindow();
+    }
+
+    private void showFunctionWindow() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            fxmlLoader.setLocation(getClass().getResource("/fxml/FunctionWindow.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+            Stage stage = new Stage();
+            stage.setTitle("Functions");
+            stage.setScene(scene);
+            stage.show();
+        } catch (UnsupportedOperationException | IOException e) {
+            JOptionPane.showMessageDialog(null, "Not implemented yet");
+        }
     }
 
     /**
@@ -284,7 +299,6 @@ public class FXMLController implements Initializable {
         double mutation = Double.valueOf(MutationProbabilityTextField.getPromptText());
         boolean elitism = ElitistToogleButton.isSelected();
         boolean decimation = DecimationButton.isSelected();
-        boolean editation = false;
         // zkontrolování uživatelských vstupů
         try {
             numberOfGenerations
@@ -314,7 +328,7 @@ public class FXMLController implements Initializable {
             JOptionPane.showMessageDialog(null, "Wrong format, setting default values...");
         }
         //puštění GP výpočtu
-        GPController demo = new GPController(
+        gpC = new GPController(
                 m,
                 dh,
                 numberOfGenerations,
@@ -326,9 +340,8 @@ public class FXMLController implements Initializable {
                 mutation,
                 elitism,
                 decimation,
-                editation,
                 selectionMethod);
-        demo.start();
+        gpC.start();
 
     }
 
@@ -340,6 +353,9 @@ public class FXMLController implements Initializable {
     @FXML
     private void StopCalculation(ActionEvent event) {
         dh.setGpStop(true);
+        m.AddMesseage("Stopped");
+        m.GetMesseage();
+        gpC.stop();//
     }
 
     /**
@@ -401,66 +417,81 @@ public class FXMLController implements Initializable {
                 m.GetMesseage();
             }
 
-            try{
-            HistogramDataset dataset = new HistogramDataset();
-            dataset.setType(HistogramType.FREQUENCY);
-            
-            
-            List<Double> listDouble = new ArrayList();
-            for (Map.Entry<BigDecimal, Integer> entry : results.entrySet()) {
-                BigDecimal key = entry.getKey();
-                Integer value = entry.getValue();
-                for (int i = 0; i < value.intValue(); i++) {
-                    listDouble.add(key.doubleValue());
-                }
-            }
-            double[] pomD = new double[listDouble.size()];
-            for (int i = 0; i < pomD.length; i++) {
-                pomD[i] = listDouble.get(i);
-            }
-            dataset.addSeries("Histogram", pomD, 50, -1, 1);
-  
-            // Dataset
-            DefaultPieDataset dataset2 = new DefaultPieDataset();
-            results.entrySet().forEach((entry) -> {
-                BigDecimal key = entry.getKey();
-                Integer value = entry.getValue();
-                dataset2.setValue(key, value);
-            });
-            //Chart
-            JFreeChart chart2 = ChartFactory.createPieChart("Output Graph", dataset2, true, true, false);
-            //Chart
-            JFreeChart chart = ChartFactory.createHistogram("Histogram", "Value", "Frequency", dataset, PlotOrientation.VERTICAL, true, true, true);
-            
-                        //STYLE
-            StandardChartTheme theme = (StandardChartTheme)org.jfree.chart.StandardChartTheme.createJFreeTheme();
+            try {
+                HistogramDataset dataset = new HistogramDataset();
+                dataset.setType(HistogramType.FREQUENCY);
 
-    theme.setTitlePaint( java.awt.Color.decode( "#4572a7" ) );
-    theme.setExtraLargeFont( new Font("Lucida Sans",Font.PLAIN, 16) ); //title
-    theme.setLargeFont( new Font("Lucida Sans",Font.BOLD, 15)); //axis-title
-    theme.setRegularFont( new Font("Lucida Sans",Font.PLAIN, 11));
-    theme.setRangeGridlinePaint( java.awt.Color.decode("#C0C0C0"));
-    theme.setPlotBackgroundPaint( java.awt.Color.white );
-    theme.setChartBackgroundPaint( java.awt.Color.white );
-    theme.setGridBandPaint( java.awt.Color.red );
-    theme.setAxisOffset( new RectangleInsets(0,0,0,0) );
-    theme.setBarPainter(new StandardBarPainter());
-    theme.setAxisLabelPaint( java.awt.Color.decode("#666666")  );
-    theme.apply( chart );
-    
-    chart.getPlot().setOutlineStroke(new BasicStroke(3f));
-            //JPanel
-            JFrame af = new JFrame("Output Graph - Histogram");
-            af.setContentPane(new ChartPanel( chart ));
-            af.setSize( 600 , 600 );
-            RefineryUtilities.centerFrameOnScreen( af );    
-            af.setVisible( true );
-            JFrame af2 = new JFrame("Output Graph - PieChart");
-            af2.setContentPane(new ChartPanel( chart2 ));
-            af2.setSize( 600 , 600 );
-            RefineryUtilities.centerFrameOnScreen( af2 );    
-            af2.setVisible( true ); 
-            }catch(Exception e){
+                List<Double> listDouble = new ArrayList();
+                for (Map.Entry<BigDecimal, Integer> entry : results.entrySet()) {
+                    BigDecimal key = entry.getKey();
+                    Integer value = entry.getValue();
+                    for (int i = 0; i < value.intValue(); i++) {
+                        listDouble.add(key.doubleValue());
+                    }
+                }
+                double[] pomD = new double[listDouble.size()];
+                for (int i = 0; i < pomD.length; i++) {
+                    pomD[i] = listDouble.get(i);
+                }
+                //CALC MIN
+                double min = 0f;
+                for (int i = 0; i < pomD.length; i++) {
+                    if (min > pomD[i]) {
+                        min = pomD[i];
+                    }
+                }
+
+                //CALC MAX
+                double max = 0f;
+                for (int i = 0; i < pomD.length; i++) {
+                    if (max < pomD[i]) {
+                        max = pomD[i];
+                    }
+                }
+
+                dataset.addSeries("Histogram", pomD, 100, min - 0.1f, max + 0.1f);
+
+                // Dataset
+                DefaultPieDataset dataset2 = new DefaultPieDataset();
+                results.entrySet().forEach((entry) -> {
+                    BigDecimal key = entry.getKey();
+                    Integer value = entry.getValue();
+                    dataset2.setValue(key, value);
+                });
+                //Chart
+                JFreeChart chart2 = ChartFactory.createPieChart("Output Graph", dataset2, true, true, false);
+                //Chart
+                JFreeChart chart = ChartFactory.createHistogram("Histogram", "Value", "Frequency", dataset, PlotOrientation.VERTICAL, true, true, true);
+
+                //STYLE
+                StandardChartTheme theme = (StandardChartTheme) org.jfree.chart.StandardChartTheme.createJFreeTheme();
+
+                theme.setTitlePaint(java.awt.Color.decode("#4572a7"));
+                theme.setExtraLargeFont(new Font("Lucida Sans", Font.PLAIN, 16)); //title
+                theme.setLargeFont(new Font("Lucida Sans", Font.BOLD, 15)); //axis-title
+                theme.setRegularFont(new Font("Lucida Sans", Font.PLAIN, 11));
+                theme.setRangeGridlinePaint(java.awt.Color.decode("#C0C0C0"));
+                theme.setPlotBackgroundPaint(java.awt.Color.white);
+                theme.setChartBackgroundPaint(java.awt.Color.white);
+                theme.setGridBandPaint(java.awt.Color.red);
+                theme.setAxisOffset(new RectangleInsets(0, 0, 0, 0));
+                theme.setBarPainter(new StandardBarPainter());
+                theme.setAxisLabelPaint(java.awt.Color.decode("#666666"));
+                theme.apply(chart);
+
+                chart.getPlot().setOutlineStroke(new BasicStroke(3f));
+                //JPanel
+                JFrame af = new JFrame("Output Graph - Histogram");
+                af.setContentPane(new ChartPanel(chart));
+                af.setSize(600, 600);
+                RefineryUtilities.centerFrameOnScreen(af);
+                af.setVisible(true);
+                JFrame af2 = new JFrame("Output Graph - PieChart");
+                af2.setContentPane(new ChartPanel(chart2));
+                af2.setSize(600, 600);
+                RefineryUtilities.centerFrameOnScreen(af2);
+                af2.setVisible(true);
+            } catch (Exception e) {
                 System.out.println("ERROR: " + e.getMessage());
             }
         }
@@ -480,9 +511,9 @@ public class FXMLController implements Initializable {
         fileChooser.setCurrentDirectory(new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI()));
         int returnValue = fileChooser.showOpenDialog(null);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fileChooser.getSelectedFile();
+            loadedDataFile = fileChooser.getSelectedFile();
             // užití knihovny třetí strany - pro zjištění typu souboru
-            String extension = FilenameUtils.getExtension(selectedFile.getName());
+            String extension = FilenameUtils.getExtension(loadedDataFile.getName());
             IReader ir;
             switch (extension) {
                 case "xlsx":
@@ -495,7 +526,7 @@ public class FXMLController implements Initializable {
                     return;
             }
             //načtení a zpracování dat
-            ir.ReadFile(selectedFile);
+            ir.ReadFile(loadedDataFile);
             dh.parseData(ir.GetData());
             // vyčištění prostoru
             Clear(null);
@@ -507,6 +538,10 @@ public class FXMLController implements Initializable {
      */
     private void updateOutput() {
         m.ClearMessenger();
+        if (loadedDataFile != null) {
+            m.AddMesseage("Expected Function: " + FilenameUtils.getBaseName(loadedDataFile.getName()));
+            m.AddMesseage("Rows: " + TableView.getItems().size());
+        }
         m.AddMesseage("Terminals: " + dh.getLoadedTerminals());
         m.AddMesseage("Functions: " + dh.getLoadedFunctions());
         m.GetAllMesseages();
@@ -533,7 +568,7 @@ public class FXMLController implements Initializable {
 
             root.setCenter(graph.getScrollPane());
 
-            graph.addGraphComponents(dh.getBestChromosome());
+            graph.addGraphComponents(dh.getBestChromosome().getRoot());
 
             Scene scene = new Scene(root, 800, 800);
             Stage primaryStage = new Stage();
@@ -566,10 +601,36 @@ public class FXMLController implements Initializable {
      * @param event
      */
     @FXML
-    private void TournamentSelected(ActionEvent event) {
-        m.AddMesseage("Tournament selection selected!");
-        SelectionMenu.setText("Selection: Tournament");
+    private void Tournament5Selected(ActionEvent event) {
+        m.AddMesseage("Tournament 5 selection selected!");
+        SelectionMenu.setText("Selection: Tournament 5");
+        selectionMethod = 2;
+        m.GetMesseage();
+    }
+
+    /**
+     * Nastavení výběru turnajové selekce
+     *
+     * @param event
+     */
+    @FXML
+    private void Tournament3Selected(ActionEvent event) {
+        m.AddMesseage("Tournament 3 selection selected!");
+        SelectionMenu.setText("Selection: Tournament 3");
         selectionMethod = 0;
+        m.GetMesseage();
+    }
+
+    /**
+     * Nastavení výběru turnajové selekce
+     *
+     * @param event
+     */
+    @FXML
+    private void Tournament2Selected(ActionEvent event) {
+        m.AddMesseage("Tournament 2 selection selected!");
+        SelectionMenu.setText("Selection: Tournament 2");
+        selectionMethod = 1;
         m.GetMesseage();
     }
 
@@ -582,7 +643,7 @@ public class FXMLController implements Initializable {
     private void RouleteSelected(ActionEvent event) {
         m.AddMesseage("Roulete selection selected!");
         SelectionMenu.setText("Selection: Roulette");
-        selectionMethod = 1;
+        selectionMethod = 3;
         m.GetMesseage();
     }
 
@@ -696,10 +757,10 @@ public class FXMLController implements Initializable {
                                 Arita = Integer.valueOf(xsr.getText());
                                 break;
                             case "FunctionValue":
-                                Functions.addAll(Function.getSet(xsr.getText().trim(), Arita));
+                                Functions.addAll(DataHandler.generateFunctions(xsr.getText().trim(), Arita));
                                 break;
                             case "Terminal":
-                                Terminals.addAll(Terminal.getSet(xsr.getText().trim()));
+                                Terminals.addAll(DataHandler.generateTerminals(xsr.getText().trim()));
                                 break;
                         }
                         element = "";
@@ -721,7 +782,7 @@ public class FXMLController implements Initializable {
                 }
             }
 
-            m.AddMesseage("Calculate...");
+            m.AddMesseage("Calculation in progress...");
             m.GetMesseage();
 
             // ČAS to vše pustit
@@ -826,16 +887,15 @@ public class FXMLController implements Initializable {
             Document doc = null;
             int numberOfConfi = configurations.size();
             long startTime = System.currentTimeMillis();
-            System.out.println("Start in: " + startTime);
-            GeneticAlgorithm ga = new GeneticAlgorithm(m, dh, true);
+            //UPRAVA -> PŘESUN DO LOOPU - loadedConfi
             for (int i = 0; i < numberOfConfi; i++) {
                 Configuration loadedConfi = configurations.get(i);
-
+                System.out.println("Start Confi" + i + " in: " + startTime);
                 outputs.add(i, new HashMap<>());
                 finalOutputs.add(i, new HashMap<>());
-
-                for (int j = 0; j < loadedConfi.NumberOfStarts; j++) {
-                    Chromosome bestChromosome = ga.runGP(
+                int numberOfStart = loadedConfi.NumberOfStarts;
+                for (int j = 0; j < numberOfStart; j++) {
+                    Chromosome bestChromosome = new GeneticAlgorithm(m, dh, true).runGP(
                             loadedConfi.NumberOfGenerations,
                             loadedConfi.PopulationSize,
                             loadedConfi.MaxDepthTreeInit,
@@ -845,15 +905,22 @@ public class FXMLController implements Initializable {
                             loadedConfi.MutationProbability,
                             loadedConfi.Elitism,
                             loadedConfi.Decimation,
-                            false,
                             loadedConfi.Selection,
                             loadedConfi.Functions,
                             loadedConfi.Terminals
                     );
                     // Zde je čas zapsat si výsledek
                     BigDecimal item = bestChromosome.getFitness().getValue();
+                    //Pokud nějak vznikla absordita, měli bychom jí smazat z výsledků
+                    System.out.println("ITEM: " +  item.doubleValue());
+                    if (item.doubleValue() >= 9999.9f /*|| item.doubleValue() <= 0.0000001*/){
+                        System.out.println("Output is infinity, didn't make it to xml.");
+                        System.out.println("Cal. N.: " + j + ": " + (startTime - System.currentTimeMillis()));
+                        continue;
+                    }
+                    
                     Output output = new Output(item, bestChromosome.getRoot().print());
-                    System.out.println("Cal.: " + (startTime - System.currentTimeMillis()));
+                    System.out.println("Cal. N.: " + j + ": " + (startTime - System.currentTimeMillis()));
                     if (outputs.get(i).containsKey(output)) {
                         outputs.get(i).put(output, outputs.get(i).get(output) + 1);
 
@@ -938,6 +1005,8 @@ public class FXMLController implements Initializable {
 
                 m.AddMesseage("File saved!");
                 m.GetMesseage();
+
+                System.out.println("DONE");
             } catch (ParserConfigurationException ex) {
                 Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
             } catch (TransformerConfigurationException ex) {

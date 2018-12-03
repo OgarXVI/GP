@@ -6,7 +6,6 @@
 package cz.ogarxvi.model;
 
 import cz.ogarxvi.genetic.GeneticAlgorithm;
-import javax.swing.JOptionPane;
 
 /**
  * Vlákno udržující parametry pro výpočet GA
@@ -58,10 +57,6 @@ public class GPController extends Thread {
      */
     private final boolean decimation;
     /**
-     * Optimalizace stromů, zjednodušeních jejich struktur
-     */
-    private final boolean editation;
-    /**
      * Vybraná selekce mezi turnajem (0) a ruletou (1)
      */
     private final int selectionMethod;
@@ -78,13 +73,12 @@ public class GPController extends Thread {
      * @param mutation Šance na mutaci
      * @param elitism Zachování nejlepších jedinců
      * @param decimation Rozšíření parametrů, následné snížení
-     * @param editation Optimalizace stromů
      * @param selectionMethod Výběrová metoda genů
      */
     public GPController(Messenger m, DataHandler dh, int numberOfGeneration, 
             int sizeOfInitPopulation, int maxDepthTreeInit, int maxDepthTreeAfterCrossover, 
             double crossover, double reproduction, double mutation, boolean elitism,
-            boolean decimation, boolean editation, int selectionMethod) {
+            boolean decimation, int selectionMethod) {
         this.m = m;
         this.dh = dh;
         this.numberOfGeneration = numberOfGeneration;
@@ -96,14 +90,13 @@ public class GPController extends Thread {
         this.mutation = mutation;
         this.elitism = elitism;
         this.decimation = decimation;
-        this.editation = editation;
         this.selectionMethod = selectionMethod;
     }
 
     @Override
     public void run() {
             GeneticAlgorithm ga = new GeneticAlgorithm(this);
-            ga.runGP(numberOfGeneration, sizeOfInitPopulation, maxDepthTreeInit, maxDepthTreeAfterCrossover, reproduction, crossover, mutation, elitism, decimation, editation, selectionMethod, null, null);
+            ga.runGP(numberOfGeneration, sizeOfInitPopulation, maxDepthTreeInit, maxDepthTreeAfterCrossover, reproduction, crossover, mutation, elitism, decimation, selectionMethod, null, null);
     }
     /***
      * Způsobí zastavení vlákna
