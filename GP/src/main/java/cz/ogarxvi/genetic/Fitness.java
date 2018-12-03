@@ -7,6 +7,7 @@ package cz.ogarxvi.genetic;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class Fitness {
      * hodnotu, aby nemohlo dojít k ovlivnění výpočtu
      */
     public Fitness() {
-        this.value = new BigDecimal(Long.MAX_VALUE);
+        this.value = new BigDecimal(Double.MAX_VALUE).round(new MathContext(6));
     }
     /**
      * Kopírovací konstruktor
@@ -32,6 +33,7 @@ public class Fitness {
      */
     public Fitness(BigDecimal f) {
         this.value = f;
+        // value = value.round(new MathContext(6)); 
     }
     /**
      * Vypočítá průměrnou odchylku vypočtených výsledků od žádoucích výsledků.

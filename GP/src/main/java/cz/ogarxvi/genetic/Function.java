@@ -74,13 +74,14 @@ public class Function extends Gen {
      * Vytvoří list genů podle zadaných parametrů
      * @param command String příkazů
      * @param arita Arita genů
+     * @param edit Edituje se gen
      * @return List vytvořených genů
      */
-    public static List<Gen> getSet(String command, int arita) {
+    public static List<Gen> getSet(String command, int arita, boolean edit) {
         List<Gen> pomListGens = new ArrayList<>();
         String[] functions = command.split(",");
         for (String f : functions) {
-            Gen gF = new Gen(f, arita);
+            Gen gF = new Gen(f, arita, edit);
             gF.setIsFunction(true);
             pomListGens.add(gF);
         }

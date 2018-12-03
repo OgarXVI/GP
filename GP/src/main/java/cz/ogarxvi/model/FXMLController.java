@@ -10,6 +10,7 @@ import java.awt.Font;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -26,7 +27,9 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
@@ -246,7 +249,22 @@ public class FXMLController implements Initializable {
      */
     @FXML
     private void CloseFromMenuItem(ActionEvent event) {
-        Platform.exit();
+        //Platform.exit();
+        showFunctionWindow();
+    }
+
+    private void showFunctionWindow() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            fxmlLoader.setLocation(getClass().getResource("/fxml/FunctionWindow.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+            Stage stage = new Stage();
+            stage.setTitle("Functions");
+            stage.setScene(scene);
+            stage.show();
+        } catch (UnsupportedOperationException | IOException e) {
+            JOptionPane.showMessageDialog(null, "Not implemented yet");
+        }
     }
 
     /**
@@ -281,7 +299,6 @@ public class FXMLController implements Initializable {
         double mutation = Double.valueOf(MutationProbabilityTextField.getPromptText());
         boolean elitism = ElitistToogleButton.isSelected();
         boolean decimation = DecimationButton.isSelected();
-        boolean editation = false;
         // zkontrolování uživatelských vstupů
         try {
             numberOfGenerations
@@ -323,7 +340,6 @@ public class FXMLController implements Initializable {
                 mutation,
                 elitism,
                 decimation,
-                editation,
                 selectionMethod);
         gpC.start();
 
@@ -337,6 +353,8 @@ public class FXMLController implements Initializable {
     @FXML
     private void StopCalculation(ActionEvent event) {
         dh.setGpStop(true);
+        m.AddMesseage("Stopped");
+        m.GetMesseage();
         gpC.stop();//
     }
 
@@ -431,7 +449,7 @@ public class FXMLController implements Initializable {
                     }
                 }
 
-                dataset.addSeries("Histogram", pomD, 20, min - 0.1f, max + 0.1f);
+                dataset.addSeries("Histogram", pomD, 100, min - 0.1f, max + 0.1f);
 
                 // Dataset
                 DefaultPieDataset dataset2 = new DefaultPieDataset();
@@ -583,10 +601,36 @@ public class FXMLController implements Initializable {
      * @param event
      */
     @FXML
-    private void TournamentSelected(ActionEvent event) {
-        m.AddMesseage("Tournament selection selected!");
-        SelectionMenu.setText("Selection: Tournament");
+    private void Tournament5Selected(ActionEvent event) {
+        m.AddMesseage("Tournament 5 selection selected!");
+        SelectionMenu.setText("Selection: Tournament 5");
+        selectionMethod = 2;
+        m.GetMesseage();
+    }
+
+    /**
+     * Nastavení výběru turnajové selekce
+     *
+     * @param event
+     */
+    @FXML
+    private void Tournament3Selected(ActionEvent event) {
+        m.AddMesseage("Tournament 3 selection selected!");
+        SelectionMenu.setText("Selection: Tournament 3");
         selectionMethod = 0;
+        m.GetMesseage();
+    }
+
+    /**
+     * Nastavení výběru turnajové selekce
+     *
+     * @param event
+     */
+    @FXML
+    private void Tournament2Selected(ActionEvent event) {
+        m.AddMesseage("Tournament 2 selection selected!");
+        SelectionMenu.setText("Selection: Tournament 2");
+        selectionMethod = 1;
         m.GetMesseage();
     }
 
@@ -599,7 +643,7 @@ public class FXMLController implements Initializable {
     private void RouleteSelected(ActionEvent event) {
         m.AddMesseage("Roulete selection selected!");
         SelectionMenu.setText("Selection: Roulette");
-        selectionMethod = 1;
+        selectionMethod = 3;
         m.GetMesseage();
     }
 
@@ -738,7 +782,7 @@ public class FXMLController implements Initializable {
                 }
             }
 
-            m.AddMesseage("Calculate...");
+            m.AddMesseage("Calculation in progress...");
             m.GetMesseage();
 
             // ČAS to vše pustit
@@ -843,16 +887,15 @@ public class FXMLController implements Initializable {
             Document doc = null;
             int numberOfConfi = configurations.size();
             long startTime = System.currentTimeMillis();
-            System.out.println("Start in: " + startTime);
-            GeneticAlgorithm ga = new GeneticAlgorithm(m, dh, true);
+            //UPRAVA -> PŘESUN DO LOOPU - loadedConfi
             for (int i = 0; i < numberOfConfi; i++) {
                 Configuration loadedConfi = configurations.get(i);
-
+                System.out.println("Start Confi" + i + " in: " + startTime);
                 outputs.add(i, new HashMap<>());
                 finalOutputs.add(i, new HashMap<>());
-
-                for (int j = 0; j < loadedConfi.NumberOfStarts; j++) {
-                    Chromosome bestChromosome = ga.runGP(
+                int numberOfStart = loadedConfi.NumberOfStarts;
+                for (int j = 0; j < numberOfStart; j++) {
+                    Chromosome bestChromosome = new GeneticAlgorithm(m, dh, true).runGP(
                             loadedConfi.NumberOfGenerations,
                             loadedConfi.PopulationSize,
                             loadedConfi.MaxDepthTreeInit,
@@ -862,15 +905,22 @@ public class FXMLController implements Initializable {
                             loadedConfi.MutationProbability,
                             loadedConfi.Elitism,
                             loadedConfi.Decimation,
-                            false,
                             loadedConfi.Selection,
                             loadedConfi.Functions,
                             loadedConfi.Terminals
                     );
                     // Zde je čas zapsat si výsledek
                     BigDecimal item = bestChromosome.getFitness().getValue();
+                    //Pokud nějak vznikla absordita, měli bychom jí smazat z výsledků
+                    System.out.println("ITEM: " +  item.doubleValue());
+                    if (item.doubleValue() >= 9999.9f /*|| item.doubleValue() <= 0.0000001*/){
+                        System.out.println("Output is infinity, didn't make it to xml.");
+                        System.out.println("Cal. N.: " + j + ": " + (startTime - System.currentTimeMillis()));
+                        continue;
+                    }
+                    
                     Output output = new Output(item, bestChromosome.getRoot().print());
-                    System.out.println("Cal.: " + (startTime - System.currentTimeMillis()));
+                    System.out.println("Cal. N.: " + j + ": " + (startTime - System.currentTimeMillis()));
                     if (outputs.get(i).containsKey(output)) {
                         outputs.get(i).put(output, outputs.get(i).get(output) + 1);
 

@@ -339,6 +339,39 @@ public class Editation {
         treesForReplace.add(prog24);
         Gen replaceProg24 = new Terminal("-1");
         substituteTrees.add(replaceProg24);
+        
+        Gen prog25 = new Gen("^", 2);
+        prog25.gens.add(new Terminal("1"));
+        prog25.gens.add(new Terminal("1"));
+        prog25.setIsFunction(true);
+        treesForReplace.add(prog25);
+        Gen replaceProg25 = new Terminal("1");
+        substituteTrees.add(replaceProg25);
+        
+         Gen prog26 = new Gen("+", 2);
+        prog26.gens.add(new Terminal("2"));
+        prog26.gens.add(new Terminal("1"));
+        prog26.setIsFunction(true);
+        treesForReplace.add(prog26);
+        Gen replaceProg26 = new Terminal("3");
+        substituteTrees.add(replaceProg26);
+        
+        Gen prog27 = new Gen("+", 2);
+        prog27.gens.add(new Terminal("1"));
+        prog27.gens.add(new Terminal("2"));
+        prog27.setIsFunction(true);
+        treesForReplace.add(prog27);
+        Gen replaceProg27 = new Terminal("3");
+        substituteTrees.add(replaceProg27);
+        
+        Gen prog28 = new Gen("^", 2);
+        prog28.gens.add(new Terminal("2"));
+        prog28.gens.add(new Terminal("1"));
+        prog28.setIsFunction(true);
+        treesForReplace.add(prog28);
+        Gen replaceProg28 = new Terminal("2");
+        substituteTrees.add(replaceProg28);
+        
     }
     /**
      * Edituje kořen

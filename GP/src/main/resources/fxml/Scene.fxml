@@ -63,7 +63,9 @@
             <ToggleSwitch fx:id="DecimationButton" layoutX="111.0" layoutY="365.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="94.0" text="Decimation " />
             <MenuButton fx:id="SelectionMenu" contentDisplay="CENTER" layoutX="14.0" layoutY="408.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="222.0" text="Selection: Tournament">
               <items>
-                <MenuItem fx:id="tournamentMenuItem" mnemonicParsing="false" onAction="#TournamentSelected" text="Tournament" />
+                <MenuItem fx:id="tournament3MenuItem" mnemonicParsing="false" onAction="#Tournament3Selected" text="Tournament3" />
+                <MenuItem fx:id="tournament2MenuItem" mnemonicParsing="false" onAction="#Tournament2Selected" text="Tournament2" />
+                <MenuItem fx:id="tournament5MenuItem" mnemonicParsing="false" onAction="#Tournament5Selected" text="Tournament5" />
                 <MenuItem fx:id="RouleteMenuItem" mnemonicParsing="false" onAction="#RouleteSelected" text="Roulete" />
               </items>
             </MenuButton>
