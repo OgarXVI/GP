@@ -70,7 +70,7 @@
               </items>
             </MenuButton>
             <Label layoutX="14.0" layoutY="442.0" text="Functions:" /> 
-            <CheckComboBox fx:id="FunctionsComboBox" layoutX="14.0" layoutY="462.0" prefHeight="26.0" prefWidth="222.0" />
+            <Button text="Select functions" onAction="#showFunctionWindow" fx:id="FunctionsButton" layoutX="14.0" layoutY="462.0" prefHeight="26.0" prefWidth="222.0" />
             <Label layoutX="14.0" layoutY="494.0" text="Terminals:" />
             <CheckComboBox fx:id="TerminalsComboBox" layoutX="14.0" layoutY="514.0" prefHeight="26.0" prefWidth="222.0" />
             <Button fx:id="StartButton" layoutX="14.0" layoutY="561.0" mnemonicParsing="false" onAction="#StartCalculation" text="Start" prefWidth="72.0" />

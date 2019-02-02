@@ -7,10 +7,9 @@ import java.util.List;
  * Třída provádějící editaci, tedy zkrácení určitelných tvarů stromů tak, aby se
  * zachovalo výsledné chování programu, ale zmenšil se výsledný vzorec. Přílišná
  * editace může vést ke zmenšení variablity a tedy menší šance k nalezení
- * potencionálně lepších programů.
- * Nahrazování funguje na nalezení přesné kopie předem nadefinovaného stromu a 
- * jeho nahrazení předem deklarovaným jiným stromem, popř. jedním terminálem.
- * 2.10.2018 - Momentálně je optimalizace nastavena na false.
+ * potencionálně lepších programů. K tomu vzhledem k náročnosti na výpočetní výkon 
+ * při evulaci matematického výrazu je tedy proces editace uplatněn při závěrečném 
+ * vracení nejlepšího chromosomu.
  */
 public class Editation {
     /**
@@ -37,7 +36,7 @@ public class Editation {
     public Editation(String[] params) {
         treesForReplace = new ArrayList<>();
         substituteTrees = new ArrayList<>();
-
+        
         for (String param : params) {
             Gen prog = new Gen("*", 2);
             prog.gens.add(new Terminal(param));
@@ -372,6 +371,8 @@ public class Editation {
         Gen replaceProg28 = new Terminal("2");
         substituteTrees.add(replaceProg28);
         
+        
+        //mXparser.consolePrintln( mXparser.LICENSE );
     }
     /**
      * Edituje kořen

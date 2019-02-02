@@ -5,8 +5,11 @@
  */
 package cz.ogarxvi.model;
 
+import cz.ogarxvi.genetic.Gen;
 import java.util.ArrayList;
+import java.util.List;
 import javafx.scene.control.TextArea;
+import org.apache.commons.io.FilenameUtils;
 
 /**
  * Třída pro ukládání a posílání zpráv
@@ -21,30 +24,40 @@ public class Messenger {
      * TextArea, kde se zprávy zobrazují
      */
     private TextArea textArea;
-
-    
+    /**
+     * Návrhový vzor Singleton
+     */
+    private static Messenger instance;
     /**
      * Vytvoří instanci pro ukládání a vypisování zpráv
      * @param textArea Vypisovací zóna
      */
-    public Messenger(TextArea textArea) {
+    private Messenger() {
         this.messages = new ArrayList<>();
-        this.textArea = textArea;
     }
-
+    
+    public static synchronized Messenger getInstance(){
+        if (instance==null)
+            instance = new Messenger();
+        return instance;
+    }
+    
     /**
      * Vyčistí list od všech zpráv v listu a smaže text vevypisované oblasti
      */
-    public void ClearMessenger() {
+    public synchronized void ClearMessenger() {
         this.messages.clear();
         this.textArea.setText("");
     }
-
+    
+    public void setArea(TextArea textArea){
+        this.textArea = textArea;
+    }
     /**
      * Vrátí posledně přidánou zprávu
      * @return Vrátí posledně přidáný string
      */
-    public String GetMesseage() {
+    public synchronized String GetMesseage() {
         if (messages.isEmpty()) {
             return null;
         }
@@ -64,7 +77,7 @@ public class Messenger {
      * Přidá do listu zprávu, pokud není NULL
      * @param s NO-NULL string
      */
-    public void AddMesseage(String s) {
+    public synchronized void AddMesseage(String s) {
         if (s == null) {
             return;
         }
@@ -75,7 +88,7 @@ public class Messenger {
      * Přidá vybranou zprávu do textové oblasti
      * @param s Vybraná zpráva
      */
-    private void AppendMesseage(String s) {
+    private synchronized void AppendMesseage(String s) {
         if (textArea != null) {
             javafx.application.Platform.runLater(() -> textArea.appendText(s));
         }
@@ -83,7 +96,7 @@ public class Messenger {
     /**
      * Zavolá metodi "GetMesseage" na všechny zaznamenané zprávy.
      */
-    public void GetAllMesseages() {
+    public synchronized void GetAllMesseages() {
         while (!messages.isEmpty()) {
             GetMesseage();
         }

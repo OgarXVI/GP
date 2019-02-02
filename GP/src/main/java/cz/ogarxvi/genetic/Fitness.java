@@ -25,7 +25,7 @@ public class Fitness {
      * hodnotu, aby nemohlo dojít k ovlivnění výpočtu
      */
     public Fitness() {
-        this.value = new BigDecimal(Double.MAX_VALUE).round(new MathContext(6));
+        this.value = new BigDecimal(Double.MAX_VALUE);
     }
     /**
      * Kopírovací konstruktor

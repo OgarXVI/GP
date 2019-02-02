@@ -56,7 +56,7 @@ public class CSVReader implements IReader {
             // založení prostoru pro data
             csvData = new String[row][coll];
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Cannot load file. Ex: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, Localizator.getString("warning.error.read") + e.getMessage());
         }
         // vložení dat do připravené tabulky
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
@@ -68,7 +68,7 @@ public class CSVReader implements IReader {
             }
 
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Cannot load file. Ex: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, Localizator.getString("warning.error.read") + e.getMessage());
         }
 
         tv.getColumns().clear();

@@ -184,19 +184,19 @@ public class Gen {
                 try {
                     return BigDecimalMath.sin(gens.get(0).resolveCommand(values), new MathContext(6));
                 } catch (ArithmeticException e) {
-                    return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity
+                    return gens.get(0).resolveCommand(values); //IGNORE
                 }
             case "cos":
                 try {
                     return BigDecimalMath.cos(gens.get(0).resolveCommand(values), new MathContext(6));
                 } catch (ArithmeticException e) {
-                    return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity
+                    return gens.get(0).resolveCommand(values); //IGNORE
                 }
             case "tan":
                 try {
                     return BigDecimalMath.tan(gens.get(0).resolveCommand(values), new MathContext(6));
                 } catch (ArithmeticException e) {
-                    return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity
+                    return gens.get(0).resolveCommand(values); //IGNORE
                 }
             case "sqrt":
                 BigDecimal bgSqrt = gens.get(0).resolveCommand(values);
@@ -204,7 +204,6 @@ public class Gen {
                         || bgSqrt.doubleValue() == Double.NEGATIVE_INFINITY) {
                     return BigDecimal.valueOf(Double.MAX_VALUE); // MOC VELKÝ!
                 }
-
                 if (bgSqrt.compareTo(BigDecimal.ZERO) < 0) {
                     return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity //NOT DEFINET
                 }
@@ -243,7 +242,7 @@ public class Gen {
                 try {
                     return BigDecimalMath.cot(gens.get(0).resolveCommand(values), new MathContext(6));
                 } catch (ArithmeticException e) {
-                    return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity
+                    return gens.get(0).resolveCommand(values); //IGNORE
                 }
             case "min":
                 return gens.get(0).resolveCommand(values).min(gens.get(1).resolveCommand(values));

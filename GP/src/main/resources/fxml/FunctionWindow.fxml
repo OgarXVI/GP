@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
 
-<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="656" prefWidth="300" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="cz.ogarxvi.model.FunctionWindowController">
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="272.0" prefWidth="300" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.ogarxvi.model.FunctionWindowController">
   <columnConstraints>
-    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
     <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
       <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
   </columnConstraints>
@@ -15,69 +17,63 @@
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
   </rowConstraints>
    <children>
-      <CheckBox mnemonicParsing="false" GridPane.rowIndex="1" />
-      <ComboBox prefHeight="31.0" prefWidth="214.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-      <Label text="Use" />
-      <Label text="Kategory" GridPane.columnIndex="1" />
-      <Label text="Function" GridPane.columnIndex="2" />
-      <Label text="+" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-      <Label text="-" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-      <Label text="*" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-      <Label text="/" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-      <Label text="exp" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-      <Label text="sqrt" GridPane.columnIndex="2" GridPane.rowIndex="6" />
-      <Label text="sin" GridPane.columnIndex="2" GridPane.rowIndex="7" />
-      <Label text="cos" GridPane.columnIndex="2" GridPane.rowIndex="8" />
-      <Label text="cotg" GridPane.columnIndex="2" GridPane.rowIndex="9" />
-      <Label text="tg" GridPane.columnIndex="2" GridPane.rowIndex="10" />
-      <Label text="abs" GridPane.columnIndex="2" GridPane.rowIndex="11" />
-      <Label text="log2" GridPane.columnIndex="2" GridPane.rowIndex="12" />
-      <Label text="log10" GridPane.columnIndex="2" GridPane.rowIndex="13" />
-      <Label text="ln" GridPane.columnIndex="2" GridPane.rowIndex="14" />
-      <Label text="!" GridPane.columnIndex="2" GridPane.rowIndex="15" />
-      <CheckBox fx:id="checkBoxPlus" mnemonicParsing="false" GridPane.rowIndex="1" />
-      <CheckBox fx:id="checkBoxMinus" mnemonicParsing="false" GridPane.rowIndex="2" />
-      <CheckBox fx:id="checkBoxTimes" mnemonicParsing="false" GridPane.rowIndex="3" />
-      <CheckBox fx:id="checkBoxDivision" mnemonicParsing="false" GridPane.rowIndex="4" />
-      <CheckBox fx:id="checkBoxExp" mnemonicParsing="false" GridPane.rowIndex="5" />
-      <CheckBox fx:id="checkBoxSqrt" mnemonicParsing="false" GridPane.rowIndex="6" />
-      <CheckBox fx:id="checkBoxSin" mnemonicParsing="false" GridPane.rowIndex="7" />
-      <CheckBox fx:id="checkBoxCos" mnemonicParsing="false" GridPane.rowIndex="8" />
-      <CheckBox fx:id="checkBoxCotg" mnemonicParsing="false" GridPane.rowIndex="9" />
-      <CheckBox fx:id="checkBoxTg" mnemonicParsing="false" GridPane.rowIndex="10" />
-      <CheckBox fx:id="checkBoxAbs" mnemonicParsing="false" GridPane.rowIndex="11" />
-      <CheckBox fx:id="checkBoxLog2" mnemonicParsing="false" GridPane.rowIndex="12" />
-      <CheckBox fx:id="checkBoxLog10" mnemonicParsing="false" GridPane.rowIndex="13" />
-      <CheckBox fx:id="checkBoxLn" mnemonicParsing="false" GridPane.rowIndex="14" />
-      <CheckBox fx:id="checkBoxNeg" mnemonicParsing="false" GridPane.rowIndex="15" />
-      <ComboBox fx:id="comboBoxPlus" prefHeight="31.0" prefWidth="214.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-      <ComboBox fx:id="comboBoxMinus" prefHeight="31.0" prefWidth="214.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-      <ComboBox fx:id="comboBoxTimes" prefHeight="31.0" prefWidth="214.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-      <ComboBox fx:id="comboBoxDivision" prefHeight="31.0" prefWidth="214.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-      <ComboBox fx:id="comboBoxExp" prefHeight="31.0" prefWidth="214.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-      <ComboBox fx:id="comboBoxSqrt" prefHeight="31.0" prefWidth="214.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-      <ComboBox fx:id="comboBoxSin" prefHeight="31.0" prefWidth="214.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-      <ComboBox fx:id="comboBoxCos" prefHeight="31.0" prefWidth="214.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-      <ComboBox fx:id="comboBoxCotg" prefHeight="31.0" prefWidth="214.0" GridPane.columnIndex="1" GridPane.rowIndex="9" />
-      <ComboBox fx:id="comboBoxTg" prefHeight="31.0" prefWidth="214.0" GridPane.columnIndex="1" GridPane.rowIndex="10" />
-      <ComboBox fx:id="comboBoxAbs" prefHeight="31.0" prefWidth="214.0" GridPane.columnIndex="1" GridPane.rowIndex="11" />
-      <ComboBox fx:id="comboBoxLog2" prefHeight="31.0" prefWidth="214.0" GridPane.columnIndex="1" GridPane.rowIndex="12" />
-      <ComboBox fx:id="comboBoxLog10" prefHeight="31.0" prefWidth="214.0" GridPane.columnIndex="1" GridPane.rowIndex="13" />
-      <ComboBox fx:id="comboBoxLn" prefHeight="31.0" prefWidth="214.0" GridPane.columnIndex="1" GridPane.rowIndex="14" />
-      <ComboBox fx:id="comboBoxNeg" prefHeight="31.0" prefWidth="214.0" GridPane.columnIndex="1" GridPane.rowIndex="15" />
+      <Label text="Category:">
+         <tooltip>
+            <Tooltip id="toolTipCategory" text="Category contains functons used in GP" />
+         </tooltip></Label>
+      <Label text="Iterations:" GridPane.columnIndex="1">
+         <tooltip>
+            <Tooltip id="toolTipIterations" text="Iteration determines how many times a certain category of functions was used. A 0 means that a given category was not used at all." />
+         </tooltip></Label>
+      <Button fx:id="buttonStorno" cancelButton="true" onAction="#ClickButtonStorno" prefHeight="31.0" prefWidth="214.0" text="Storno" GridPane.rowIndex="7">
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <GridPane.margin>
+            <Insets bottom="10.0" left="15.0" right="5.0" top="10.0" />
+         </GridPane.margin></Button>
+      <Button fx:id="buttonOK" onAction="#ClickButtonOK" prefHeight="31.0" prefWidth="214.0" text="OK" GridPane.columnIndex="1" GridPane.rowIndex="7">
+         <GridPane.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </GridPane.margin></Button>
+      <ComboBox fx:id="comboBoxBinaryIterations" prefWidth="150.0" promptText="0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+         <opaqueInsets>
+            <Insets left="5.0" right="5.0" />
+         </opaqueInsets>
+         <GridPane.margin>
+            <Insets left="10.0" right="10.0" />
+         </GridPane.margin>
+      </ComboBox>
+      <ComboBox fx:id="comboBoxUnaryIterations" prefWidth="150.0" promptText="0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+         <GridPane.margin>
+            <Insets left="10.0" right="10.0" />
+         </GridPane.margin>
+      </ComboBox>
+      <ComboBox fx:id="comboBoxTrigonometricIterations" prefWidth="150.0" promptText="0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+         <GridPane.margin>
+            <Insets left="10.0" right="10.0" />
+         </GridPane.margin>
+      </ComboBox>
+      <Label id="labelBinary" text="Binary" GridPane.rowIndex="1">
+         <tooltip>
+            <Tooltip id="toolTipBinary" text="This Category cointains: + - * /" />
+         </tooltip>
+      </Label>
+      <Label id="labelUnary" text="Unary" GridPane.rowIndex="2">
+         <tooltip>
+            <Tooltip text="This Category contains: ! Sqrt " />
+         </tooltip>
+      </Label>
+      <Label id="labelTrigonometric" text="Trigonometric" GridPane.rowIndex="3">
+         <tooltip>
+            <Tooltip text="This Caterory contains: sin, cos, tg, cotg" />
+         </tooltip>
+      </Label>
    </children>
 </GridPane>

@@ -7,6 +7,7 @@ import cz.ogarxvi.model.Graph.Layout;
 import cz.ogarxvi.model.Graph.TreeLayout;
 import java.awt.BasicStroke;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -29,7 +30,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
@@ -37,8 +37,10 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -77,18 +79,6 @@ import org.jfree.ui.RefineryUtilities;
  */
 public class FXMLController implements Initializable {
 
-    /**
-     * Data pro GP
-     */
-    private DataHandler dh;
-    /**
-     * Záznamník zpráv
-     */
-    private Messenger m;
-    /**
-     * Vybraná selekční metoda
-     */
-    private int selectionMethod = 0;
     /**
      * Tabulka pro ovládání a zobrazení
      */
@@ -140,11 +130,6 @@ public class FXMLController implements Initializable {
     @FXML
     private MenuButton SelectionMenu;
     /**
-     * CheckBomboBox s funkcemi
-     */
-    @FXML
-    private CheckComboBox<DataHandler.BoxDataItem> FunctionsComboBox;
-    /**
      * CheckComboBox s terminály
      */
     @FXML
@@ -175,69 +160,41 @@ public class FXMLController implements Initializable {
     @FXML
     private Button ClearButton;
     //Listeners
-    private ListChangeListener<DataHandler.BoxDataItem> functionCheckComboBoxListener;
+    //private ListChangeListener<DataHandler.BoxDataItem> functionCheckComboBoxListener;
     private ListChangeListener<DataHandler.BoxDataItem> terminalCheckComboBoxListener;
-    /**
-     * *
-     * Načtený soubor s daty
-     */
-    private File loadedDataFile;
-    /**
-     * Graf na vykreslení outputu
-     */
-    private Graph graph;
-    /**
-     * Ovladač vlákna pro manuálně puštěný výpočet
-     */
-    private GPController gpC;
-    @FXML
-    private MenuItem tournamentMenuItem;
     @FXML
     private MenuItem RouleteMenuItem;
+    @FXML
+    private MenuItem tournament3MenuItem;
+    @FXML
+    private MenuItem tournament2MenuItem;
+    @FXML
+    private MenuItem tournament5MenuItem;
+    @FXML
+    private Button FunctionsButton;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         //Init
-        m = new Messenger(ConsoleOutput);
-        dh = new DataHandler();
+        Messenger.getInstance().setArea(this.ConsoleOutput);
         //Vytvoření předmětů v CheckComboBoxexh
-        FunctionsComboBox.getItems().addAll(DataHandler.BoxDataItem.generateFunctionBoxItems());
         TerminalsComboBox.getItems().addAll(DataHandler.BoxDataItem.generateTerminalsBoxItems());
-        //Inicializace posluchačů
-        functionCheckComboBoxListener = new ListChangeListener<DataHandler.BoxDataItem>() {
-            @Override
-            public void onChanged(ListChangeListener.Change<? extends DataHandler.BoxDataItem> c) {
-                ObservableList<DataHandler.BoxDataItem> olChecked = FunctionsComboBox.getCheckModel().getCheckedItems();
-                dh.getLoadedFunctions().clear();
-                for (DataHandler.BoxDataItem boxDataItem : olChecked) {
-                    dh.getLoadedFunctions().addAll(boxDataItem.getGens());
-                }
-                if (FunctionsComboBox.equals(TerminalsComboBox)) {
-                    dh.loadParamsAsTerminals();
-                }
-                m.ClearMessenger();
-                updateOutput();
-            }
-        };
         //Incializace posluchačů
         terminalCheckComboBoxListener = new ListChangeListener<DataHandler.BoxDataItem>() {
             @Override
             public void onChanged(ListChangeListener.Change<? extends DataHandler.BoxDataItem> c) {
                 ObservableList<DataHandler.BoxDataItem> olChecked = TerminalsComboBox.getCheckModel().getCheckedItems();
-                dh.getLoadedTerminals().clear();
+                DataHandler.getInstance().getLoadedTerminals().clear();
                 for (DataHandler.BoxDataItem boxDataItem : olChecked) {
-                    dh.getLoadedTerminals().addAll(boxDataItem.getGens());
+                    DataHandler.getInstance().getLoadedTerminals().addAll(boxDataItem.getGens());
                 }
                 if (TerminalsComboBox.equals(TerminalsComboBox)) {
-                    dh.loadParamsAsTerminals();
+                    DataHandler.getInstance().loadParamsAsTerminals();
                 }
-                m.ClearMessenger();
-                updateOutput();
+                parOfUpdate();
             }
         };
-
         //přižazení posluchačů
-        FunctionsComboBox.getCheckModel().getCheckedItems().addListener(functionCheckComboBoxListener);
         TerminalsComboBox.getCheckModel().getCheckedItems().addListener(terminalCheckComboBoxListener);
 
     }
@@ -249,21 +206,29 @@ public class FXMLController implements Initializable {
      */
     @FXML
     private void CloseFromMenuItem(ActionEvent event) {
-        //Platform.exit();
-        showFunctionWindow();
+        Platform.exit();
     }
 
+    @FXML
     private void showFunctionWindow() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader();
             fxmlLoader.setLocation(getClass().getResource("/fxml/FunctionWindow.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
+
             Stage stage = new Stage();
             stage.setTitle("Functions");
+            stage.getIcons().add(new Image("/images/icon.jpg"));
             stage.setScene(scene);
+
+            FunctionWindowController fwc = fxmlLoader.getController();
+            /* fwc.setMyStage(stage);
+            fwc.setDataHandler(dh);
+            fwc.setFXMLController(this);*/
+
             stage.show();
         } catch (UnsupportedOperationException | IOException e) {
-            JOptionPane.showMessageDialog(null, "Not implemented yet");
+            JOptionPane.showMessageDialog(null, e.getMessage());
         }
     }
 
@@ -275,19 +240,19 @@ public class FXMLController implements Initializable {
     @FXML
     private void StartCalculation(ActionEvent event) {
         // ošetření nevyplněných parametrů
-        if (!dh.isLoaded()) {
-            JOptionPane.showMessageDialog(null, "Load data.");
+        if (!DataHandler.getInstance().isLoaded()) {
+            JOptionPane.showMessageDialog(null, Localizator.getString("warning.loadData"));
             event.consume();
             return;
         }
-        if (dh.getLoadedFunctions().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Select function.");
+        if (!DataHandler.getInstance().isAnyFunctionsLoaded()) {
+            JOptionPane.showMessageDialog(null, Localizator.getString("warning.noSelectedFunction"));
             event.consume();
             return;
         }
 
-        if (dh.getLoadedTerminals().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Running without terminals.");
+        if (DataHandler.getInstance().getLoadedTerminals().isEmpty()) {
+            JOptionPane.showMessageDialog(null, Localizator.getString("warning.withoutTerminals"));
         }
         // založení bezpečných parametrů
         int numberOfGenerations = Integer.valueOf(NumberOfGenerationsTextField.getPromptText());
@@ -325,12 +290,10 @@ public class FXMLController implements Initializable {
             elitism = ElitistToogleButton.isSelected();
             decimation = DecimationButton.isSelected();
         } catch (NumberFormatException nfe) {
-            JOptionPane.showMessageDialog(null, "Wrong format, setting default values...");
+            JOptionPane.showMessageDialog(null, Localizator.getString("warning.wrongFormat"));
         }
         //puštění GP výpočtu
-        gpC = new GPController(
-                m,
-                dh,
+        GPController gpC = new GPController(
                 numberOfGenerations,
                 sizeOfInitPopulation,
                 treeMaxInitDepth,
@@ -339,8 +302,7 @@ public class FXMLController implements Initializable {
                 reproduction,
                 mutation,
                 elitism,
-                decimation,
-                selectionMethod);
+                decimation);
         gpC.start();
 
     }
@@ -352,10 +314,11 @@ public class FXMLController implements Initializable {
      */
     @FXML
     private void StopCalculation(ActionEvent event) {
-        dh.setGpStop(true);
-        m.AddMesseage("Stopped");
-        m.GetMesseage();
-        gpC.stop();//
+        if (!DataHandler.getInstance().isGpStop()) {
+            DataHandler.getInstance().setGpStop(true);
+            Messenger.getInstance().AddMesseage(Localizator.getString("output.stoped"));
+            Messenger.getInstance().GetMesseage();
+        }
     }
 
     /**
@@ -413,8 +376,8 @@ public class FXMLController implements Initializable {
                     xsr.next();
                 }
             } catch (FileNotFoundException | NumberFormatException | XMLStreamException e) {
-                m.AddMesseage("Error: " + e.getMessage());
-                m.GetMesseage();
+                Messenger.getInstance().AddMesseage("Error: " + e.getMessage());
+                Messenger.getInstance().GetMesseage();
             }
 
             try {
@@ -482,11 +445,13 @@ public class FXMLController implements Initializable {
                 chart.getPlot().setOutlineStroke(new BasicStroke(3f));
                 //JPanel
                 JFrame af = new JFrame("Output Graph - Histogram");
+                af.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/images/icon.jpg")));
                 af.setContentPane(new ChartPanel(chart));
                 af.setSize(600, 600);
                 RefineryUtilities.centerFrameOnScreen(af);
                 af.setVisible(true);
                 JFrame af2 = new JFrame("Output Graph - PieChart");
+                af2.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/images/icon.jpg")));
                 af2.setContentPane(new ChartPanel(chart2));
                 af2.setSize(600, 600);
                 RefineryUtilities.centerFrameOnScreen(af2);
@@ -511,9 +476,9 @@ public class FXMLController implements Initializable {
         fileChooser.setCurrentDirectory(new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI()));
         int returnValue = fileChooser.showOpenDialog(null);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
-            loadedDataFile = fileChooser.getSelectedFile();
+            DataHandler.getInstance().setLoadedDataFile(fileChooser.getSelectedFile());
             // užití knihovny třetí strany - pro zjištění typu souboru
-            String extension = FilenameUtils.getExtension(loadedDataFile.getName());
+            String extension = FilenameUtils.getExtension(DataHandler.getInstance().getLoadedDataFile().getName());
             IReader ir;
             switch (extension) {
                 case "xlsx":
@@ -526,25 +491,11 @@ public class FXMLController implements Initializable {
                     return;
             }
             //načtení a zpracování dat
-            ir.ReadFile(loadedDataFile);
-            dh.parseData(ir.GetData());
-            // vyčištění prostoru
+            ir.ReadFile(DataHandler.getInstance().getLoadedDataFile());
+            DataHandler.getInstance().parseData(ir.GetData());
+            DataHandler.getInstance().setRows(TableView.getItems().size());
             Clear(null);
         }
-    }
-
-    /**
-     * Aktulizování textového výstupu
-     */
-    private void updateOutput() {
-        m.ClearMessenger();
-        if (loadedDataFile != null) {
-            m.AddMesseage("Expected Function: " + FilenameUtils.getBaseName(loadedDataFile.getName()));
-            m.AddMesseage("Rows: " + TableView.getItems().size());
-        }
-        m.AddMesseage("Terminals: " + dh.getLoadedTerminals());
-        m.AddMesseage("Functions: " + dh.getLoadedFunctions());
-        m.GetAllMesseages();
     }
 
     /**
@@ -555,8 +506,8 @@ public class FXMLController implements Initializable {
     @FXML
     private void ShowGraph(ActionEvent event) {
 
-        if (dh.getBestChromosome() == null) {
-            JOptionPane.showMessageDialog(null, "Missing chromosome for rendering");
+        if (DataHandler.getInstance().getBestChromosome() == null) {
+            JOptionPane.showMessageDialog(null, Localizator.getString("warning.missingChromosome"));
             return;
         }
 
@@ -564,15 +515,15 @@ public class FXMLController implements Initializable {
         try {
             root = new BorderPane();
 
-            graph = new Graph();
+            Graph graph = new Graph();
 
             root.setCenter(graph.getScrollPane());
 
-            graph.addGraphComponents(dh.getBestChromosome().getRoot());
+            graph.addGraphComponents(DataHandler.getInstance().getBestChromosome().getRoot());
 
             Scene scene = new Scene(root, 800, 800);
             Stage primaryStage = new Stage();
-            primaryStage.setTitle("Tree Graph");
+            primaryStage.setTitle(Localizator.getString("graph.title"));
             primaryStage.setScene(scene);
             primaryStage.show();
 
@@ -592,7 +543,7 @@ public class FXMLController implements Initializable {
      */
     @FXML
     private void ShowAbout(ActionEvent event) {
-        JOptionPane.showMessageDialog(null, "Autor: Jaroslav Dibitanzl \nVersion: 0.9");
+        JOptionPane.showMessageDialog(null, Localizator.getString("app.autor") + Localizator.getString("app.version"));
     }
 
     /**
@@ -602,10 +553,11 @@ public class FXMLController implements Initializable {
      */
     @FXML
     private void Tournament5Selected(ActionEvent event) {
-        m.AddMesseage("Tournament 5 selection selected!");
-        SelectionMenu.setText("Selection: Tournament 5");
-        selectionMethod = 2;
-        m.GetMesseage();
+        Messenger.getInstance().AddMesseage(Localizator.getString("parameter.selection.tournament5") + Localizator.getString("parameter.selection.selected"));
+        SelectionMenu.setText(Localizator.getString("parameter.selection.method")
+                + Localizator.getString("parameter.selection.tournament5"));
+        DataHandler.getInstance().setSelectionMethod(2);
+        Messenger.getInstance().GetMesseage();
     }
 
     /**
@@ -615,10 +567,11 @@ public class FXMLController implements Initializable {
      */
     @FXML
     private void Tournament3Selected(ActionEvent event) {
-        m.AddMesseage("Tournament 3 selection selected!");
-        SelectionMenu.setText("Selection: Tournament 3");
-        selectionMethod = 0;
-        m.GetMesseage();
+        Messenger.getInstance().AddMesseage(Localizator.getString("parameter.selection.tournament3") + Localizator.getString("parameter.selection.selected"));
+        SelectionMenu.setText(Localizator.getString("parameter.selection.method")
+                + Localizator.getString("parameter.selection.tournament3"));
+        DataHandler.getInstance().setSelectionMethod(0);
+        Messenger.getInstance().GetMesseage();
     }
 
     /**
@@ -628,10 +581,11 @@ public class FXMLController implements Initializable {
      */
     @FXML
     private void Tournament2Selected(ActionEvent event) {
-        m.AddMesseage("Tournament 2 selection selected!");
-        SelectionMenu.setText("Selection: Tournament 2");
-        selectionMethod = 1;
-        m.GetMesseage();
+        Messenger.getInstance().AddMesseage(Localizator.getString("parameter.selection.tournament2") + Localizator.getString("parameter.selection.selected"));
+        SelectionMenu.setText(Localizator.getString("parameter.selection.method")
+                + Localizator.getString("parameter.selection.tournament2"));
+        DataHandler.getInstance().setSelectionMethod(1);
+        Messenger.getInstance().GetMesseage();
     }
 
     /**
@@ -641,10 +595,11 @@ public class FXMLController implements Initializable {
      */
     @FXML
     private void RouleteSelected(ActionEvent event) {
-        m.AddMesseage("Roulete selection selected!");
-        SelectionMenu.setText("Selection: Roulette");
-        selectionMethod = 3;
-        m.GetMesseage();
+        Messenger.getInstance().AddMesseage(Localizator.getString("parameter.selection.roulette") + Localizator.getString("parameter.selection.selected"));
+        SelectionMenu.setText(Localizator.getString("parameter.selection.method")
+                + Localizator.getString("parameter.selection.roulette"));
+        DataHandler.getInstance().setSelectionMethod(3);
+        Messenger.getInstance().GetMesseage();
     }
 
     /**
@@ -655,20 +610,24 @@ public class FXMLController implements Initializable {
      */
     @FXML
     private void Clear(ActionEvent event) {
-        m.ClearMessenger();
-        dh.getLoadedTerminals().clear();
-        FunctionsComboBox.getCheckModel().getCheckedItems().removeListener(functionCheckComboBoxListener);
-        dh.getLoadedFunctions().clear();
+        Messenger.getInstance().ClearMessenger();
+        DataHandler.getInstance().getLoadedTerminals().clear();
         TerminalsComboBox.getCheckModel().getCheckedItems().removeListener(terminalCheckComboBoxListener);
-        dh.loadParamsAsTerminals();
-        updateOutput();
-
-        //
-        FunctionsComboBox.getCheckModel().clearChecks();
+        DataHandler.getInstance().loadParamsAsTerminals();
+        parOfUpdate();
         TerminalsComboBox.getCheckModel().clearChecks();
-
-        FunctionsComboBox.getCheckModel().getCheckedItems().addListener(functionCheckComboBoxListener);
         TerminalsComboBox.getCheckModel().getCheckedItems().addListener(terminalCheckComboBoxListener);
+    }
+
+    private void parOfUpdate() {
+        Messenger.getInstance().ClearMessenger();
+        if (DataHandler.getInstance().getLoadedDataFile() != null) {
+            Messenger.getInstance().AddMesseage(Localizator.getString("output.expectedFunctions") + FilenameUtils.getBaseName(DataHandler.getInstance().getLoadedDataFile().getName()));
+            Messenger.getInstance().AddMesseage(Localizator.getString("output.rows") + DataHandler.getInstance().getTableRows());
+        }
+        Messenger.getInstance().AddMesseage(Localizator.getString("output.terminals") + DataHandler.getInstance().getLoadedTerminals());
+        Messenger.getInstance().AddMesseage(Localizator.getString("output.functions") + DataHandler.getInstance().getAllFunctionsAsString());
+        Messenger.getInstance().GetAllMesseages();
     }
 
     @FXML
@@ -757,10 +716,10 @@ public class FXMLController implements Initializable {
                                 Arita = Integer.valueOf(xsr.getText());
                                 break;
                             case "FunctionValue":
-                                Functions.addAll(DataHandler.generateFunctions(xsr.getText().trim(), Arita));
+                                Functions.addAll(DataHandler.getInstance().generateFunctions(xsr.getText().trim(), Arita));
                                 break;
                             case "Terminal":
-                                Terminals.addAll(DataHandler.generateTerminals(xsr.getText().trim()));
+                                Terminals.addAll(DataHandler.getInstance().generateTerminals(xsr.getText().trim()));
                                 break;
                         }
                         element = "";
@@ -773,17 +732,17 @@ public class FXMLController implements Initializable {
                     xsr.next();
                 }
             } catch (Exception e) {
-                System.err.println("Chyba při čtení souboru: " + e.getMessage());
+                System.err.println(Localizator.getString("warning.error.read") + e.getMessage());
             } finally {
                 try {
                     xsr.close();
                 } catch (Exception e) {
-                    System.err.println("Chyba při uzavírání souboru: " + e.getMessage());
+                    System.err.println(Localizator.getString("warning.error.close") + e.getMessage());
                 }
             }
 
-            m.AddMesseage("Calculation in progress...");
-            m.GetMesseage();
+            Messenger.getInstance().AddMesseage(Localizator.getString("output.calculation.progress"));
+            Messenger.getInstance().GetMesseage();
 
             // ČAS to vše pustit
             AutomatController ac = new AutomatController(configurations, outputs, finalOutputs);
@@ -887,6 +846,8 @@ public class FXMLController implements Initializable {
             Document doc = null;
             int numberOfConfi = configurations.size();
             long startTime = System.currentTimeMillis();
+            //TOHLE POŘEŠÍ ČASOVOU NÁROČNOST STUPAJÍCÍ V ČASE
+            GeneticAlgorithm ga = new GeneticAlgorithm(true);
             //UPRAVA -> PŘESUN DO LOOPU - loadedConfi
             for (int i = 0; i < numberOfConfi; i++) {
                 Configuration loadedConfi = configurations.get(i);
@@ -895,7 +856,7 @@ public class FXMLController implements Initializable {
                 finalOutputs.add(i, new HashMap<>());
                 int numberOfStart = loadedConfi.NumberOfStarts;
                 for (int j = 0; j < numberOfStart; j++) {
-                    Chromosome bestChromosome = new GeneticAlgorithm(m, dh, true).runGP(
+                    Chromosome bestChromosome = ga.runGP(
                             loadedConfi.NumberOfGenerations,
                             loadedConfi.PopulationSize,
                             loadedConfi.MaxDepthTreeInit,
@@ -905,20 +866,18 @@ public class FXMLController implements Initializable {
                             loadedConfi.MutationProbability,
                             loadedConfi.Elitism,
                             loadedConfi.Decimation,
-                            loadedConfi.Selection,
                             loadedConfi.Functions,
                             loadedConfi.Terminals
                     );
                     // Zde je čas zapsat si výsledek
                     BigDecimal item = bestChromosome.getFitness().getValue();
                     //Pokud nějak vznikla absordita, měli bychom jí smazat z výsledků
-                    System.out.println("ITEM: " +  item.doubleValue());
-                    if (item.doubleValue() >= 9999.9f /*|| item.doubleValue() <= 0.0000001*/){
-                        System.out.println("Output is infinity, didn't make it to xml.");
+                    // System.out.println("ITEM: " +  item.doubleValue());
+                    if (item.doubleValue() >= 9999.9f /*|| item.doubleValue() <= 0.0000001*/) {
                         System.out.println("Cal. N.: " + j + ": " + (startTime - System.currentTimeMillis()));
                         continue;
                     }
-                    
+
                     Output output = new Output(item, bestChromosome.getRoot().print());
                     System.out.println("Cal. N.: " + j + ": " + (startTime - System.currentTimeMillis()));
                     if (outputs.get(i).containsKey(output)) {
@@ -934,8 +893,8 @@ public class FXMLController implements Initializable {
                     }
                 }
                 //Zpráva o výstupu
-                m.AddMesseage("Configuration " + configurations.get(i).Id + " done");
-                m.GetMesseage();
+                Messenger.getInstance().AddMesseage("Configuration " + configurations.get(i).Id + " done");
+                Messenger.getInstance().GetMesseage();
             }
             // Zde je čas zapsat výsledek do xml
             //Budeme chtít všechny nalezené formule a jejich fitness
@@ -1000,13 +959,13 @@ public class FXMLController implements Initializable {
                 TransformerFactory transformerFactory = TransformerFactory.newInstance();
                 Transformer transformer = transformerFactory.newTransformer();
                 DOMSource source = new DOMSource(doc);
-                StreamResult result = new StreamResult(new File("Output.xml"));
+                StreamResult result = new StreamResult(new File("Output_" + DataHandler.getInstance().getLoadedDataFile().getName()));
                 transformer.transform(source, result);
 
-                m.AddMesseage("File saved!");
-                m.GetMesseage();
+                Messenger.getInstance().AddMesseage(Localizator.getString("ouptut.file.saved"));
+                Messenger.getInstance().GetMesseage();
 
-                System.out.println("DONE");
+                System.out.println(Localizator.getString("output.done"));
             } catch (ParserConfigurationException ex) {
                 Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
             } catch (TransformerConfigurationException ex) {

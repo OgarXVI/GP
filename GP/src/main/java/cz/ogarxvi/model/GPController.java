@@ -13,14 +13,6 @@ import cz.ogarxvi.genetic.GeneticAlgorithm;
  */
 public class GPController extends Thread {
     /**
-     * Odkaz na data
-     */
-    private final DataHandler dh;
-    /**
-     * Odkaz na zapisovař zpráv
-     */
-    private final Messenger m;
-    /**
      * Počet generací
      */
     private final int numberOfGeneration;
@@ -57,13 +49,7 @@ public class GPController extends Thread {
      */
     private final boolean decimation;
     /**
-     * Vybraná selekce mezi turnajem (0) a ruletou (1)
-     */
-    private final int selectionMethod;
-    /**
      * Založí vlákno s parametry pro výpočet GA
-     * @param m Záznamník
-     * @param dh Data
      * @param numberOfGeneration Počet generací
      * @param sizeOfInitPopulation Velikost generace
      * @param maxDepthTreeInit Max hloubka stromu při založení
@@ -73,14 +59,11 @@ public class GPController extends Thread {
      * @param mutation Šance na mutaci
      * @param elitism Zachování nejlepších jedinců
      * @param decimation Rozšíření parametrů, následné snížení
-     * @param selectionMethod Výběrová metoda genů
      */
-    public GPController(Messenger m, DataHandler dh, int numberOfGeneration, 
+    public GPController(int numberOfGeneration, 
             int sizeOfInitPopulation, int maxDepthTreeInit, int maxDepthTreeAfterCrossover, 
             double crossover, double reproduction, double mutation, boolean elitism,
-            boolean decimation, int selectionMethod) {
-        this.m = m;
-        this.dh = dh;
+            boolean decimation) {
         this.numberOfGeneration = numberOfGeneration;
         this.sizeOfInitPopulation = sizeOfInitPopulation;
         this.maxDepthTreeInit = maxDepthTreeInit;
@@ -90,34 +73,11 @@ public class GPController extends Thread {
         this.mutation = mutation;
         this.elitism = elitism;
         this.decimation = decimation;
-        this.selectionMethod = selectionMethod;
     }
 
     @Override
     public void run() {
-            GeneticAlgorithm ga = new GeneticAlgorithm(this);
-            ga.runGP(numberOfGeneration, sizeOfInitPopulation, maxDepthTreeInit, maxDepthTreeAfterCrossover, reproduction, crossover, mutation, elitism, decimation, selectionMethod, null, null);
-    }
-    /***
-     * Způsobí zastavení vlákna
-     */
-    public void myStop(){
-        this.stop();
-    }
-    /**
-     * Vrátí odkaz na DataHandler
-     * @return DataHandler
-     */
-    public DataHandler getDh() {
-        return dh;
-    }
-    /**
-     * Vrátí odkaz na Messenger
-     * @return Messenger
-     */
-    public Messenger getM() {
-        return m;
-    }
-    
-    
+            GeneticAlgorithm ga = new GeneticAlgorithm();
+            ga.runGP(numberOfGeneration, sizeOfInitPopulation, maxDepthTreeInit, maxDepthTreeAfterCrossover, reproduction, crossover, mutation, elitism, decimation, null, null);
+    } 
 }
