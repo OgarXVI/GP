@@ -1,4 +1,4 @@
-package cz.ogarxvi.genetic;
+package cz.ogarxvi.model.genetic;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import ch.obermuhlner.math.big.BigDecimalMath;
-import java.math.BigInteger;
 import java.math.MathContext;
 
 /**
@@ -119,15 +118,9 @@ public class Gen {
             case 1:
                 return command + "(" + gens.get(0).print() + ")";
             case 2:
-                /*if (editable)
-                    return command + "(" + gens.get(0).print() + ", " + gens.get(1).print() + ")";
-                else*/
                 return ((depth != 0) ? "(" : "") + gens.get(0).print() + command + gens.get(1).print() + ((depth != 0) ? ")" : "");
             case 3:
                 return ((depth != 0) ? "(" : "") + gens.get(0).print() + command + gens.get(1).print() + command + gens.get(2).print() + ((depth != 0) ? ")" : "");
-            case 4:
-                return ((depth != 0) ? "(" : "") + gens.get(0).print() + command + gens.get(1).print() + command + gens.get(2).print() + command + gens.get(3).print() + ((depth != 0) ? ")" : "");
-
         }
         return "";
     }
@@ -224,7 +217,7 @@ public class Gen {
                     return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity //NOT DEFINET
                 }
                 return BigDecimalMath.log2(bgLog2, new MathContext(6));
-            case "log10":
+            case "log":
                 BigDecimal bgLog10 = gens.get(0).resolveCommand(values);
                 if (bgLog10.compareTo(BigDecimal.ZERO) <= 0) {
                     return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity //NOT DEFINET

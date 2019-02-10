@@ -5,7 +5,7 @@
  */
 package cz.ogarxvi.model;
 
-import cz.ogarxvi.genetic.Gen;
+import cz.ogarxvi.model.genetic.Gen;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

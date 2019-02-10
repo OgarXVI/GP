@@ -1,4 +1,4 @@
-package cz.ogarxvi.genetic;
+package cz.ogarxvi.model.genetic;
 
 /**
  * Třída pro uchování odkazu na právě vybraný gen. 

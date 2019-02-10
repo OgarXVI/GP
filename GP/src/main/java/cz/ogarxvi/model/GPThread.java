@@ -5,13 +5,13 @@
  */
 package cz.ogarxvi.model;
 
-import cz.ogarxvi.genetic.GeneticAlgorithm;
+import cz.ogarxvi.model.genetic.GeneticAlgorithm;
 
 /**
  * Vlákno udržující parametry pro výpočet GA
  * @author OgarXVI
  */
-public class GPController extends Thread {
+public class GPThread extends Thread {
     /**
      * Počet generací
      */
@@ -60,7 +60,7 @@ public class GPController extends Thread {
      * @param elitism Zachování nejlepších jedinců
      * @param decimation Rozšíření parametrů, následné snížení
      */
-    public GPController(int numberOfGeneration, 
+    public GPThread(int numberOfGeneration, 
             int sizeOfInitPopulation, int maxDepthTreeInit, int maxDepthTreeAfterCrossover, 
             double crossover, double reproduction, double mutation, boolean elitism,
             boolean decimation) {
@@ -79,5 +79,7 @@ public class GPController extends Thread {
     public void run() {
             GeneticAlgorithm ga = new GeneticAlgorithm();
             ga.runGP(numberOfGeneration, sizeOfInitPopulation, maxDepthTreeInit, maxDepthTreeAfterCrossover, reproduction, crossover, mutation, elitism, decimation, null, null);
+            //Reconstruct
+            FileHandler.getInstance().resolveGPReconstruct(DataHandler.getInstance().getBestChromosome().toString());
     } 
 }

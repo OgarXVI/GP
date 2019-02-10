@@ -5,10 +5,10 @@
  */
 package cz.ogarxvi.model;
 
-import cz.ogarxvi.genetic.Chromosome;
-import cz.ogarxvi.genetic.Function;
-import cz.ogarxvi.genetic.Gen;
-import cz.ogarxvi.genetic.Terminal;
+import cz.ogarxvi.model.genetic.Chromosome;
+import cz.ogarxvi.model.genetic.Function;
+import cz.ogarxvi.model.genetic.Gen;
+import cz.ogarxvi.model.genetic.Terminal;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
+import java.lang.NullPointerException;
 /**
  * Třída obsahující potřebná data pro aplikaci, navržená jako Singleton.
  *
@@ -33,7 +33,7 @@ public class DataHandler {
      *
      * Načtený soubor s daty
      */
-    private File loadedDataFile;
+    //private File loadedDataFile;
     /**
      * Hlavní terminály tabulky, vychází jako názvy sloupců tabulky, kromě
      * posledního výsledkového
@@ -62,15 +62,11 @@ public class DataHandler {
     /**
      * Definuje, zda se má výpočet GA zastavit
      */
-    private boolean gpStop;
+    private volatile boolean gpStop;
     /**
      * Pomocná proměnná, vybraný nejlepší jedinec
      */
     private Chromosome bestChromosome;
-    /**
-     * Povolení kombinovat předchozí categorie
-     */
-    private boolean combineCategory;
     /**
      * Určuje počet použití daných kategorií 0 - Binary, 1 - Unary, 2 -
      * Trigonometric
@@ -118,18 +114,19 @@ public class DataHandler {
         //Načti data pro tabulku a sloupec
         for (int i = 0; i < mathData.length; i++) {
             for (int j = 0; j < mathData[i].length; j++) {
-                mathData[i][j] = BigDecimal.valueOf(Double.valueOf(data[i + 1][j]));
+                mathData[i][j] = resultMathData(data, i, j);
             }
-            expectedResults[i] = BigDecimal.valueOf(Double.valueOf(data[i + 1][mathData[i].length]));
+            expectedResults[i] = resultMathData(data, i, mathData[i].length);
         }
         //uprav správně hlavičky na terminály, odstraň poslední sloupec
         params = Arrays.copyOf(params, params.length - 1);
         // DataHandler byl načten
         loaded = true;
+        
         // přidá hlavičky jako terminály
         loadParamsAsTerminals();
-        /*
-        System.out.println("PARAM:");
+        
+        /*System.out.println("PARAM:");
         System.out.println(Arrays.toString(params));
         System.out.println("MATHDATA:");
         for (BigDecimal[] math : mathData) {
@@ -137,7 +134,21 @@ public class DataHandler {
         }
         System.out.println("RESULTS:");
         System.out.println(Arrays.toString(expectedResults));
-         */
+        */
+        //System.out.println("Errors:");
+        //System.out.println(Arrays.toString(errorRowPosition.toArray()));
+    }
+
+    private BigDecimal resultMathData(String[][] data, int i, int j) throws NumberFormatException {
+        BigDecimal pomValue;
+        try{
+            pomValue = BigDecimal.valueOf(Double.valueOf(data[i + 1][j]));
+        }catch(NullPointerException | NumberFormatException e){
+            FileHandler.getInstance().errorsInFile = true; //registruj chybu
+            FileHandler.getInstance().errorRowPositions.add(i);
+            return null; //pracujeme se zástupnými znaky
+        }
+        return pomValue;
     }
 
     public String[] getParams() {
@@ -172,10 +183,6 @@ public class DataHandler {
         return bestChromosome;
     }
 
-    public boolean isCombineCategory() {
-        return combineCategory;
-    }
-
     public int[] getNumberIterationsCategory() {
         return numberIterationsCategory;
     }
@@ -190,14 +197,6 @@ public class DataHandler {
 
     public void setBestChromosome(Chromosome bestChromosome) {
         this.bestChromosome = bestChromosome;
-    }
-
-    public File getLoadedDataFile() {
-        return loadedDataFile;
-    }
-
-    public void setLoadedDataFile(File loadedDataFile) {
-        this.loadedDataFile = loadedDataFile;
     }
 
     public int getSelectionMethod() {
@@ -269,13 +268,15 @@ public class DataHandler {
      * @return Načtené funkce jako string
      */
     public String getAllFunctionsAsString() {
-        String pom = "";
+        String pom = "[";
         for (List<Gen> loadedFunctionsCategory : DataHandler.getInstance().getLoadedFunctionsCategories()) {
-            if (loadedFunctionsCategory != null) {
-                pom += Arrays.toString(loadedFunctionsCategory.toArray());
+            for (Gen gen : loadedFunctionsCategory) {
+                if (loadedFunctionsCategory != null) {
+                    pom += gen.getCommand() + ",";
+                }
             }
         }
-        return pom;
+        return pom+="]";
     }
 
     /**
@@ -301,9 +302,9 @@ public class DataHandler {
             //UNARY
             case 1: {
                 list.addAll(Function.getSet("sqrt", 1, false));
-                list.addAll(Function.getSet("log2", 1, false));
+                //list.addAll(Function.getSet("log2", 1, false));
                 //list.addAll(Function.getSet("exp", 1, false));
-                list.addAll(Function.getSet("log10", 1, false));
+                list.addAll(Function.getSet("log", 1, false));
                 list.addAll(Function.getSet("ln", 1, false));
                 break;
             }
@@ -323,7 +324,7 @@ public class DataHandler {
      *
      * @return
      */
-    boolean isAnyFunctionsLoaded() {
+    public boolean isAnyFunctionsLoaded() {
         return loadedFunctionsCategories.stream().anyMatch((loadedFunctionsCategory) -> (!loadedFunctionsCategory.isEmpty()));
     }
     /**

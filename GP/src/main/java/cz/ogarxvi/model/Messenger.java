@@ -5,11 +5,8 @@
  */
 package cz.ogarxvi.model;
 
-import cz.ogarxvi.genetic.Gen;
 import java.util.ArrayList;
-import java.util.List;
 import javafx.scene.control.TextArea;
-import org.apache.commons.io.FilenameUtils;
 
 /**
  * Třída pro ukládání a posílání zpráv

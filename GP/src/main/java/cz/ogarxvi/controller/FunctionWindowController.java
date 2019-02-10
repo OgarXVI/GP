@@ -3,9 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cz.ogarxvi.model;
+package cz.ogarxvi.controller;
 
+import cz.ogarxvi.model.DataHandler;
 import cz.ogarxvi.model.DataHandler.FunctionCategory;
+import cz.ogarxvi.model.FileHandler;
+import cz.ogarxvi.model.Localizator;
+import cz.ogarxvi.model.Messenger;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -87,9 +91,9 @@ public class FunctionWindowController implements Initializable {
                 FunctionCategory.TRIGONOMETRIK.category);
         
         Messenger.getInstance().ClearMessenger();
-        if (DataHandler.getInstance().getLoadedDataFile() != null) {
+        if (FileHandler.getInstance().file != null) {
             Messenger.getInstance().AddMesseage(Localizator.getString("output.expectedFunctions") + 
-                    FilenameUtils.getBaseName(DataHandler.getInstance().getLoadedDataFile().getName()));
+                    FilenameUtils.getBaseName(FileHandler.getInstance().file.getName()));
             Messenger.getInstance().AddMesseage(Localizator.getString("output.rows") +
                     DataHandler.getInstance().getTableRows());
         }

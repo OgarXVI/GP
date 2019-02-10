@@ -1,9 +1,10 @@
-package cz.ogarxvi.genetic;
+package cz.ogarxvi.model.genetic;
 
 import cz.ogarxvi.model.DataHandler;
-import cz.ogarxvi.model.GPController;
+import cz.ogarxvi.model.GPThread;
 import cz.ogarxvi.model.Localizator;
 import cz.ogarxvi.model.Messenger;
+import java.awt.BorderLayout;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.ArrayList;
@@ -13,6 +14,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 
 /**
@@ -21,6 +27,7 @@ import javax.swing.JProgressBar;
  * @author OgarXVI
  */
 public class GeneticAlgorithm {
+
     /**
      * Populace chromosomů, tedy jedinců představující programy
      */
@@ -41,7 +48,7 @@ public class GeneticAlgorithm {
     /**
      * Reference na Thread
      */
-    private GPController gpc;
+    private GPThread gpc;
     /**
      * Poslední chromozomy, kontrola pro předčasnou konvergenci
      */
@@ -120,19 +127,60 @@ public class GeneticAlgorithm {
             setOfTerminals.addAll(DataHandler.getInstance().getLoadedTerminals());
         }
 
-        //EDIT: NAPROSTO PŘEDĚLAT ZPŮSOB ZÍSKÁVÁNÍ 
-        //KROKY:
-        //ZNÁME POŘADÍ FUNKCÍ:
-        //NEJDŘÍVE JE BINAR, PAK UNAR, PAK TRIGO
-        //PRVNĚ SE PROJEDE x-KRÁT BINAR, PAK UNAR...
-        //KAŽDÝ PRŮCHOD SI MUSÍ ULOŽIT VÝSLEDEK DO POLE NEJLEPŠÍCH VÝSLEDKŮ
-        //List<Gen> usedFunctions = new ArrayList<>();
+        JFrame pf;
+        JProgressBar dpb;
+        JDialog dlg;
+        JLabel jl;
+        int workPreg;
+        int workDone = 0;
+        workPreg = calculateEstimateTime(numberOfGenerations);
+
+        pf = new JFrame();
+        pf.setSize(500, 150);
+        jl = new JLabel();
+        jl.setText("Calculating...");
+        pf.add(BorderLayout.CENTER, jl);
+        pf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        dlg = new JDialog(pf, "Progress Dialog", true);
+        dpb = new JProgressBar(0, workPreg);
+        dlg.add(BorderLayout.CENTER, dpb);
+        dlg.add(BorderLayout.NORTH, jl);
+        dlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dlg.setSize(300, 75);
+        dlg.setLocationRelativeTo(pf);
+        if (!isAutomat) {
+            //Thread
+            Thread t = new Thread(() -> {
+                dlg.setVisible(true);
+            });
+
+            t.start();
+        }
+        List<Gen> functions = new ArrayList<>();
         List<List<Gen>> category = DataHandler.getInstance().getLoadedFunctionsCategories();
-        for (int c = 0; c < category.size(); c++) {
-            for (int f = 0; f < DataHandler.getInstance().getNumberIterationsCategory()[c]; f++) {
-                List<Gen> functions = category.get(c);
-                if (functions.isEmpty()) {
-                    continue;
+        int categorySize = category.size();
+        if (isAutomat) {
+            categorySize = setOfFunctions.size();
+        }
+
+        System.out.println("JSEM AUTOMAT: " + isAutomat);
+        System.out.println("NAČETL JSEM FUNKCE: " + Arrays.toString(setOfFunctions.toArray()));
+
+        for (int c = 0; c < categorySize; c++) {
+            int numberIteartionInCategory = DataHandler.getInstance().getNumberIterationsCategory()[c];
+            if (isAutomat) {
+                numberIteartionInCategory = setOfFunctions.size();
+            }
+            for (int f = 0; f < numberIteartionInCategory; f++) {
+                if (isAutomat) {
+                    functions = setOfFunctions;
+                } else {
+                    functions.addAll(category.get(c));
+                }
+                if (!isAutomat) {
+                    if (category.get(c).isEmpty()) {
+                        continue;
+                    }
                 }
                 // Založení populace
                 population = new ArrayList<>(initSizeOfPopulation);
@@ -141,13 +189,7 @@ public class GeneticAlgorithm {
                 int numberOfCrossover = (int) (crossoverProbability * initSizeOfPopulation) / 2;
                 int numberOfMutation = (int) (mutationProbability * initSizeOfPopulation);
 
-                while ((numberOfReproduction + (numberOfCrossover * 2) + numberOfMutation) < initSizeOfPopulation) {
-                    numberOfReproduction++;
-                }
-
-                if (elitismus) {
-                    numberOfReproduction = numberOfReproduction - 1;
-                }
+                numberOfReproduction = decimationIncrement(numberOfReproduction, numberOfCrossover, numberOfMutation, initSizeOfPopulation, elitismus);
 
                 int generationOfDecimation = 10;
                 int numberOfProgramBeforeDecimation = 10 * initSizeOfPopulation;
@@ -159,16 +201,9 @@ public class GeneticAlgorithm {
                     numberOfCrossover = (int) (crossoverProbability * numberOfProgramBeforeDecimation) / 2;
                     numberOfMutation = (int) (mutationProbability * numberOfProgramBeforeDecimation);
 
-                    while ((numberOfReproduction + (numberOfCrossover * 2) + numberOfMutation) < numberOfProgramBeforeDecimation) {
-                        numberOfReproduction++;
-                    }
-
-                    if (elitismus) {
-                        numberOfReproduction = numberOfReproduction - 1;
-                    }
+                    numberOfReproduction = decimationIncrement(numberOfReproduction, numberOfCrossover, numberOfMutation, numberOfProgramBeforeDecimation, elitismus);
 
                     InitStartPopulate(setOfTerminals, functions, initTreeMaxDepth, numberOfProgramBeforeDecimation);
-
                 } else {
                     InitStartPopulate(setOfTerminals, functions, initTreeMaxDepth, initSizeOfPopulation);
                 }
@@ -176,6 +211,8 @@ public class GeneticAlgorithm {
                 Chromosome bestChromosome = new Chromosome(population.get(0));
                 // Iterace přes generace
                 for (int i = 0; i < numberOfGenerations; i++) {
+                    workDone += 10;
+                    dpb.setValue(workDone);
                     //Stop thread
                     if (DataHandler.getInstance().isGpStop()) {
                         DataHandler.getInstance().setBestChromosome(bestChromosome);
@@ -217,13 +254,6 @@ public class GeneticAlgorithm {
                     if (i > CHECKED_NUMBER_OF_CHROMOSOMES) {
                         if (checkChromosomes()) {
                             int newPopulationSize = population.size();
-                            //NEZVYŠOVAT ČASOVO NÁROČNOST POKUD TO NENÍ NUTNÉ
-
-                            if (!isAutomat) {
-                                //Messenger.getInstance().AddMesseage(Localizator.getString("output.gp.prematureConvergence.warning"));
-                                //Messenger.getInstance().GetMesseage();
-                            }
-
                             if (population.size() != initSizeOfPopulation) {
                                 newPopulationSize /= 10;
                             } else {
@@ -246,25 +276,17 @@ public class GeneticAlgorithm {
 
                     // dát zprávu o nejlepším jedinci v populaci
                     if (!isAutomat) {
-                        Messenger.getInstance().AddMesseage(bestChromosomeInGeneration.getFitness().getValue() + 
-                                "  " + bestChromosomeInGeneration.getRoot().print());
-                        Messenger.getInstance().GetMesseage();
+                        System.out.println(bestChromosomeInGeneration.getFitness().getValue()
+                                + "  " + bestChromosomeInGeneration.getRoot().print());
                     }
                     // Ukončovací podmínka
-                    if ((bestChromosomeInGeneration.getFitness().getValue().compareTo(BigDecimal.ZERO) == 0)
-                            || (numberOfGenerations == i + 1)) {
-                        //dataHandler.setGpStop(true);
-                        //bestChromosome.setFitness(new Fitness(bestChromosome.getFitness().getValue().round(new MathContext(6))));
+                    if ((bestChromosomeInGeneration.getFitness().getValue().compareTo(BigDecimal.ZERO) == 0) || (numberOfGenerations == i + 1)) {
                         DataHandler.getInstance().setBestChromosome(bestChromosome);
-                        if (!isAutomat) {
-                            Messenger.getInstance().AddMesseage(Localizator.getString("output.gp.used.functions") + 
-                                    Arrays.toString(functions.toArray()));
-                            Messenger.getInstance().GetMesseage();
-                            Messenger.getInstance().AddMesseage(Localizator.getString("output.gp.chromosome.best") +
-                                    bestChromosome.getFitness().getValue() + " " + bestChromosome.getRoot().print());
-                            Messenger.getInstance().GetMesseage();
-                        }
                         ListOfBestResults.add(bestChromosome);
+                        //rovnou utni výsledek
+                        if ((bestChromosomeInGeneration.getFitness().getValue().compareTo(BigDecimal.ZERO) == 0)) {
+                            return returnBestResult(dlg, jl, pf);
+                        }
                         continue;
                     }
                     // zmenšení populace
@@ -281,13 +303,8 @@ public class GeneticAlgorithm {
                         numberOfCrossover = (int) (crossoverProbability * initSizeOfPopulation) / 2;
                         numberOfMutation = (int) (mutationProbability * initSizeOfPopulation);
 
-                        while ((numberOfReproduction + (numberOfCrossover * 2) + numberOfMutation) < initSizeOfPopulation) {
-                            numberOfReproduction++;
-                        }
-
-                        if (elitismus) {
-                            numberOfReproduction = numberOfReproduction - 1;
-                        }
+                        numberOfReproduction = decimationIncrement(numberOfReproduction,
+                                numberOfCrossover, numberOfMutation, initSizeOfPopulation, elitismus);
 
                         population = populationAfterDecimation;
 
@@ -299,100 +316,132 @@ public class GeneticAlgorithm {
                         Chromosome bestChromosome2 = new Chromosome(bestChromosome);
                         newPopulation.add(bestChromosome2);
                     }
-
-                    // reprodukce
-                    for (int j = 0; j < numberOfReproduction; j++) {
-
-                        Chromosome selectedChromosome = chooseSelectionMethod(DataHandler.getInstance().getSelectionMethod());
-                        newPopulation.add(selectedChromosome);
-                    }
-
-                    // křížení
-                    for (int j = 0; j < numberOfCrossover; j++) {
-
-                        Chromosome selectedChromosome1 = chooseSelectionMethod(DataHandler.getInstance().getSelectionMethod());
-                        Chromosome selectedChromosome2 = chooseSelectionMethod(DataHandler.getInstance().getSelectionMethod());
-
-                        SelectedGen selectedGen1 = randomGen(selectedChromosome1);
-                        SelectedGen selectedGen2 = randomGen(selectedChromosome2);
-
-                        selectedGen1.getGenAbove().setDepth(0);
-                        selectedGen2.getGenAbove().setDepth(0);
-
-                        selectedGen1.getGenAbove().fixDepth();
-                        selectedGen2.getGenAbove().fixDepth();
-
-                        selectedGen1.getGenAbove().setMaxDepth(selectedGen1.getGenAbove());
-                        int maxDepthOfGen1 = Gen.maxDepth;
-
-                        selectedGen2.getGenAbove().setMaxDepth(selectedGen2.getGenAbove());
-                        int maxDepthOfGen2 = Gen.maxDepth;
-
-                        if ((maxDepthOfGen1 + maxDepthOfGen2) <= treeMaxDepthAfterOperation) {
-
-                            Gen gen1 = selectedGen1.getGenAbove().gens.get(selectedGen1.genIndex());
-                            Gen gen2 = selectedGen2.getGenAbove().gens.get(selectedGen2.genIndex());
-
-                            selectedGen1.getGenAbove().gens.set(selectedGen1.genIndex(), gen2);
-                            selectedGen2.getGenAbove().gens.set(selectedGen2.genIndex(), gen1);
-
-                            selectedChromosome1.getRoot().fixDepth();
-                            selectedChromosome2.getRoot().fixDepth();
-
-                            newPopulation.add(selectedChromosome1);
-                            newPopulation.add(selectedChromosome2);
-
-                        } else {
-                            j--;
-                        }
-                    }
-
+                    //reproduction
+                    reproduction(numberOfReproduction, newPopulation);
+                    //crossover
+                    crossover(numberOfCrossover, treeMaxDepthAfterOperation, newPopulation);
                     // mutace:
-                    for (int j = 0; j < numberOfMutation; j++) {
-
-                        Chromosome selectedChromosome = chooseSelectionMethod(DataHandler.getInstance().getSelectionMethod());
-
-                        SelectedGen selectedGen = randomGen(selectedChromosome);
-
-                        Gen gen = selectedGen.getGenAbove().gens.get(selectedGen.genIndex());
-
-                        if ((gen.depth - 1) == treeMaxDepthAfterOperation) {
-                            gen = setOfTerminals.get(getRandomNumber(setOfTerminals.size()));
-                        } else {
-                            Gen ff = functions.get(getRandomNumber(functions.size()));
-                            gen = new Function(ff.command, ff.arita, gen.depth, treeMaxDepthAfterOperation, setOfTerminals, functions);
-                        }
-
-                        selectedGen.getGenAbove().gens.set(selectedGen.genIndex(), gen);
-                        selectedChromosome.getRoot().fixDepth();
-
-                        newPopulation.add(selectedChromosome);
-                    }
-
+                    mutation(numberOfMutation, treeMaxDepthAfterOperation, setOfTerminals, functions, newPopulation);
                     population = newPopulation;
                 }
-
-                //CRASH STATE
-                if (ListOfBestResults.isEmpty()) {
-                    return population.get(0);
-                }
-
-                //SORTListOfBestResults.get(0)
-                Collections.sort(ListOfBestResults);
-                DataHandler.getInstance().setBestChromosome(ListOfBestResults.get(0));
-                editation.editRoot(ListOfBestResults.get(0).getRoot()); // EDIT
-                Messenger.getInstance().AddMesseage(
-                        Localizator.getString("output.gp.chromosome.best")
-                        + ///ListOfBestResults.get(0).getFitness().getValue() +
-                        " " + ListOfBestResults.get(0).getRoot().print());
-                Messenger.getInstance().GetMesseage();
-                //stop
-                DataHandler.getInstance().setGpStop(true);
-                //GET
-                return ListOfBestResults.get(0);
             }
         }
-        return null;
+        return returnBestResult(dlg, jl, pf);
+    }
+
+    private void mutation(int numberOfMutation, int treeMaxDepthAfterOperation, List<Gen> setOfTerminals, List<Gen> functions, List<Chromosome> newPopulation) {
+        for (int j = 0; j < numberOfMutation; j++) {
+
+            Chromosome selectedChromosome = chooseSelectionMethod(DataHandler.getInstance().getSelectionMethod());
+
+            SelectedGen selectedGen = randomGen(selectedChromosome);
+
+            Gen gen = selectedGen.getGenAbove().gens.get(selectedGen.genIndex());
+
+            if ((gen.depth - 1) == treeMaxDepthAfterOperation) {
+                gen = setOfTerminals.get(getRandomNumber(setOfTerminals.size()));
+            } else {
+                Gen ff = functions.get(getRandomNumber(functions.size()));
+                gen = new Function(ff.command, ff.arita, gen.depth, treeMaxDepthAfterOperation, setOfTerminals, functions);
+            }
+
+            selectedGen.getGenAbove().gens.set(selectedGen.genIndex(), gen);
+            selectedChromosome.getRoot().fixDepth();
+
+            newPopulation.add(selectedChromosome);
+        }
+    }
+
+    private void crossover(int numberOfCrossover, int treeMaxDepthAfterOperation, List<Chromosome> newPopulation) {
+        for (int j = 0; j < numberOfCrossover; j++) {
+
+            Chromosome selectedChromosome1 = chooseSelectionMethod(DataHandler.getInstance().getSelectionMethod());
+            Chromosome selectedChromosome2 = chooseSelectionMethod(DataHandler.getInstance().getSelectionMethod());
+
+            SelectedGen selectedGen1 = randomGen(selectedChromosome1);
+            SelectedGen selectedGen2 = randomGen(selectedChromosome2);
+
+            selectedGen1.getGenAbove().setDepth(0);
+            selectedGen2.getGenAbove().setDepth(0);
+
+            selectedGen1.getGenAbove().fixDepth();
+            selectedGen2.getGenAbove().fixDepth();
+
+            selectedGen1.getGenAbove().setMaxDepth(selectedGen1.getGenAbove());
+            int maxDepthOfGen1 = Gen.maxDepth;
+
+            selectedGen2.getGenAbove().setMaxDepth(selectedGen2.getGenAbove());
+            int maxDepthOfGen2 = Gen.maxDepth;
+
+            if ((maxDepthOfGen1 + maxDepthOfGen2) <= treeMaxDepthAfterOperation) {
+
+                Gen gen1 = selectedGen1.getGenAbove().gens.get(selectedGen1.genIndex());
+                Gen gen2 = selectedGen2.getGenAbove().gens.get(selectedGen2.genIndex());
+
+                selectedGen1.getGenAbove().gens.set(selectedGen1.genIndex(), gen2);
+                selectedGen2.getGenAbove().gens.set(selectedGen2.genIndex(), gen1);
+
+                selectedChromosome1.getRoot().fixDepth();
+                selectedChromosome2.getRoot().fixDepth();
+
+                newPopulation.add(selectedChromosome1);
+                newPopulation.add(selectedChromosome2);
+
+            } else {
+                j--;
+            }
+        }
+    }
+
+    private void reproduction(int numberOfReproduction, List<Chromosome> newPopulation) {
+        for (int j = 0; j < numberOfReproduction; j++) {
+
+            Chromosome selectedChromosome = chooseSelectionMethod(DataHandler.getInstance().getSelectionMethod());
+            newPopulation.add(selectedChromosome);
+        }
+    }
+
+    private int decimationIncrement(int numberOfReproduction, int numberOfCrossover, int numberOfMutation, int numberOfProgramBeforeDecimation, boolean elitismus) {
+        while ((numberOfReproduction + (numberOfCrossover * 2) + numberOfMutation) < numberOfProgramBeforeDecimation) {
+            numberOfReproduction++;
+        }
+        if (elitismus) {
+            numberOfReproduction = numberOfReproduction - 1;
+        }
+        return numberOfReproduction;
+    }
+
+    private Chromosome returnBestResult(JDialog dlg, JLabel jl, JFrame parentFrame) {
+        //CRASH STATE
+        if (ListOfBestResults != null) {
+            if (ListOfBestResults.isEmpty()) {
+                return population.get(0);
+            }
+        } else {
+            return population.get(0);
+        }
+        //SORT
+        Collections.sort(ListOfBestResults);
+        //POST
+        jl.setText("Postprocessing...");
+        DataHandler.getInstance().setBestChromosome(ListOfBestResults.get(0));
+        String simplified = editation.simplify(ListOfBestResults.get(0)); // EDIT
+        Messenger.getInstance().AddMesseage(Localizator.getString(
+                "output.gp.chromosome.best")
+                + " " + simplified);
+        Messenger.getInstance().AddMesseage(Localizator.getString(
+                "output.gp.deflection")
+                + " (" + ListOfBestResults.get(0).getFitness().getValue() + " "
+                + Localizator.getString("output.gp.deflection.from") + ")");
+        Messenger.getInstance().GetAllMesseages();
+        //Dispose
+        dlg.setVisible(false);
+        dlg.dispose();
+        parentFrame.dispose();
+        //stop
+        DataHandler.getInstance().setGpStop(true);
+        //GET
+        return ListOfBestResults.get(0);
     }
 
     /**
@@ -706,18 +755,16 @@ public class GeneticAlgorithm {
     }
 
     /**
-     * Vrátí nejvyšší nalezenou katogegorii
+     * Vypočítá počet počítáných funkcí pro generace a populace a vynásobí 10.
      *
-     * @param selectedBoxDataItem Vybrané funkce
-     * @return Nejvyšší kategorie
+     * @return Vrátí odhad času
      */
-    private int findTheMostCostedFunction(List<DataHandler.BoxDataItem> selectedBoxDataItem) {
-
-        int i = 1;
-        for (DataHandler.BoxDataItem boxDataItem : selectedBoxDataItem) {
-            i = i < boxDataItem.getCategory() ? boxDataItem.getCategory() : i;
+    private int calculateEstimateTime(int numberOfGenerations) {
+        int tmp = 0;
+        for (int i = 0; i < DataHandler.getInstance().getLoadedFunctionsCategories().size(); i++) {
+            tmp += DataHandler.getInstance().getNumberIterationsCategory()[i];
         }
-        return i;
+        return (numberOfGenerations * tmp) * 10;
     }
 
 }
