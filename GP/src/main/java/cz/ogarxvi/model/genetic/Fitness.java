@@ -7,7 +7,6 @@ package cz.ogarxvi.model.genetic;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.List;
 
@@ -45,6 +44,7 @@ public class Fitness {
         BigDecimal val = new BigDecimal(BigInteger.ZERO);        
         
         for (int i = 0; i < calcResult.size(); i++) {
+            if (expectedResults[i] != null)
             val = val.add(calcResult.get(i).subtract(expectedResults[i]));
         }
         val = val.divide(BigDecimal.valueOf(calcResult.size()), 6, RoundingMode.HALF_UP);

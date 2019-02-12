@@ -9,14 +9,11 @@ import cz.ogarxvi.model.genetic.Chromosome;
 import cz.ogarxvi.model.genetic.Function;
 import cz.ogarxvi.model.genetic.Gen;
 import cz.ogarxvi.model.genetic.Terminal;
-import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import java.lang.NullPointerException;
+
 /**
  * Třída obsahující potřebná data pro aplikaci, navržená jako Singleton.
  *
@@ -24,16 +21,14 @@ import java.lang.NullPointerException;
  */
 public class DataHandler {
 
+    /**
+     *
+     */
     private int rows;
     /**
      * Vybraná selekční metoda
      */
     private int selectionMethod = 0;
-    /**
-     *
-     * Načtený soubor s daty
-     */
-    //private File loadedDataFile;
     /**
      * Hlavní terminály tabulky, vychází jako názvy sloupců tabulky, kromě
      * posledního výsledkového
@@ -76,6 +71,14 @@ public class DataHandler {
      * Reference na odkaz
      */
     private static DataHandler instance;
+    /**
+     *
+     */
+    private List<String> allTerminals;
+    /**
+     *
+     */
+    private List<String> allCheckedTerminals;
 
     /**
      * Založení uložiště dat
@@ -83,6 +86,8 @@ public class DataHandler {
     private DataHandler() {
         numberIterationsCategory = new int[FunctionCategory.values().length];
         loadedTerminals = new ArrayList<>();
+        allTerminals = new ArrayList<>();
+        allCheckedTerminals = new ArrayList<>();
         loadedFunctionsCategories = new ArrayList<>();
         loadedFunctionsCategories.add(new ArrayList<>()); //0
         loadedFunctionsCategories.add(new ArrayList<>()); //1
@@ -99,6 +104,20 @@ public class DataHandler {
             instance = new DataHandler();
         }
         return instance;
+    }
+
+    /**
+     *
+     * @return Vrátí všechny terminály jako list stringů
+     */
+    public List<String> getStringFromTerminals() {
+        List<String> pom = new ArrayList<>();
+        for (Gen loadedTerminal : loadedTerminals) {
+            if (!Character.isAlphabetic(loadedTerminal.getCommand().charAt(0))) {
+                pom.add(loadedTerminal.getCommand());
+            }
+        }
+        return pom;
     }
 
     /**
@@ -122,10 +141,10 @@ public class DataHandler {
         params = Arrays.copyOf(params, params.length - 1);
         // DataHandler byl načten
         loaded = true;
-        
+
         // přidá hlavičky jako terminály
         loadParamsAsTerminals();
-        
+
         /*System.out.println("PARAM:");
         System.out.println(Arrays.toString(params));
         System.out.println("MATHDATA:");
@@ -134,18 +153,19 @@ public class DataHandler {
         }
         System.out.println("RESULTS:");
         System.out.println(Arrays.toString(expectedResults));
-        */
+         */
         //System.out.println("Errors:");
         //System.out.println(Arrays.toString(errorRowPosition.toArray()));
     }
 
     private BigDecimal resultMathData(String[][] data, int i, int j) throws NumberFormatException {
         BigDecimal pomValue;
-        try{
+        try {
             pomValue = BigDecimal.valueOf(Double.valueOf(data[i + 1][j]));
-        }catch(NullPointerException | NumberFormatException e){
+        } catch (NullPointerException | NumberFormatException e) {
             FileHandler.getInstance().errorsInFile = true; //registruj chybu
             FileHandler.getInstance().errorRowPositions.add(i);
+            FileHandler.getInstance().errorColummPosition.add(j);
             return null; //pracujeme se zástupnými znaky
         }
         return pomValue;
@@ -165,6 +185,10 @@ public class DataHandler {
 
     public boolean isLoaded() {
         return loaded;
+    }
+
+    public List<String> getAllCheckedTerminals() {
+        return allCheckedTerminals;
     }
 
     public List<List<Gen>> getLoadedFunctionsCategories() {
@@ -213,6 +237,14 @@ public class DataHandler {
 
     public void setRows(int rows) {
         this.rows = rows;
+    }
+
+    public List<String> getAllTerminals() {
+        return allTerminals;
+    }
+
+    public void setAllTerminals(List<String> allTerminals) {
+        this.allTerminals = allTerminals;
     }
 
     /**
@@ -276,7 +308,7 @@ public class DataHandler {
                 }
             }
         }
-        return pom+="]";
+        return pom += "]";
     }
 
     /**
@@ -320,153 +352,34 @@ public class DataHandler {
     }
 
     /**
+     *
+     * @param inputListString vstupní list stringů
+     */
+    public void setAllCheckedTerminals(List<String> inputListString) {
+        allCheckedTerminals = inputListString;
+        loadedTerminals.clear();
+        for (String string : inputListString) {
+            loadedTerminals.addAll(generateTerminals(string));
+        }
+        loadParamsAsTerminals();
+    }
+
+    /**
      * Zjistí, zda byla načtena aspoň jedna funkce v seznamu kategorií funkcí
      *
-     * @return
+     * @return vrátí true, pokud je nějaká funkce v seznamu
      */
     public boolean isAnyFunctionsLoaded() {
         return loadedFunctionsCategories.stream().anyMatch((loadedFunctionsCategory) -> (!loadedFunctionsCategory.isEmpty()));
     }
-    /**
-     * Třída sloužící jako box pro data v checkComboBoxu
-     */
-    public static class BoxDataItem {
 
-        /**
-         * List genů, který daný item nese
-         */
-        private final List<Gen> gens;
-        /**
-         * Jakou aritu daný gen nese
-         */
-        private final int arita;
-        /**
-         * Číselné označení kategorie
-         */
-        private final int category;
-
-        /**
-         * Založí item nesoucí geny
-         *
-         * @param gens Seznam genů
-         */
-        public BoxDataItem(List<Gen> gens) {
-            this.gens = gens;
-            this.arita = 0;
-            this.category = 0;
-        }
-
-        /**
-         * Založí item nesoucí geny a jejich aritu
-         *
-         * @param gens Seznam genů
-         * @param arita Arita genů
-         */
-        public BoxDataItem(List<Gen> gens, int arita) {
-            this.gens = gens;
-            this.arita = arita;
-            this.category = 0;
-        }
-
-        /**
-         * Založí item nesoucí geny a jejich aritu
-         *
-         * @param gens Seznam genů
-         * @param arita Arita genů
-         * @param category Kategorie
-         */
-        public BoxDataItem(List<Gen> gens, int arita, int category) {
-            this.gens = gens;
-            this.arita = arita;
-            this.category = category;
-        }
-
-        /**
-         * Vrátí list genů
-         *
-         * @return Geny
-         */
-        public List<Gen> getGens() {
-            return gens;
-        }
-
-        /**
-         * Vrátí číselné označení kategorie funkce
-         *
-         * @return int
-         */
-        public int getCategory() {
-            return category;
-        }
-
-        @Override
-        public String toString() {
-            return gens.toString() + (category == 0 ? "" : " (Category: " + category + ")");
-        }
-
-        /**
-         * Vrátí předefinovaný list předmětů do checkComboBoxu
-         *
-         * @return List funkcí
-         */
-        public static ObservableList<DataHandler.BoxDataItem> generateFunctionBoxItems() {
-            List ol = new ArrayList<>();
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("+", 2, false), 2, 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("-", 2, false), 2, 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("*", 2, false), 2, 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("/", 2, false), 2, 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("^", 2, false), 2, 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("min", 2, true), 2, 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("max", 2, true), 2, 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("cotg", 1, false), 1, 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("sin", 1, false), 1, 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("cos", 1, false), 1, 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("tan", 1, false), 1, 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("sqrt", 1, false), 1, 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("abs", 1, false), 1, 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("exp", 1, false), 1, 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("log2", 1, false), 1, 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("log10", 1, false), 1, 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("ln", 1, false), 1, 1));
-            ol.add(new DataHandler.BoxDataItem(Function.getSet("!", 1, false), 1, 1));
-
-            return FXCollections.observableArrayList(ol);
-        }
-
-        /**
-         * Vrátí předefinovaný list předmětů do checkComboBoxu
-         *
-         * @return List terminálů
-         */
-        public static ObservableList<DataHandler.BoxDataItem> generateTerminalsBoxItems() {
-            List ol = new ArrayList<>();
-            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("-5")));
-            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("-4")));
-            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("-3")));
-            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("-2")));
-            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("-1")));
-            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("0")));
-            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("1")));
-            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("2")));
-            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("3")));
-            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("4")));
-            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("5")));
-            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("-5,-4,-3,-2,-1")));
-            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("1,2,3,4,5")));
-            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("2,4,6,8")));
-            ol.add(new DataHandler.BoxDataItem(Terminal.getSet("1,3,5,7,9")));
-
-            return FXCollections.observableArrayList(ol);
-        }
-
-    }
-
-    public enum FunctionCategory{
+    public enum FunctionCategory {
         BINARY(0), UNARY(1), TRIGONOMETRIK(2);
         public final int category;
+
         private FunctionCategory(int category) {
             this.category = category;
         }
     }
-    
+
 }

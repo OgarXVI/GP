@@ -21,8 +21,6 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -30,7 +28,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -43,7 +40,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.apache.commons.io.FilenameUtils;
-import org.controlsfx.control.CheckComboBox;
 import org.controlsfx.control.ToggleSwitch;
 
 /**
@@ -105,11 +101,6 @@ public class FXMLController implements Initializable {
     @FXML
     private MenuButton SelectionMenu;
     /**
-     * CheckComboBox s terminály
-     */
-    @FXML
-    private CheckComboBox<DataHandler.BoxDataItem> TerminalsComboBox;
-    /**
      * Tlačítko pro spuštění výpočtu GA
      */
     @FXML
@@ -134,47 +125,20 @@ public class FXMLController implements Initializable {
      */
     @FXML
     private Button ClearButton;
-    //Listeners
-    //private ListChangeListener<DataHandler.BoxDataItem> functionCheckComboBoxListener;
-    private ListChangeListener<DataHandler.BoxDataItem> terminalCheckComboBoxListener;
-    @FXML
-    private MenuItem RouleteMenuItem;
-    @FXML
-    private MenuItem tournament3MenuItem;
-    @FXML
-    private MenuItem tournament2MenuItem;
-    @FXML
-    private MenuItem tournament5MenuItem;
+    /**
+     * Button
+     */
     @FXML
     private Button FunctionsButton;
+    /**
+     * Button
+     */
+    @FXML
+    private Button TerminalsButton;
 
-    @Override
     public void initialize(URL url, ResourceBundle rb) {
-        //Init
         Messenger.getInstance().setArea(this.ConsoleOutput);
-        //Vytvoření předmětů v CheckComboBoxexh
-        TerminalsComboBox.getItems().addAll(DataHandler.BoxDataItem.generateTerminalsBoxItems());
-        //Incializace posluchačů
-        
-        //TODO: Zrušit a půjde zde podobně jako funkce okno
-        
-        terminalCheckComboBoxListener = new ListChangeListener<DataHandler.BoxDataItem>() {
-            @Override
-            public void onChanged(ListChangeListener.Change<? extends DataHandler.BoxDataItem> c) {
-                ObservableList<DataHandler.BoxDataItem> olChecked = TerminalsComboBox.getCheckModel().getCheckedItems();
-                DataHandler.getInstance().getLoadedTerminals().clear();
-                for (DataHandler.BoxDataItem boxDataItem : olChecked) {
-                    DataHandler.getInstance().getLoadedTerminals().addAll(boxDataItem.getGens());
-                }
-                if (TerminalsComboBox.equals(TerminalsComboBox)) {
-                    DataHandler.getInstance().loadParamsAsTerminals();
-                }
-                parOfUpdate();
-            }
-        };
-        //přižazení posluchačů
-        TerminalsComboBox.getCheckModel().getCheckedItems().addListener(terminalCheckComboBoxListener);
-
+        //LOCALIZATOR
     }
 
     /**
@@ -187,6 +151,9 @@ public class FXMLController implements Initializable {
         Platform.exit();
     }
 
+    /**
+     * Zobrazení okno funkcí
+     */
     @FXML
     private void showFunctionWindow() {
         try {
@@ -195,14 +162,10 @@ public class FXMLController implements Initializable {
             Scene scene = new Scene(fxmlLoader.load());
 
             Stage stage = new Stage();
-            stage.setTitle("Functions");
+            stage.setTitle(Localizator.getString("window.title.functions"));
             stage.getIcons().add(new Image("/images/icon.jpg"));
             stage.setScene(scene);
 
-            //FunctionWindowController fwc = fxmlLoader.getController();
-            /* fwc.setMyStage(stage);
-            fwc.setDataHandler(dh);
-            fwc.setFXMLController(this);*/
             stage.show();
         } catch (UnsupportedOperationException | IOException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
@@ -212,7 +175,7 @@ public class FXMLController implements Initializable {
     /**
      * Kliknutí START tlačítka
      *
-     * @param event
+     * @param event event
      */
     @FXML
     private void StartCalculation(ActionEvent event) {
@@ -287,7 +250,7 @@ public class FXMLController implements Initializable {
     /**
      * Ukončení výpočtu
      *
-     * @param event
+     * @param event event
      */
     @FXML
     private void StopCalculation(ActionEvent event) {
@@ -301,7 +264,7 @@ public class FXMLController implements Initializable {
     /**
      * Načte soubor a zpracuje z něho tabulku, kterou zobrazí
      *
-     * @param event
+     * @param event event
      */
     @FXML
     private void OpenOutput(ActionEvent event) throws URISyntaxException, XMLStreamException {
@@ -321,7 +284,7 @@ public class FXMLController implements Initializable {
     /**
      * Načtení souboru
      *
-     * @param event
+     * @param event event
      * @throws URISyntaxException
      */
     @FXML
@@ -346,6 +309,8 @@ public class FXMLController implements Initializable {
                 default:
                     return;
             }
+            //resetovaní error logu
+            FileHandler.getInstance().reset();
             //načtení a zpracování dat
             ir.ReadFile(FileHandler.getInstance().file);
             FileHandler.getInstance().readedData = ir.GetData();
@@ -359,11 +324,14 @@ public class FXMLController implements Initializable {
                 Scene scene = new Scene(fxmlLoader.load());
 
                 Stage stage = new Stage();
-                stage.setTitle(FileHandler.getInstance().errorsInFile ? "Found Errors in File:" : "No Errors Found:");
+                stage.setTitle(FileHandler.getInstance().errorsInFile
+                        ? Localizator.getString("warning.error.found")
+                        : Localizator.getString("warning.error.notFound"));
                 stage.getIcons().add(new Image("/images/icon.jpg"));
                 stage.setScene(scene);
 
                 ErrorWindowController controller = fxmlLoader.getController();
+
                 controller.fillData(FileHandler.getInstance().readedData, FileHandler.getInstance().errorRowPositions);
 
                 stage.show();
@@ -381,7 +349,7 @@ public class FXMLController implements Initializable {
     /**
      * Zobrazení grafu nejlepšího jedince
      *
-     * @param event
+     * @param event event
      */
     @FXML
     private void ShowGraph(ActionEvent event
@@ -420,68 +388,64 @@ public class FXMLController implements Initializable {
     /**
      * Zobraz o programu
      *
-     * @param event
+     * @param event event
      */
     @FXML
-    private void ShowAbout(ActionEvent event
-    ) {
+    private void ShowAbout(ActionEvent event) {
         JOptionPane.showMessageDialog(null, Localizator.getString("app.autor") + Localizator.getString("app.version"));
     }
-
     /**
-     * Nastavení výběru turnajové selekce
-     *
-     * @param event
+     * Slouží pro sdružení kódu volení selekčních mechanismů
+     * @param x číslo výběru
      */
-    @FXML
-    private void Tournament5Selected(ActionEvent event
-    ) {
-        Messenger.getInstance().AddMesseage(Localizator.getString("parameter.selection.tournament5") + Localizator.getString("parameter.selection.selected"));
+    private void TournamentXSelected(String x, int setType) {
+        Messenger.getInstance().AddMesseage(Localizator.getString("parameter.selection.selected") + " " + Localizator.getString("parameter.selection.tournament" + x)); 
         SelectionMenu.setText(Localizator.getString("parameter.selection.method")
-                + Localizator.getString("parameter.selection.tournament5"));
-        DataHandler.getInstance().setSelectionMethod(2);
+                + Localizator.getString("parameter.selection.tournament" + x));
+        DataHandler.getInstance().setSelectionMethod(setType);
         Messenger.getInstance().GetMesseage();
+
     }
 
     /**
      * Nastavení výběru turnajové selekce
      *
-     * @param event
+     * @param event event
      */
     @FXML
-    private void Tournament3Selected(ActionEvent event
-    ) {
-        Messenger.getInstance().AddMesseage(Localizator.getString("parameter.selection.tournament3") + Localizator.getString("parameter.selection.selected"));
-        SelectionMenu.setText(Localizator.getString("parameter.selection.method")
-                + Localizator.getString("parameter.selection.tournament3"));
-        DataHandler.getInstance().setSelectionMethod(0);
-        Messenger.getInstance().GetMesseage();
+    private void Tournament5Selected(ActionEvent event) {
+        TournamentXSelected("5", 2);
     }
 
     /**
      * Nastavení výběru turnajové selekce
      *
-     * @param event
+     * @param event event
      */
     @FXML
-    private void Tournament2Selected(ActionEvent event
-    ) {
-        Messenger.getInstance().AddMesseage(Localizator.getString("parameter.selection.tournament2") + Localizator.getString("parameter.selection.selected"));
-        SelectionMenu.setText(Localizator.getString("parameter.selection.method")
-                + Localizator.getString("parameter.selection.tournament2"));
-        DataHandler.getInstance().setSelectionMethod(1);
-        Messenger.getInstance().GetMesseage();
+    private void Tournament3Selected(ActionEvent event) {
+        TournamentXSelected("3", 0);
+    }
+
+    /**
+     * Nastavení výběru turnajové selekce
+     *
+     * @param event event
+     */
+    @FXML
+    private void Tournament2Selected(ActionEvent event) {
+        TournamentXSelected("2", 1);
     }
 
     /**
      * Nastavení výběru ruletové selekce
      *
-     * @param event
+     * @param event event
      */
     @FXML
-    private void RouleteSelected(ActionEvent event
-    ) {
-        Messenger.getInstance().AddMesseage(Localizator.getString("parameter.selection.roulette") + Localizator.getString("parameter.selection.selected"));
+    private void RouleteSelected(ActionEvent event) {
+        Messenger.getInstance().AddMesseage(Localizator.getString("parameter.selection.selected") 
+                + " " + Localizator.getString("parameter.selection.roulette"));
         SelectionMenu.setText(Localizator.getString("parameter.selection.method")
                 + Localizator.getString("parameter.selection.roulette"));
         DataHandler.getInstance().setSelectionMethod(3);
@@ -492,36 +456,52 @@ public class FXMLController implements Initializable {
      * Vyčistí záznamník, správně ošetří odstranění posluchačů, načtení dat a
      * opětovné nastavení posluchačů
      *
-     * @param event
+     * @param event event
      */
     @FXML
-    private void Clear(ActionEvent event
-    ) {
+    private void Clear(ActionEvent event) {
         Messenger.getInstance().ClearMessenger();
         DataHandler.getInstance().getLoadedTerminals().clear();
-        TerminalsComboBox.getCheckModel().getCheckedItems().removeListener(terminalCheckComboBoxListener);
         DataHandler.getInstance().loadParamsAsTerminals();
-        parOfUpdate();
-        TerminalsComboBox.getCheckModel().clearChecks();
-        TerminalsComboBox.getCheckModel().getCheckedItems().addListener(terminalCheckComboBoxListener);
+        Messenger.getInstance().Update();
     }
 
-    private void parOfUpdate() {
-        Messenger.getInstance().ClearMessenger();
-        if (FileHandler.getInstance().file != null) {
-            Messenger.getInstance().AddMesseage(Localizator.getString("output.expectedFunctions") + FilenameUtils.getBaseName(FileHandler.getInstance().file.getName()));
-            Messenger.getInstance().AddMesseage(Localizator.getString("output.rows") + DataHandler.getInstance().getTableRows());
-        }
-        Messenger.getInstance().AddMesseage(Localizator.getString("output.terminals") + DataHandler.getInstance().getLoadedTerminals());
-        Messenger.getInstance().AddMesseage(Localizator.getString("output.functions") + DataHandler.getInstance().getAllFunctionsAsString());
-        Messenger.getInstance().GetAllMesseages();
-    }
-
+    /**
+     * Pustí konfiguraci
+     *
+     * @param event event
+     * @throws URISyntaxException
+     * @throws TransformerConfigurationException
+     * @throws TransformerException
+     */
     @FXML
     private void RunCofiguration(ActionEvent event) throws URISyntaxException, TransformerConfigurationException, TransformerException {
         ConfigurationThread configurationThread = new ConfigurationThread(FileHandler.getInstance().file.getName());
         configurationThread.LoadData();
         configurationThread.start();
+    }
+
+    /**
+     * Zobrazí okno pro terminály
+     *
+     * @param event event
+     */
+    @FXML
+    private void showTerminalWindow(ActionEvent event) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            fxmlLoader.setLocation(getClass().getResource("/fxml/TerminalWindow.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+
+            Stage stage = new Stage();
+            stage.setTitle("Terminals");
+            stage.getIcons().add(new Image("/images/icon.jpg"));
+            stage.setScene(scene);
+
+            stage.show();
+        } catch (UnsupportedOperationException | IOException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
     }
 
 }

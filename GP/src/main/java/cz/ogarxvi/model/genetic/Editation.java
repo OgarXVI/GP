@@ -383,14 +383,15 @@ public class Editation {
     }
 
     /**
-     * Tato metoda se pouští ve dvou režimech: a) OFFLINE Pokud není přístup k
-     * internetu, využije se vlastní implemtace CAS. b) ONLINE: Pokud je přístup
+     * Tato metoda se pouští ve dvou režimech: 
+     * a) OFFLINE Pokud není přístup k
+     * internetu, využije se vlastní implemtace CAS. 
+     * b) ONLINE: Pokud je přístup
      * k internetu využije se Wolfram|Alpha API Podmínky pro použití
      * https://www.wolframalpha.com/termsofuse/
      *
-     * @param bestResult
-     * @param entireMathExpression
-     * @return
+     * @param bestResult Vstupní nejlepší jedinec, ze kterého je získán 
+     * @return upravený a zjodnodušený string popisující funkci
      */
     public String simplify(Chromosome bestResult) {
         //Proces

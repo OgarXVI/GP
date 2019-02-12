@@ -5,7 +5,6 @@
  */
 package cz.ogarxvi.controller;
 
-import cz.ogarxvi.model.DataHandler;
 import cz.ogarxvi.model.FileHandler;
 import cz.ogarxvi.model.Localizator;
 import java.net.URL;
@@ -20,9 +19,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
@@ -35,26 +32,51 @@ import org.controlsfx.control.ToggleSwitch;
  * @author OgarXVI
  */
 public class ErrorWindowController implements Initializable {
-
+    /**
+     * Table View Error
+     */
     @FXML
     private TableView<String[]> errorsTableView;
+    /**
+     * Toggle Switch
+     */
     @FXML
     private ToggleSwitch toggleSwitchFixErrors;
+    /**
+     * Tooltip
+     */
     @FXML
     private Tooltip tooltipFixErrors;
+    /**
+     * Toggle Switch
+     */
     @FXML
     private ToggleSwitch toggleSwitchNewFIle;
+    /**
+     * Tooltip
+     */
     @FXML
     private Tooltip tooltipNewFile;
+    /**
+     * Toggle Switch
+     */
     @FXML
     private ToggleSwitch toggleSwitchRepairAll;
+    /**
+     * Tooltip
+     */
     @FXML
     private Tooltip tooltipRepairAll;
+    /**
+     * Button
+     */
     @FXML
     private Button buttonOK;
 
     /**
      * Initializes the controller class.
+     * @param url url
+     * @param rb rb
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -62,14 +84,19 @@ public class ErrorWindowController implements Initializable {
         tooltipFixErrors.setText(Localizator.getString("tooltip.toggleSwitchFixErrors"));
         tooltipNewFile.setText(Localizator.getString("tooltip.toggleSwitchNewFIle"));
         tooltipRepairAll.setText(Localizator.getString("tooltip.toggleSwitchRepairAll"));
+        toggleSwitchRepairAll.setText(Localizator.getString("toogleSwitch.text.repairAllRow"));
         //bind
+        //toggleSwitchNewFIle.disableProperty().set(true);
         toggleSwitchNewFIle.disableProperty().bind(toggleSwitchFixErrors.selectedProperty());
         toggleSwitchNewFIle.disableProperty().bind(toggleSwitchFixErrors.selectedProperty().not());
         toggleSwitchRepairAll.disableProperty().bind(toggleSwitchFixErrors.selectedProperty());
         toggleSwitchRepairAll.disableProperty().bind(toggleSwitchFixErrors.selectedProperty().not());
         //Next bind level:
     }
-
+    /**
+     * Naastaví parametry FileHandler instance a ukončí okno
+     * @param event 
+     */
     @FXML
     private void buttonOkContinue(ActionEvent event) {
         //setValues
@@ -85,14 +112,17 @@ public class ErrorWindowController implements Initializable {
         Stage stage = (Stage) buttonOK.getScene().getWindow();
         stage.close();
     }
-
+    /**
+     * Parsuje data
+     * @param readData Data na čtení
+     * @param errorRows seznam řádků s chybou
+     */
     public void fillData(String[][] readData, List<Integer> errorRows) {
         String[][] newErrorData = new String[errorRows.size()+2][readData[0].length];
         newErrorData[0] = readData[0];
         for (int i = 1; i < errorRows.size()+1; i++) {
             newErrorData[i] = readData[errorRows.get(i-1)+1];
         }
-
         errorsTableView.getColumns().clear();
         errorsTableView.getItems().clear();
         errorsTableView.getSelectionModel().clearSelection();
@@ -108,28 +138,12 @@ public class ErrorWindowController implements Initializable {
                     return new SimpleStringProperty((p.getValue()[colNo]));
                 }
             });
-//            tc.setCellFactory(colum -> {
-//                return new TableCell<String, String>() {
-//                    @Override
-//                    protected void updateItem(String item, boolean empty) {
-//                        super.updateItem(item, empty);
-//
-//                        setText(empty ? null : getItem());
-//                        setGraphic(null);
-//                        TableRow<String> currentRow = getTableRow();
-//
-//                        if (isEmpty()) {
-//                            currentRow.setStyle("-fx-background-color:lightcoral");
-//
-//                        }
-//                    }
-//                };
-//            });
             tc.setPrefWidth(90);
             errorsTableView.getColumns().add(tc);
         }
         errorsTableView.setItems(data);
 
     }
+
 
 }

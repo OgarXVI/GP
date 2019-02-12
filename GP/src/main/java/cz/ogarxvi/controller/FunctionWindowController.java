@@ -7,8 +7,6 @@ package cz.ogarxvi.controller;
 
 import cz.ogarxvi.model.DataHandler;
 import cz.ogarxvi.model.DataHandler.FunctionCategory;
-import cz.ogarxvi.model.FileHandler;
-import cz.ogarxvi.model.Localizator;
 import cz.ogarxvi.model.Messenger;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -18,7 +16,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
-import org.apache.commons.io.FilenameUtils;
 
 /**
  * FXML Controller class
@@ -90,18 +87,7 @@ public class FunctionWindowController implements Initializable {
                 comboBoxTrigonometricIterations.getSelectionModel().getSelectedItem(),
                 FunctionCategory.TRIGONOMETRIK.category);
         
-        Messenger.getInstance().ClearMessenger();
-        if (FileHandler.getInstance().file != null) {
-            Messenger.getInstance().AddMesseage(Localizator.getString("output.expectedFunctions") + 
-                    FilenameUtils.getBaseName(FileHandler.getInstance().file.getName()));
-            Messenger.getInstance().AddMesseage(Localizator.getString("output.rows") +
-                    DataHandler.getInstance().getTableRows());
-        }
-        Messenger.getInstance().AddMesseage(Localizator.getString("output.terminals") +
-                DataHandler.getInstance().getLoadedTerminals());
-        Messenger.getInstance().AddMesseage(Localizator.getString("output.functions") +
-                DataHandler.getInstance().getAllFunctionsAsString());
-        Messenger.getInstance().GetAllMesseages();
+        Messenger.getInstance().Update();
         
         //Close
         Stage stage = (Stage) buttonStorno.getScene().getWindow();

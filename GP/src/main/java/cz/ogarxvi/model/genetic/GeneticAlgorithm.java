@@ -6,16 +6,12 @@ import cz.ogarxvi.model.Localizator;
 import cz.ogarxvi.model.Messenger;
 import java.awt.BorderLayout;
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -163,9 +159,6 @@ public class GeneticAlgorithm {
             categorySize = setOfFunctions.size();
         }
 
-        System.out.println("JSEM AUTOMAT: " + isAutomat);
-        System.out.println("NAČETL JSEM FUNKCE: " + Arrays.toString(setOfFunctions.toArray()));
-
         for (int c = 0; c < categorySize; c++) {
             int numberIteartionInCategory = DataHandler.getInstance().getNumberIterationsCategory()[c];
             if (isAutomat) {
@@ -227,7 +220,8 @@ public class GeneticAlgorithm {
                         Map<String, BigDecimal> values = new HashMap<>();
                         for (BigDecimal[] mathData : DataHandler.getInstance().getMathData()) {
                             for (int l = 0; l < mathData.length; l++) {
-                                values.put(DataHandler.getInstance().getParams()[l], mathData[l]);
+                                if (mathData[l] != null)
+                                    values.put(DataHandler.getInstance().getParams()[l], mathData[l]);
                             }
                             for (int m = 0; m < setOfTerminals.size(); m++) {
                                 if (!Character.isLetter(setOfTerminals.get(m).command.charAt(0))) {

@@ -5,13 +5,14 @@
  */
 package cz.ogarxvi.model;
 
+import java.io.File;
 import java.util.List;
 
 /**
  *
  * @author OgarXVI
  */
-public interface IWritter {
-    boolean update(List<String> replaces, List<Integer> colums, List<Integer> rows);
-    boolean copy(List<String> replaces, List<Integer> colums, List<Integer> rows);
+public interface IWriter {
+    boolean update(List<String> replaces, List<Integer> colums, List<Integer> rows, File file);
+    boolean copy(List<String> replaces, List<Integer> colums, List<Integer> rows, File file);
 }

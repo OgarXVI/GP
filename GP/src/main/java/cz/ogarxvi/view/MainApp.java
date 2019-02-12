@@ -1,5 +1,6 @@
 package cz.ogarxvi.view;
 
+import cz.ogarxvi.model.Localizator;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.fxml.FXMLLoader;
@@ -24,7 +25,7 @@ public class MainApp extends Application {
         // načte ikonku 
         stage.getIcons().add(new Image("/images/icon.jpg"));
         // nastaví titulek
-        stage.setTitle("Symbolic Regression");
+        stage.setTitle(Localizator.getString("window.title.main"));
         // nastaví aplikaci scénu 
         stage.setScene(scene);
         // zobrazí scénu

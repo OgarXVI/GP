@@ -88,7 +88,7 @@ public class Gen {
     /**
      * Kopírovací konstruktor
      *
-     * @param gen
+     * @param gen gen
      */
     public Gen(Gen gen) {
         this.command = gen.command;

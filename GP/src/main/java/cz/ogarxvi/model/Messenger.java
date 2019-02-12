@@ -7,12 +7,15 @@ package cz.ogarxvi.model;
 
 import java.util.ArrayList;
 import javafx.scene.control.TextArea;
+import org.apache.commons.io.FilenameUtils;
 
 /**
  * Třída pro ukládání a posílání zpráv
+ *
  * @author OgarXVI
  */
 public class Messenger {
+
     /**
      * List zpráv
      */
@@ -25,20 +28,23 @@ public class Messenger {
      * Návrhový vzor Singleton
      */
     private static Messenger instance;
+
     /**
      * Vytvoří instanci pro ukládání a vypisování zpráv
+     *
      * @param textArea Vypisovací zóna
      */
     private Messenger() {
         this.messages = new ArrayList<>();
     }
-    
-    public static synchronized Messenger getInstance(){
-        if (instance==null)
+
+    public static synchronized Messenger getInstance() {
+        if (instance == null) {
             instance = new Messenger();
+        }
         return instance;
     }
-    
+
     /**
      * Vyčistí list od všech zpráv v listu a smaže text vevypisované oblasti
      */
@@ -46,12 +52,14 @@ public class Messenger {
         this.messages.clear();
         this.textArea.setText("");
     }
-    
-    public void setArea(TextArea textArea){
+
+    public void setArea(TextArea textArea) {
         this.textArea = textArea;
     }
+
     /**
      * Vrátí posledně přidánou zprávu
+     *
      * @return Vrátí posledně přidáný string
      */
     public synchronized String GetMesseage() {
@@ -72,6 +80,7 @@ public class Messenger {
 
     /**
      * Přidá do listu zprávu, pokud není NULL
+     *
      * @param s NO-NULL string
      */
     public synchronized void AddMesseage(String s) {
@@ -83,6 +92,7 @@ public class Messenger {
 
     /**
      * Přidá vybranou zprávu do textové oblasti
+     *
      * @param s Vybraná zpráva
      */
     private synchronized void AppendMesseage(String s) {
@@ -90,6 +100,7 @@ public class Messenger {
             javafx.application.Platform.runLater(() -> textArea.appendText(s));
         }
     }
+
     /**
      * Zavolá metodi "GetMesseage" na všechny zaznamenané zprávy.
      */
@@ -97,6 +108,23 @@ public class Messenger {
         while (!messages.isEmpty()) {
             GetMesseage();
         }
+    }
+    /**
+     * Vypíše aktuální stav načtených funkcí, terminálů a souboru.
+     */
+    public synchronized void Update() {
+        ClearMessenger();
+        if (FileHandler.getInstance().file != null) {
+            AddMesseage(Localizator.getString("output.expectedFunctions")
+                    + FilenameUtils.getBaseName(FileHandler.getInstance().file.getName()));
+            AddMesseage(Localizator.getString("output.rows")
+                    + DataHandler.getInstance().getTableRows());
+        }
+        AddMesseage(Localizator.getString("output.terminals")
+                + DataHandler.getInstance().getLoadedTerminals());
+        AddMesseage(Localizator.getString("output.functions")
+                + DataHandler.getInstance().getAllFunctionsAsString());
+        GetAllMesseages();
     }
 
 }
