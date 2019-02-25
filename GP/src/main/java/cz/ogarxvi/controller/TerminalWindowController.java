@@ -9,8 +9,6 @@ import cz.ogarxvi.model.DataHandler;
 import cz.ogarxvi.model.Localizator;
 import cz.ogarxvi.model.Messenger;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -142,7 +140,7 @@ public class TerminalWindowController implements Initializable {
             Double.parseDouble(inputText); //CHECK TEST
         } catch (Exception e) {
             //
-            JOptionPane.showConfirmDialog(null, Localizator.getString("warning.wrongInput"));
+            JOptionPane.showMessageDialog(null, Localizator.getString("warning.wrongInput"));
             return false;
         }
         return true;

@@ -279,7 +279,7 @@ public class GeneticAlgorithm {
                         ListOfBestResults.add(bestChromosome);
                         //rovnou utni výsledek
                         if ((bestChromosomeInGeneration.getFitness().getValue().compareTo(BigDecimal.ZERO) == 0)) {
-                            return returnBestResult(dlg, jl, pf);
+                            return returnBestResult(dlg, jl, pf, dpb, workPreg);
                         }
                         continue;
                     }
@@ -320,7 +320,7 @@ public class GeneticAlgorithm {
                 }
             }
         }
-        return returnBestResult(dlg, jl, pf);
+        return returnBestResult(dlg, jl, pf, dpb, workPreg);
     }
 
     private void mutation(int numberOfMutation, int treeMaxDepthAfterOperation, List<Gen> setOfTerminals, List<Gen> functions, List<Chromosome> newPopulation) {
@@ -405,7 +405,7 @@ public class GeneticAlgorithm {
         return numberOfReproduction;
     }
 
-    private Chromosome returnBestResult(JDialog dlg, JLabel jl, JFrame parentFrame) {
+    private Chromosome returnBestResult(JDialog dlg, JLabel jl, JFrame parentFrame, JProgressBar bar, int workReq) {
         //CRASH STATE
         if (ListOfBestResults != null) {
             if (ListOfBestResults.isEmpty()) {
@@ -414,12 +414,17 @@ public class GeneticAlgorithm {
         } else {
             return population.get(0);
         }
+        //Full
+        bar.setValue(workReq);
         //SORT
         Collections.sort(ListOfBestResults);
         //POST
         jl.setText("Postprocessing...");
         DataHandler.getInstance().setBestChromosome(ListOfBestResults.get(0));
-        String simplified = editation.simplify(ListOfBestResults.get(0)); // EDIT
+        String simplified = ListOfBestResults.get(0).toString();
+        if (!isAutomat)
+            simplified = editation.simplify(ListOfBestResults.get(0)); // EDIT
+        
         Messenger.getInstance().AddMesseage(Localizator.getString(
                 "output.gp.chromosome.best")
                 + " " + simplified);

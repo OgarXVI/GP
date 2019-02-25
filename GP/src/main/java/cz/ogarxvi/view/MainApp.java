@@ -1,8 +1,8 @@
 package cz.ogarxvi.view;
 
 import cz.ogarxvi.model.Localizator;
+import java.util.Locale;
 import javafx.application.Application;
-import static javafx.application.Application.launch;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -16,6 +16,11 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        //Set localization
+        //force
+        Localizator.setLocale(Locale.getDefault());
+        //set encoding
+        System.setProperty("file.encoding", "UTF-8");
         // načte vzor 
         Parent root = FXMLLoader.load(getClass().getResource("/fxml/Scene.fxml"));
         // vytvoří scénu

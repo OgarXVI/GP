@@ -27,10 +27,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -135,10 +139,156 @@ public class FXMLController implements Initializable {
      */
     @FXML
     private Button TerminalsButton;
+    /**
+     * Menu File
+     */
+    @FXML
+    private Menu menuFile;
+    /**
+     * Menu Item Load Data
+     */
+    @FXML
+    private MenuItem menuItemLoadData;
+    /**
+     * Menu Item Run Cofiguration
+     */
+    @FXML
+    private MenuItem menuItemRunConfi;
+    /**
+     * Menu Item Open Output
+     */
+    @FXML
+    private MenuItem menuItemOpenOutput;
+    /**
+     * Menu Item Exit
+     */
+    @FXML
+    private MenuItem menuItemExit;
+    /**
+     * Menu Show
+     */
+    @FXML
+    private Menu menuShow;
+    /**
+     * Menu Item Show Graph
+     */
+    @FXML
+    private MenuItem menuItemShowGraph;
+    /**
+     * Menu About
+     */
+    @FXML
+    private Menu menuAbout;
+    /**
+     * Menu Item About
+     */
+    @FXML
+    private MenuItem menuItemAbout;
+    /**
+     * Label Population Size
+     */
+    @FXML
+    private Label labelPopulationSize;
+    /**
+     * Label Number of Generation
+     */
+    @FXML
+    private Label labelNumberofGeneration;
+    /**
+     * Label Reproduction of Probability
+     */
+    @FXML
+    private Label labelReproductionProbability;
+    /**
+     * Label Muation of Probability
+     */
+    @FXML
+    private Label labelMutationProbabilty;
+    /**
+     * Label Crossing of Probability
+     */
+    @FXML
+    private Label labelCrossingProbabilty;
+    /**
+     * Label Tree Max Operation Depth
+     */
+    @FXML
+    private Label labelTreeMaxOperationDepth;
+    /**
+     * Label Tree Max Init Depth
+     */
+    @FXML
+    private Label labelTreeMaxInitDepth;
+    /**
+     * Menu Item Tournament 3
+     */
+    @FXML
+    private MenuItem menuItemTournament3;
+    /**
+     * Menu Item Tournamrnt 2
+     */
+    @FXML
+    private MenuItem menuItemTournament2;
+    /**
+     * Menu Item tournament 5
+     */
+    @FXML
+    private MenuItem menuItemTournament5;
+    /**
+     * Menu Item Roulete 
+     */
+    @FXML
+    private MenuItem menuItemRoulete;
+    /**
+     * Label Functions
+     */
+    @FXML
+    private Label labelFunctions;
+    /**
+     * Bale Terminals
+     */
+    @FXML
+    private Label labelTerminals;
+    /**
+     * Nápověda pro TreeMaxDepthAfterOperation
+     */
+    //@FXML
+    //private Tooltip tooltipTreeMaxDepthAfterOperationTextField;
 
     public void initialize(URL url, ResourceBundle rb) {
         Messenger.getInstance().setArea(this.ConsoleOutput);
-        //LOCALIZATOR
+        ElitistToogleButton.setText(Localizator.getString("parameter.elitism"));
+        DecimationButton.setText(Localizator.getString("parameter.decimation"));
+        labelTerminals.setText(Localizator.getString("parameter.terminals"));
+        labelFunctions.setText(Localizator.getString("parameter.functions"));
+        menuItemRoulete.setText(Localizator.getString("parameter.selection.roulette"));
+        menuItemTournament5.setText(Localizator.getString("parameter.selection.tournament5"));
+        menuItemTournament3.setText(Localizator.getString("parameter.selection.tournament3"));
+        menuItemTournament2.setText(Localizator.getString("parameter.selection.tournament2"));
+        labelTreeMaxInitDepth.setText(Localizator.getString("parameter.treeMaxInitDepth"));
+        labelTreeMaxOperationDepth.setText(Localizator.getString("parameter.treeMaxOperationDepth"));
+        labelCrossingProbabilty.setText(Localizator.getString("parameter.crossingProbability"));
+        labelMutationProbabilty.setText(Localizator.getString("parameter.mutationProbability"));
+        labelReproductionProbability.setText(Localizator.getString("parameter.reproductionProbability"));
+        labelNumberofGeneration.setText(Localizator.getString("parameter.numberOfGenerations"));
+        labelPopulationSize.setText(Localizator.getString("parameter.populationsize"));
+        menuItemAbout.setText(Localizator.getString("menu.about.about"));
+        menuAbout.setText(Localizator.getString("menu.about"));
+        menuItemShowGraph.setText(Localizator.getString("menu.show.graph"));
+        menuShow.setText(Localizator.getString("menu.show"));
+        menuItemExit.setText(Localizator.getString("menu.file.exit"));
+        menuItemOpenOutput.setText(Localizator.getString("menu.file.openoOutput"));
+        menuItemRunConfi.setText(Localizator.getString("menu.file.runConfiguration"));
+        menuItemLoadData.setText(Localizator.getString("menu.file.loadData"));
+        menuFile.setText(Localizator.getString("menu.file"));
+        TerminalsButton.setText(Localizator.getString("parameter.terminals.select"));
+        SelectionMenu.setText(Localizator.getString("parameter.selection.method"));
+        FunctionsButton.setText(Localizator.getString("parameter.functions.select"));
+        ClearButton.setText(Localizator.getString("button.clear"));
+        StopButton.setText(Localizator.getString("button.stop"));
+        StartButton.setText(Localizator.getString("button.start"));
+        //tooltipTreeMaxDepthAfterOperationTextField.setText(Localizator.getString(""));
+        TableView.setPlaceholder(new Label(Localizator.getString("tableview.empty")));
     }
 
     /**

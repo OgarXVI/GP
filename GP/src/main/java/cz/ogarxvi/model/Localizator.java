@@ -1,34 +1,45 @@
 package cz.ogarxvi.model;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+
 import java.util.Locale;
-import java.util.PropertyResourceBundle;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Třída nabízející statickou metodu pro získání řetězce na základě klíče
+ *
  * @author OgarXVI
  */
 public class Localizator {
+
+    private static ResourceBundle words;
+
     /**
      * Vrátí řětezec na základě uvedeného klíče
+     *
      * @param key Klíč pro nalezení řetězce
      * @return Řetezec ze resources
      */
     public static String getString(String key) {
-        
-        FileInputStream fis = null;
-        ResourceBundle words = null;
         try {
-             words = ResourceBundle.getBundle("localization/localization");
-             return words.getString(key);
+            return words.getString(key);
         } catch (Exception e) {
             e.printStackTrace();
-        } 
-        return "";
+        }
+        return null;
+    }
+
+    /**
+     * Nastaví lokalizaci a balíček jazyka
+     *
+     * @param local lokal
+     * @return
+     */
+    public static boolean setLocale(Locale local) {
+        try {
+            words = ResourceBundle.getBundle("localization/localization", local);
+        } catch (MissingResourceException e) {
+            return false;
+        }
+        return true;
     }
 }
