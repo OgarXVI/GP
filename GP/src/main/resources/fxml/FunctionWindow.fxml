@@ -27,9 +27,9 @@
          <tooltip>
             <Tooltip id="toolTipCategory" text="Category contains functons used in GP" />
          </tooltip></Label>
-      <Label text="Iterations:" GridPane.columnIndex="1">
+      <Label text="Use:" GridPane.columnIndex="1">
          <tooltip>
-            <Tooltip id="toolTipIterations" text="Iteration determines how many times a certain category of functions was used. A 0 means that a given category was not used at all." />
+            <Tooltip id="toolTipIterations" text="Use determines if a certain category of functions was used." />
          </tooltip></Label>
       <Button fx:id="buttonStorno" cancelButton="true" onAction="#ClickButtonStorno" prefHeight="31.0" prefWidth="214.0" text="Storno" GridPane.rowIndex="7">
          <opaqueInsets>
@@ -42,24 +42,6 @@
          <GridPane.margin>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </GridPane.margin></Button>
-      <ComboBox fx:id="comboBoxBinaryIterations" prefWidth="150.0" promptText="0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-         <opaqueInsets>
-            <Insets left="5.0" right="5.0" />
-         </opaqueInsets>
-         <GridPane.margin>
-            <Insets left="10.0" right="10.0" />
-         </GridPane.margin>
-      </ComboBox>
-      <ComboBox fx:id="comboBoxUnaryIterations" prefWidth="150.0" promptText="0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-         <GridPane.margin>
-            <Insets left="10.0" right="10.0" />
-         </GridPane.margin>
-      </ComboBox>
-      <ComboBox fx:id="comboBoxTrigonometricIterations" prefWidth="150.0" promptText="0" GridPane.columnIndex="1" GridPane.rowIndex="3">
-         <GridPane.margin>
-            <Insets left="10.0" right="10.0" />
-         </GridPane.margin>
-      </ComboBox>
       <Label id="labelBinary" text="Binary" GridPane.rowIndex="1">
          <tooltip>
             <Tooltip id="toolTipBinary" text="This Category cointains: + - * /" />
@@ -75,5 +57,8 @@
             <Tooltip text="This Caterory contains: sin, cos, tg, cotg" />
          </tooltip>
       </Label>
+      <CheckBox fx:id="checkBoxBinary" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <CheckBox fx:id="checkBoxUnary" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      <CheckBox fx:id="checkBoxTrigonometric" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
    </children>
 </GridPane>

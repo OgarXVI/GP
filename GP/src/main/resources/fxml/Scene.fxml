@@ -21,33 +21,34 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="656" prefWidth="830" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.ogarxvi.controller.FXMLController">
+<AnchorPane id="AnchorPane" prefHeight="656" prefWidth="830" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.ogarxvi.controller.FXMLController">
     <children>
         <MenuBar layoutY="14.0" prefHeight="26.0" prefWidth="829.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
             <menus>
-                <Menu mnemonicParsing="false" fx:id="menuFile" text="File">
+                <Menu fx:id="menuFile" mnemonicParsing="false" text="File">
                     <items>
-                        <MenuItem mnemonicParsing="false" fx:id="menuItemLoadData" onAction="#LoadFile" text="Load Data" />
-                        <MenuItem mnemonicParsing="false" fx:id="menuItemRunConfi" onAction="#RunCofiguration" text="Run Configuration" />
-                        <MenuItem mnemonicParsing="false" fx:id="menuItemOpenOutput" onAction="#OpenOutput" text="Open Output" />
-                        <MenuItem mnemonicParsing="false" fx:id="menuItemExit" onAction="#CloseFromMenuItem" text="Exit" />
+                        <MenuItem fx:id="menuItemLoadData" mnemonicParsing="false" onAction="#LoadFile" text="Load Data" />
+                        <MenuItem fx:id="menuItemRunConfi" mnemonicParsing="false" onAction="#RunCofiguration" text="Run Configuration" />
+                        <MenuItem fx:id="menuItemOpenOutput" mnemonicParsing="false" onAction="#OpenOutput" text="Open Output" />
+                  <MenuItem fx:id="menuitemSetting" mnemonicParsing="false" onAction="#menuitemSettingClick" text="Setting" />
+                        <MenuItem fx:id="menuItemExit" mnemonicParsing="false" onAction="#CloseFromMenuItem" text="Exit" />
                     </items>
                 </Menu>
-                <Menu mnemonicParsing="false" fx:id="menuShow" text="Show">
+                <Menu fx:id="menuShow" mnemonicParsing="false" text="Show">
                     <items>
-                        <MenuItem mnemonicParsing="false" fx:id="menuItemShowGraph" onAction="#ShowGraph" text="Graph" />
+                        <MenuItem fx:id="menuItemShowGraph" mnemonicParsing="false" onAction="#ShowGraph" text="Graph" />
                     </items>
                 </Menu>
-                <Menu mnemonicParsing="false" fx:id="menuAbout" text="About">
+                <Menu fx:id="menuAbout" mnemonicParsing="false" text="About">
                     <items>
-                        <MenuItem mnemonicParsing="false" fx:id="menuItemAbout" onAction="#ShowAbout" text="About" />
+                        <MenuItem fx:id="menuItemAbout" mnemonicParsing="false" onAction="#ShowAbout" text="About" />
                     </items>
                 </Menu>
             </menus>
         </MenuBar>
         <TableView fx:id="TableView" editable="true" layoutX="15.0" layoutY="52.0" prefHeight="246.0" prefWidth="600.0" AnchorPane.leftAnchor="13.0" AnchorPane.rightAnchor="266.0" />
         <TextArea fx:id="ConsoleOutput" editable="false" layoutX="15.0" layoutY="305.0" prefHeight="330.0" prefWidth="600.0" promptText="Program started..." AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="13.0" AnchorPane.rightAnchor="266.0" AnchorPane.topAnchor="305.0" />
-        <AnchorPane layoutX="591.0" layoutY="52.0" prefHeight="574.0" prefWidth="222.0" AnchorPane.topAnchor="48.0" AnchorPane.rightAnchor="20.0" AnchorPane.bottomAnchor="5.0">
+        <AnchorPane layoutX="591.0" layoutY="52.0" prefHeight="574.0" prefWidth="222.0" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="48.0">
             <!-- <BorderPane prefHeight="574.0" prefWidth="194.0" > -->
             <children>
                 <Label fx:id="labelPopulationSize" layoutX="15.0" text="Population size:" />
@@ -57,21 +58,21 @@
                 <Label fx:id="labelCrossingProbabilty" layoutX="15.0" layoutY="200.0" text="Crossing probability:" />
                 <Label fx:id="labelTreeMaxOperationDepth" layoutX="15.0" layoutY="250.0" text="Tree max operation depth:" />
                 <Label fx:id="labelTreeMaxInitDepth" layoutX="15.0" layoutY="300.0" text="Tree max init depth:" />
-                <TextField fx:id="PopulationSIzeTextField" layoutX="15.0" layoutY="20.0" promptText="100" prefWidth="222.0" />
-                <TextField fx:id="NumberOfGenerationsTextField" layoutX="15.0" layoutY="70.0" promptText="100" prefWidth="222.0" />
-                <TextField fx:id="ReproductionProbabilityTextField" layoutX="15.0" layoutY="120.0" promptText="0.1" prefWidth="222.0" />
-                <TextField fx:id="MutationProbabilityTextField" layoutX="15.0" layoutY="170.0" promptText="0.3" prefWidth="222.0" />
-                <TextField fx:id="CrossoverProbabilityTextField" layoutX="15.0" layoutY="220.0" promptText="0.6" prefWidth="222.0" />
-                <TextField fx:id="TreeMaxDepthAfterOperationTextField" layoutX="15.0" layoutY="270.0" promptText="5" prefWidth="222.0" />
-                <TextField fx:id="TreeMaxInicializationDepthTextField" layoutX="15.0" layoutY="320.0" promptText="3" prefWidth="222.0" />
+                <TextField fx:id="PopulationSIzeTextField" layoutX="15.0" layoutY="20.0" prefWidth="222.0" promptText="100" />
+                <TextField fx:id="NumberOfGenerationsTextField" layoutX="15.0" layoutY="70.0" prefWidth="222.0" promptText="100" />
+                <TextField fx:id="ReproductionProbabilityTextField" layoutX="15.0" layoutY="120.0" prefWidth="222.0" promptText="0.1" />
+                <TextField fx:id="MutationProbabilityTextField" layoutX="15.0" layoutY="170.0" prefWidth="222.0" promptText="0.3" />
+                <TextField fx:id="CrossoverProbabilityTextField" layoutX="15.0" layoutY="220.0" prefWidth="222.0" promptText="0.6" />
+                <TextField fx:id="TreeMaxDepthAfterOperationTextField" layoutX="15.0" layoutY="270.0" prefWidth="222.0" promptText="5" />
+                <TextField fx:id="TreeMaxInicializationDepthTextField" layoutX="15.0" layoutY="320.0" prefWidth="222.0" promptText="3" />
                 <ToggleSwitch fx:id="ElitistToogleButton" layoutX="15.0" layoutY="365.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="65.0" text="Elitism " />
                 <ToggleSwitch fx:id="DecimationButton" layoutX="111.0" layoutY="365.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="94.0" text="Decimation " />
-                <MenuButton fx:id="SelectionMenu" contentDisplay="CENTER" layoutX="14.0" layoutY="408.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="222.0" text="Selection: Tournament">
+                <MenuButton fx:id="SelectionMenu" contentDisplay="CENTER" layoutX="14.0" layoutY="408.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="222.0" text="Selection: Tournament 3">
                     <items>
-                        <MenuItem mnemonicParsing="false" fx:id="menuItemTournament3" onAction="#Tournament3Selected" text="Tournament3" />
-                        <MenuItem mnemonicParsing="false" fx:id="menuItemTournament2" onAction="#Tournament2Selected" text="Tournament2" />
-                        <MenuItem mnemonicParsing="false" fx:id="menuItemTournament5" onAction="#Tournament5Selected" text="Tournament5" />
-                        <MenuItem mnemonicParsing="false" fx:id="menuItemRoulete" onAction="#RouleteSelected" text="Roulete" />
+                        <MenuItem fx:id="menuItemTournament3" mnemonicParsing="false" onAction="#Tournament3Selected" text="Tournament3" />
+                        <MenuItem fx:id="menuItemTournament2" mnemonicParsing="false" onAction="#Tournament2Selected" text="Tournament2" />
+                        <MenuItem fx:id="menuItemTournament5" mnemonicParsing="false" onAction="#Tournament5Selected" text="Tournament5" />
+                        <MenuItem fx:id="menuItemRoulete" mnemonicParsing="false" onAction="#RouleteSelected" text="Roulete" />
                     </items>
                 </MenuButton>
             <!--
@@ -80,14 +81,14 @@
                 <Label fx:id="labelTerminals" layoutX="14.0" layoutY="494.0" text="Terminals:" />
                 <Button fx:id="TerminalsButton" cancelButton="false" text="" onAction="#showTerminalWindow" layoutX="14.0" layoutY="514.0" prefHeight="26.0" prefWidth="222.0" />
                 -->
-            <Label layoutX="14.0" fx:id="labelFunctions" layoutY="442.0" text="Functions:" /> 
-            <Button text="Select functions" onAction="#showFunctionWindow" fx:id="FunctionsButton" layoutX="14.0" layoutY="462.0" prefHeight="26.0" prefWidth="222.0" />
-            <Label layoutX="14.0" fx:id="labelTerminals" layoutY="494.0" text="Terminals:" />
-            <Button text="Select terminals" fx:id="TerminalsButton" onAction="#showTerminalWindow" layoutX="14.0" layoutY="514.0" prefHeight="26.0" prefWidth="222.0" />
+            <Label fx:id="labelFunctions" layoutX="14.0" layoutY="442.0" text="Functions:" /> 
+            <Button fx:id="FunctionsButton" layoutX="14.0" layoutY="462.0" onAction="#showFunctionWindow" prefHeight="26.0" prefWidth="222.0" text="Select functions" />
+            <Label fx:id="labelTerminals" layoutX="14.0" layoutY="494.0" text="Terminals:" />
+            <Button fx:id="TerminalsButton" layoutX="14.0" layoutY="514.0" onAction="#showTerminalWindow" prefHeight="26.0" prefWidth="222.0" text="Select terminals" />
             
-                <Button fx:id="StartButton" layoutX="14.0" layoutY="561.0" mnemonicParsing="false" onAction="#StartCalculation" text="Start" prefWidth="72.0" />
-                <Button fx:id="ClearButton" layoutX="89.0" layoutY="561.0" mnemonicParsing="false" onAction="#Clear" text="Clear" prefWidth="72.0" />
-                <Button fx:id="StopButton" layoutX="164.0" layoutY="561.0" mnemonicParsing="false" onAction="#StopCalculation" text="Stop" prefWidth="72.0" />
+                <Button fx:id="StartButton" layoutX="14.0" layoutY="561.0" mnemonicParsing="false" onAction="#StartCalculation" prefWidth="72.0" text="Start" />
+                <Button fx:id="ClearButton" layoutX="89.0" layoutY="561.0" mnemonicParsing="false" onAction="#Clear" prefWidth="72.0" text="Clear" />
+                <Button fx:id="StopButton" layoutX="164.0" layoutY="561.0" mnemonicParsing="false" onAction="#StopCalculation" prefWidth="72.0" text="Stop" />
             </children>
             <!-- </BorderPane> -->
         </AnchorPane>

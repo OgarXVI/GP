@@ -331,4 +331,23 @@ public class FileHandler {
         this.errorRowPositions.clear();
     }
 
+    public void createReport(List<String> reports, boolean openFileAfter) {
+        File fileNew = new File("Report.txt");
+        try {
+            FileUtils.writeLines(fileNew, reports);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            Logger.getLogger(FileHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if (openFileAfter) {
+            ProcessBuilder pb = new ProcessBuilder("Notepad.exe", "Report.txt");
+            try {
+                pb.start();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                Logger.getLogger(FileHandler.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
 }

@@ -1,6 +1,7 @@
 package cz.ogarxvi.model.genetic;
 
 import cz.ogarxvi.model.DataHandler;
+import cz.ogarxvi.model.FileHandler;
 import cz.ogarxvi.model.GPThread;
 import cz.ogarxvi.model.Localizator;
 import cz.ogarxvi.model.Messenger;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.Executors;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -57,6 +59,10 @@ public class GeneticAlgorithm {
      * Jaký index má posledně přidaný prvek
      */
     private int indexOfLastAddedChromosome = 0;
+    /**
+     *
+     */
+    private List<String> reports;
 
     /**
      * Založení GA
@@ -66,6 +72,7 @@ public class GeneticAlgorithm {
         editation = new Editation(DataHandler.getInstance().getParams());
         ListOfBestResults = new ArrayList<>();
         lastChromosomes = new Chromosome[CHECKED_NUMBER_OF_CHROMOSOMES];
+        reports = new ArrayList<>();
     }
 
     /**
@@ -79,6 +86,7 @@ public class GeneticAlgorithm {
         this.isAutomat = isAutomat;
         ListOfBestResults = new ArrayList<>();
         lastChromosomes = new Chromosome[CHECKED_NUMBER_OF_CHROMOSOMES];
+        reports = new ArrayList<>();
     }
 
     /**
@@ -158,7 +166,20 @@ public class GeneticAlgorithm {
         if (isAutomat) {
             categorySize = setOfFunctions.size();
         }
-
+        //Read data before calc
+        Map<String, BigDecimal> values = new HashMap<>();
+        for (BigDecimal[] mathData : DataHandler.getInstance().getMathData()) {
+            for (int l = 0; l < mathData.length; l++) {
+                if (mathData[l] != null) {
+                    values.put(DataHandler.getInstance().getParams()[l], mathData[l]);
+                }
+            }
+            for (int m = 0; m < setOfTerminals.size(); m++) {
+                if (!Character.isLetter(setOfTerminals.get(m).command.charAt(0))) {
+                    values.put(setOfTerminals.get(m).command, BigDecimal.valueOf(Double.valueOf(setOfTerminals.get(m).command)));
+                }
+            }
+        }
         for (int c = 0; c < categorySize; c++) {
             int numberIteartionInCategory = DataHandler.getInstance().getNumberIterationsCategory()[c];
             if (isAutomat) {
@@ -177,11 +198,16 @@ public class GeneticAlgorithm {
                 }
                 // Založení populace
                 population = new ArrayList<>(initSizeOfPopulation);
+                reports.add("Population size: " + initSizeOfPopulation);
+                reports.add("Number of generation: " + numberOfGenerations);
                 // Vyhodnocení šancí
                 int numberOfReproduction = (int) (reproductionProbability * initSizeOfPopulation);
+                reports.add("Number of chromosomes to reproduction: " + numberOfReproduction);
                 int numberOfCrossover = (int) (crossoverProbability * initSizeOfPopulation) / 2;
+                reports.add("Number of chromosomes to crossover: " + numberOfCrossover);
                 int numberOfMutation = (int) (mutationProbability * initSizeOfPopulation);
-
+                reports.add("Number of chromosomes to mutation: " + numberOfMutation);
+                reports.add("Selection method: " + DataHandler.getInstance().getSelectionMethod());
                 numberOfReproduction = decimationIncrement(numberOfReproduction, numberOfCrossover, numberOfMutation, initSizeOfPopulation, elitismus);
 
                 int generationOfDecimation = 10;
@@ -204,34 +230,40 @@ public class GeneticAlgorithm {
                 Chromosome bestChromosome = new Chromosome(population.get(0));
                 // Iterace přes generace
                 for (int i = 0; i < numberOfGenerations; i++) {
+                    String report00 = "Generation " + i + " started...";
+                    if (DataHandler.getInstance().isPrintGeneration()) {
+                        Messenger.getInstance().AddMesseage(report00);
+                        Messenger.getInstance().GetMesseage();
+                    }
+                    reports.add(report00);
                     workDone += 10;
                     dpb.setValue(workDone);
                     //Stop thread
                     if (DataHandler.getInstance().isGpStop()) {
                         DataHandler.getInstance().setBestChromosome(bestChromosome);
-                        return bestChromosome;
+                        return returnBestResult(dlg, jl, pf, dpb, workPreg);
                     }
                     // Nejlepší jedinec je vždy první v generaci
                     Chromosome bestChromosomeInGeneration = new Chromosome(population.get(0));
                     //POPULACE
                     for (int j = 0; j < population.size(); j++) {
+                        if (DataHandler.getInstance().isGpStop()) {
+                            DataHandler.getInstance().setBestChromosome(bestChromosome);
+                            return returnBestResult(dlg, jl, pf, dpb, workPreg);
+                        }
                         //Namapování hodnot na klíče (X->4...)
                         List<BigDecimal> results = new ArrayList<>();
-                        Map<String, BigDecimal> values = new HashMap<>();
-                        for (BigDecimal[] mathData : DataHandler.getInstance().getMathData()) {
-                            for (int l = 0; l < mathData.length; l++) {
-                                if (mathData[l] != null)
-                                    values.put(DataHandler.getInstance().getParams()[l], mathData[l]);
-                            }
-                            for (int m = 0; m < setOfTerminals.size(); m++) {
-                                if (!Character.isLetter(setOfTerminals.get(m).command.charAt(0))) {
-                                    values.put(setOfTerminals.get(m).command, BigDecimal.valueOf(Double.valueOf(setOfTerminals.get(m).command)));
-                                }
-                            }
-                            results.add(population.get(j).getRoot().resolveCommand(values));
-                        }
+                        results.add(population.get(j).getRoot().resolveCommand(values));
                         // výpočet fitness jedince
                         population.get(j).getFitness().calculate(results, DataHandler.getInstance().getExpectedResults());
+                        String report01 = "Chromosome " + j + " in generation " + i + " has fitness " + population.get(j).getFitness().getValue();
+                        String report02 = "Chromosome " + j + " is " + population.get(j).toString();
+                        if (DataHandler.getInstance().isPrintPopulation()) {
+                            Messenger.getInstance().AddMesseage(report01);
+                            Messenger.getInstance().AddMesseage(report02);
+                            Messenger.getInstance().GetAllMesseages();
+                        }
+                        reports.add(report01);
                         // zjištění nejlepšího jedince
                         if (population.get(j).getFitness().getValue().abs().compareTo(bestChromosome.getFitness().getValue().abs()) < 0) {
                             bestChromosome = new Chromosome(population.get(j));
@@ -270,8 +302,11 @@ public class GeneticAlgorithm {
 
                     // dát zprávu o nejlepším jedinci v populaci
                     if (!isAutomat) {
-                        System.out.println(bestChromosomeInGeneration.getFitness().getValue()
-                                + "  " + bestChromosomeInGeneration.getRoot().print());
+                        String report02 = "Best Chromosome in generation (" + i + ")";
+                        String report03 = bestChromosomeInGeneration.getFitness().getValue() + "  " + bestChromosomeInGeneration.getRoot().print();
+                        reports.add(report02);
+                        reports.add(report03);
+                        //System.out.println(report03);
                     }
                     // Ukončovací podmínka
                     if ((bestChromosomeInGeneration.getFitness().getValue().compareTo(BigDecimal.ZERO) == 0) || (numberOfGenerations == i + 1)) {
@@ -327,7 +362,7 @@ public class GeneticAlgorithm {
         for (int j = 0; j < numberOfMutation; j++) {
 
             Chromosome selectedChromosome = chooseSelectionMethod(DataHandler.getInstance().getSelectionMethod());
-
+            reports.add("For mutation was selected: " + selectedChromosome.toString());
             SelectedGen selectedGen = randomGen(selectedChromosome);
 
             Gen gen = selectedGen.getGenAbove().gens.get(selectedGen.genIndex());
@@ -341,7 +376,7 @@ public class GeneticAlgorithm {
 
             selectedGen.getGenAbove().gens.set(selectedGen.genIndex(), gen);
             selectedChromosome.getRoot().fixDepth();
-
+            reports.add("Mutation created: " + selectedChromosome.toString());
             newPopulation.add(selectedChromosome);
         }
     }
@@ -351,7 +386,8 @@ public class GeneticAlgorithm {
 
             Chromosome selectedChromosome1 = chooseSelectionMethod(DataHandler.getInstance().getSelectionMethod());
             Chromosome selectedChromosome2 = chooseSelectionMethod(DataHandler.getInstance().getSelectionMethod());
-
+            reports.add("For Crossover was selected " + selectedChromosome1.toString());
+            reports.add("For Crossover was selected " + selectedChromosome2.toString());
             SelectedGen selectedGen1 = randomGen(selectedChromosome1);
             SelectedGen selectedGen2 = randomGen(selectedChromosome2);
 
@@ -378,6 +414,8 @@ public class GeneticAlgorithm {
                 selectedChromosome1.getRoot().fixDepth();
                 selectedChromosome2.getRoot().fixDepth();
 
+                reports.add("After CrossOver was addded " + selectedChromosome1.toString());
+                reports.add("After CrossOver was addded " + selectedChromosome2.toString());
                 newPopulation.add(selectedChromosome1);
                 newPopulation.add(selectedChromosome2);
 
@@ -389,8 +427,8 @@ public class GeneticAlgorithm {
 
     private void reproduction(int numberOfReproduction, List<Chromosome> newPopulation) {
         for (int j = 0; j < numberOfReproduction; j++) {
-
             Chromosome selectedChromosome = chooseSelectionMethod(DataHandler.getInstance().getSelectionMethod());
+            reports.add("Reproduction created " + selectedChromosome.toString());
             newPopulation.add(selectedChromosome);
         }
     }
@@ -407,6 +445,14 @@ public class GeneticAlgorithm {
 
     private Chromosome returnBestResult(JDialog dlg, JLabel jl, JFrame parentFrame, JProgressBar bar, int workReq) {
         //CRASH STATE
+        if (DataHandler.getInstance().isGpStop()) {
+            jl.setText("Stopped...");
+            //
+            dlg.setVisible(false);
+            dlg.dispose();
+            parentFrame.dispose();
+            return population.get(0);
+        }
         if (ListOfBestResults != null) {
             if (ListOfBestResults.isEmpty()) {
                 return population.get(0);
@@ -422,23 +468,40 @@ public class GeneticAlgorithm {
         jl.setText("Postprocessing...");
         DataHandler.getInstance().setBestChromosome(ListOfBestResults.get(0));
         String simplified = ListOfBestResults.get(0).toString();
-        if (!isAutomat)
+        if (!isAutomat) {
             simplified = editation.simplify(ListOfBestResults.get(0)); // EDIT
-        
-        Messenger.getInstance().AddMesseage(Localizator.getString(
+        }
+        String report00 = Localizator.getString(
                 "output.gp.chromosome.best")
-                + " " + simplified);
-        Messenger.getInstance().AddMesseage(Localizator.getString(
+                + " " + simplified;
+        String report01 = Localizator.getString(
                 "output.gp.deflection")
                 + " (" + ListOfBestResults.get(0).getFitness().getValue() + " "
-                + Localizator.getString("output.gp.deflection.from") + ")");
+                + Localizator.getString("output.gp.deflection.from") + ")";
+        reports.add(report00);
+        reports.add(report01);
+
+        Messenger.getInstance().AddMesseage(report00);
+        Messenger.getInstance().AddMesseage(report01);
         Messenger.getInstance().GetAllMesseages();
+        //Report
+        if (!isAutomat) {
+            //Thread
+            Thread t2 = new Thread(() -> {
+                if (DataHandler.getInstance().isCreateFile()) {
+                    FileHandler.getInstance().createReport(reports, DataHandler.getInstance().isOpenFileAfter());
+                }
+            });
+            t2.start();
+        }
+
         //Dispose
         dlg.setVisible(false);
         dlg.dispose();
         parentFrame.dispose();
         //stop
         DataHandler.getInstance().setGpStop(true);
+        //Create and open report
         //GET
         return ListOfBestResults.get(0);
     }
@@ -664,9 +727,14 @@ public class GeneticAlgorithm {
 
         for (int i = 0; i < sizeOfPopulation; i++) {
             Chromosome chromosome = new Chromosome(maxDepth, listOfTerminals, listOfFunctions);
+            String report00 = "Chromosome " + chromosome.getRoot().print() + " created";
+            if (DataHandler.getInstance().isPrintPopulation()) {
+                Messenger.getInstance().AddMesseage(report00);
+            }
+            reports.add(report00);
             population.add(chromosome);
         }
-
+        Messenger.getInstance().GetAllMesseages();
     }
 
     /**

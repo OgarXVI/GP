@@ -79,7 +79,23 @@ public class DataHandler {
      *
      */
     private List<String> allCheckedTerminals;
-
+    /**
+     * 
+     */
+    private boolean printGeneration;
+    /**
+     * 
+     */
+    private boolean printPopulation;
+    /**
+     * 
+     */
+    private boolean createFile = true;
+    /**
+     * 
+     */
+    private boolean openFileAfter = true;
+    
     /**
      * Založení uložiště dat
      */
@@ -90,6 +106,7 @@ public class DataHandler {
         allCheckedTerminals = new ArrayList<>();
         loadedFunctionsCategories = new ArrayList<>();
         loadedFunctionsCategories.add(new ArrayList<>()); //0
+        loadedFunctionsCategories.get(0).addAll(getFunctionsByCategory(0));
         loadedFunctionsCategories.add(new ArrayList<>()); //1
         loadedFunctionsCategories.add(new ArrayList<>()); //2
     }
@@ -215,6 +232,10 @@ public class DataHandler {
         this.loaded = loaded;
     }
 
+    public void gpStop(){
+        this.gpStop = true;
+    }
+    
     public void setGpStop(boolean gpStop) {
         this.gpStop = gpStop;
     }
@@ -245,6 +266,38 @@ public class DataHandler {
 
     public void setAllTerminals(List<String> allTerminals) {
         this.allTerminals = allTerminals;
+    }
+
+    public boolean isPrintGeneration() {
+        return printGeneration;
+    }
+
+    public void setPrintGeneration(boolean printGeneration) {
+        this.printGeneration = printGeneration;
+    }
+
+    public boolean isPrintPopulation() {
+        return printPopulation;
+    }
+
+    public void setPrintPopulation(boolean printPopulation) {
+        this.printPopulation = printPopulation;
+    }
+
+    public boolean isCreateFile() {
+        return createFile;
+    }
+
+    public void setCreateFile(boolean createFile) {
+        this.createFile = createFile;
+    }
+
+    public boolean isOpenFileAfter() {
+        return openFileAfter;
+    }
+
+    public void setOpenFileAfter(boolean openFileAfter) {
+        this.openFileAfter = openFileAfter;
     }
 
     /**
@@ -301,7 +354,7 @@ public class DataHandler {
      */
     public String getAllFunctionsAsString() {
         String pom = "[";
-        for (List<Gen> loadedFunctionsCategory : DataHandler.getInstance().getLoadedFunctionsCategories()) {
+        for (List<Gen> loadedFunctionsCategory : loadedFunctionsCategories) {
             for (Gen gen : loadedFunctionsCategory) {
                 if (loadedFunctionsCategory != null) {
                     pom += gen.getCommand() + ",";

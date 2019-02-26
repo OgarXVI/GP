@@ -7,6 +7,7 @@ package cz.ogarxvi.controller;
 
 import cz.ogarxvi.model.DataHandler;
 import cz.ogarxvi.model.DataHandler.FunctionCategory;
+import cz.ogarxvi.model.Localizator;
 import cz.ogarxvi.model.Messenger;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -14,7 +15,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.CheckBox;
 import javafx.stage.Stage;
 
 /**
@@ -29,45 +30,36 @@ public class FunctionWindowController implements Initializable {
     @FXML
     private Button buttonOK;
     @FXML
-    private ComboBox<Integer> comboBoxBinaryIterations;
+    private CheckBox checkBoxBinary;
     @FXML
-    private ComboBox<Integer> comboBoxUnaryIterations;
+    private CheckBox checkBoxUnary;
     @FXML
-    private ComboBox<Integer> comboBoxTrigonometricIterations;
+    private CheckBox checkBoxTrigonometric;
+
     /**
      * Initializes the controller class.
+     *
      * @param url URL
      * @param rb ResourceBundle
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-        populateComboBoxs();
+        //buttonStorno.setText(Localizator.getString(""));
+        //buttonOK.setText(Localizator.getString(""));
+        //buttonStorno.setText(Localizator.getString(""));
+        //buttonStorno.setText(Localizator.getString(""));
         setDefaultSelectedItems();
     }
+
     /**
      * Nastaví první hodnoty jako vybrané hodnoty
      */
-    private void setDefaultSelectedItems(){
-        comboBoxBinaryIterations.getSelectionModel().select(
-                DataHandler.getInstance().getNumberIterationsCategory()[FunctionCategory.BINARY.category]);
-        comboBoxUnaryIterations.getSelectionModel().select(
-                DataHandler.getInstance().getNumberIterationsCategory()[FunctionCategory.UNARY.category]);
-        comboBoxTrigonometricIterations.getSelectionModel().select(
-                DataHandler.getInstance().getNumberIterationsCategory()[FunctionCategory.TRIGONOMETRIK.category]);
+    private void setDefaultSelectedItems() {
+        checkBoxBinary.setSelected(true);
+        checkBoxUnary.setSelected(true);
+        checkBoxTrigonometric.setSelected(true);
     }
-    
-    /**
-     * Naplní comboboxy daty pro selekci
-     */
-    private void populateComboBoxs(){
-        for (int i = 0; i <= 10; i++) {
-            comboBoxBinaryIterations.getItems().add(i);
-            comboBoxUnaryIterations.getItems().add(i);
-            comboBoxTrigonometricIterations.getItems().add(i);
-        }
-    }
-    
+
     @FXML
     private void ClickButtonStorno(ActionEvent event) {
         Stage stage = (Stage) buttonStorno.getScene().getWindow();
@@ -77,21 +69,27 @@ public class FunctionWindowController implements Initializable {
     @FXML
     private void ClickButtonOK(ActionEvent event) {
         //SEND INFO INTO DATAHANDLER
-        DataHandler.getInstance().AddFunctions(
-                comboBoxBinaryIterations.getSelectionModel().getSelectedItem(),
-                FunctionCategory.BINARY.category);
-        DataHandler.getInstance().AddFunctions(
-                comboBoxUnaryIterations.getSelectionModel().getSelectedItem(),
-                FunctionCategory.UNARY.category);
-        DataHandler.getInstance().AddFunctions(
-                comboBoxTrigonometricIterations.getSelectionModel().getSelectedItem(),
-                FunctionCategory.TRIGONOMETRIK.category);
-        
+        if (checkBoxBinary.isSelected()) {
+            DataHandler.getInstance().AddFunctions(
+                    1,
+                    FunctionCategory.BINARY.category);
+        }
+        if (checkBoxUnary.isSelected()) {
+            DataHandler.getInstance().AddFunctions(
+                    1,
+                    FunctionCategory.UNARY.category);
+        }
+        if (checkBoxTrigonometric.isSelected()) {
+            DataHandler.getInstance().AddFunctions(
+                    1,
+                    FunctionCategory.TRIGONOMETRIK.category);
+        }
+
         Messenger.getInstance().Update();
-        
+
         //Close
         Stage stage = (Stage) buttonStorno.getScene().getWindow();
         stage.close();
     }
-    
+
 }

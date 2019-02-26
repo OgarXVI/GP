@@ -12,11 +12,13 @@ import cz.ogarxvi.model.IReader;
 import cz.ogarxvi.model.Localizator;
 import cz.ogarxvi.model.Messenger;
 import cz.ogarxvi.model.XLSXReader;
+import cz.ogarxvi.model.genetic.Gen;
 import cz.ogarxvi.view.OutputGraph;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -249,6 +251,11 @@ public class FXMLController implements Initializable {
      */
     @FXML
     private Label labelTerminals;
+    /**
+     * Menu item
+     */
+    @FXML
+    private MenuItem menuitemSetting;
     /**
      * Nápověda pro TreeMaxDepthAfterOperation
      */
@@ -612,6 +619,10 @@ public class FXMLController implements Initializable {
     private void Clear(ActionEvent event) {
         Messenger.getInstance().ClearMessenger();
         DataHandler.getInstance().getLoadedTerminals().clear();
+        //clear
+        DataHandler.getInstance().getLoadedFunctionsCategories().forEach((loadedFunctionsCategory) -> {
+            loadedFunctionsCategory.clear();
+        });
         DataHandler.getInstance().loadParamsAsTerminals();
         Messenger.getInstance().Update();
     }
@@ -650,6 +661,26 @@ public class FXMLController implements Initializable {
 
             stage.show();
         } catch (UnsupportedOperationException | IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+    }
+
+    @FXML
+    private void menuitemSettingClick(ActionEvent event) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            fxmlLoader.setLocation(getClass().getResource("/fxml/SettingWindow.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+
+            Stage stage = new Stage();
+            stage.setTitle("Setting");
+            stage.getIcons().add(new Image("/images/icon.jpg"));
+            stage.setScene(scene);
+
+            stage.show();
+        } catch (UnsupportedOperationException | IOException e) {
+            e.printStackTrace();
             JOptionPane.showMessageDialog(null, e.getMessage());
         }
     }

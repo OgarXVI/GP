@@ -16,57 +16,40 @@
   <rowConstraints>
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
   </rowConstraints>
    <children>
-      <CustomTextField fx:id="terminalTextField" GridPane.rowIndex="4">
-         <GridPane.margin>
-            <Insets bottom="20.0" left="10.0" right="10.0" top="20.0" />
-         </GridPane.margin>
-         <padding>
-            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-         </padding>
-         <tooltip>
-            <Tooltip fx:id="tooltipTextFieldTerminal" text="Write there terminal to add into list" />
-         </tooltip>
-      </CustomTextField>
-      <Button fx:id="buttonAdd" mnemonicParsing="false" onAction="#ButtonAddClick" text="Add" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="4" GridPane.valignment="CENTER">
-         <GridPane.margin>
-            <Insets left="10.0" />
-         </GridPane.margin>
-         <tooltip>
-            <Tooltip fx:id="tooltipButtonAddTerminal" text="Click to add terminal in text field into list" />
-         </tooltip>
-      </Button>
       <Button fx:id="buttonOk" mnemonicParsing="false" onAction="#ButtonOKClose" text="OK" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER">
          <GridPane.margin>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </GridPane.margin>
       </Button>
-      <Label text="Terminals:" GridPane.halignment="LEFT" GridPane.valignment="BOTTOM">
-         <tooltip>
-            <Tooltip fx:id="tooltipActiveTerminals" text="Checked terminals will be used in GP." />
-         </tooltip>
+      <ToggleSwitch fx:id="toogleSwitchSwap" text="Integers" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
          <GridPane.margin>
-            <Insets left="10.0" top="10.0" />
-         </GridPane.margin>
-      </Label>
-      <Button fx:id="buttonRemoveTerminal" mnemonicParsing="false" onAction="#buttonRemoveTerminalClick" text="Remove" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="CENTER">
+            <Insets top="10.0" />
+         </GridPane.margin></ToggleSwitch>
+      <RangeSlider fx:id="slider" prefHeight="18.0" prefWidth="34.0" GridPane.columnSpan="3" GridPane.rowIndex="1">
          <GridPane.margin>
-            <Insets right="10.0" />
+            <Insets left="10.0" right="10.0" />
          </GridPane.margin>
-         <tooltip>
-            <Tooltip fx:id="tooltipButtonRemoveTerminal" text="Remove from list selected terminal" />
-         </tooltip>
-      </Button>
-      <CheckListView fx:id="checklistViewTerminals" GridPane.columnSpan="3" GridPane.rowIndex="1" GridPane.rowSpan="2">
+      </RangeSlider>
+      <TextArea fx:id="textAreaExample" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="3" GridPane.rowSpan="2">
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
          <GridPane.margin>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </GridPane.margin></TextArea>
+      <Label fx:id="labelExample" text="Example:" GridPane.rowIndex="2">
+         <tooltip>
+            <Tooltip fx:id="tooltipActiveTerminals1" text="Checked terminals will be used in GP." />
+         </tooltip>
+         <GridPane.margin>
+            <Insets left="10.0" top="20.0" />
          </GridPane.margin>
-      </CheckListView>
+      </Label>
    </children>
    <padding>
       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

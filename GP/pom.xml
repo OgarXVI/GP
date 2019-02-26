@@ -22,8 +22,8 @@
 
     <repositories>
         <repository>
-            <id>WolframAplha</id>
-            <name>WolframAplha</name>
+            <id>groupId</id>
+            <name>artifactId</name>
             <url>file://${project.basedir}/libs</url>
         </repository>
     </repositories>    
@@ -158,12 +158,6 @@
             <version>4.4.6</version>
         </dependency>
         <dependency>
-            <groupId>groupId</groupId>
-            <artifactId>artifactId</artifactId>
-            <version>1.1</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
             <groupId>com.github.virtuald</groupId>
             <artifactId>curvesapi</artifactId>
             <version>1.04</version>
@@ -230,6 +224,11 @@
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
             <version>4.4</version>
+        </dependency>
+        <dependency>
+            <groupId>groupId</groupId>
+            <artifactId>artifactId</artifactId>
+            <version>1.1</version>
         </dependency>
     </dependencies>
 </project>
