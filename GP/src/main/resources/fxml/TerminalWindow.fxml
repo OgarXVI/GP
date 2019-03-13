@@ -26,28 +26,46 @@
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </GridPane.margin>
       </Button>
-      <ToggleSwitch fx:id="toogleSwitchSwap" text="Integers" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+      <ToggleSwitch fx:id="toogleSwitchSwap" text="Integers" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
          <GridPane.margin>
             <Insets top="10.0" />
          </GridPane.margin></ToggleSwitch>
-      <RangeSlider fx:id="slider" prefHeight="18.0" prefWidth="34.0" GridPane.columnSpan="3" GridPane.rowIndex="1">
+      <Slider fx:id="sliderMin" majorTickUnit="10.0" min="-100.0" minorTickCount="1" prefHeight="18.0" prefWidth="34.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
          <GridPane.margin>
-            <Insets left="10.0" right="10.0" />
+            <Insets left="60.0" right="10.0" />
          </GridPane.margin>
-      </RangeSlider>
-      <TextArea fx:id="textAreaExample" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="3" GridPane.rowSpan="2">
+      </Slider>
+      <TextArea fx:id="textAreaExample" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="4">
          <padding>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </padding>
          <GridPane.margin>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </GridPane.margin></TextArea>
-      <Label fx:id="labelExample" text="Example:" GridPane.rowIndex="2">
+      <Label fx:id="labelExample" text="Output:" GridPane.rowIndex="3">
          <tooltip>
             <Tooltip fx:id="tooltipActiveTerminals1" text="Checked terminals will be used in GP." />
          </tooltip>
          <GridPane.margin>
-            <Insets left="10.0" top="20.0" />
+            <Insets left="10.0" top="30.0" />
+         </GridPane.margin>
+      </Label>
+      <Slider fx:id="sliderMax" majorTickUnit="10.0" min="-100.0" minorTickCount="1" prefHeight="18.0" prefWidth="34.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+         <GridPane.margin>
+            <Insets left="60.0" right="10.0" />
+         </GridPane.margin>
+      </Slider>
+      <Label text="Max:" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+         <GridPane.margin>
+            <Insets bottom="10.0" left="10.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Min:" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+         <padding>
+            <Insets left="10.0" />
+         </padding>
+         <GridPane.margin>
+            <Insets bottom="10.0" />
          </GridPane.margin>
       </Label>
    </children>

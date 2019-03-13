@@ -80,6 +80,10 @@ public class GPThread extends Thread {
             GeneticAlgorithm ga = new GeneticAlgorithm();
             ga.runGP(numberOfGeneration, sizeOfInitPopulation, maxDepthTreeInit, maxDepthTreeAfterCrossover, reproduction, crossover, mutation, elitism, decimation, null, null);
             //Reconstruct
-            FileHandler.getInstance().resolveGPReconstruct(DataHandler.getInstance().getBestChromosome().toString());
+            try{
+                //FileHandler.getInstance().resolveGPReconstruct(DataHandler.getInstance().getBestChromosome().toString());
+            }catch(NullPointerException ex){
+                ex.printStackTrace();
+            }
     } 
 }

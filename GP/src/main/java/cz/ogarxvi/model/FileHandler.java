@@ -5,6 +5,7 @@
  */
 package cz.ogarxvi.model;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -19,6 +20,12 @@ import javax.script.ScriptException;
 import javax.swing.JOptionPane;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 /**
  * Singleton na držení informací o načteném souboru. Spravuje úkony na souboru.
@@ -331,18 +338,126 @@ public class FileHandler {
         this.errorRowPositions.clear();
     }
 
-    public void createReport(List<String> reports, boolean openFileAfter) {
-        File fileNew = new File("Report.txt");
-        try {
-            FileUtils.writeLines(fileNew, reports);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            Logger.getLogger(FileHandler.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        if (openFileAfter) {
-            ProcessBuilder pb = new ProcessBuilder("Notepad.exe", "Report.txt");
+    /**
+     * Vytvoří a zapíše report do souboru
+     *
+     * @param reports
+     * @param outputPdf
+     * @param openFileAfter
+     * @param createPdfOutput
+     * @param exp
+     */
+    public void createReport(List<String> reports, List<String> outputPdf, boolean openFileAfter, boolean createPdfOutput, String exp) {
+        if (exp.equals("txt")) {
+            File fileNew = new File("Report.txt");
+            System.out.println("PRINT LOG");
             try {
-                pb.start();
+                FileUtils.writeLines(fileNew, reports);
+                System.out.println("LOG SAVED");
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                Logger.getLogger(FileHandler.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if (openFileAfter) {
+                ProcessBuilder pb = new ProcessBuilder("Notepad.exe", "Report.txt");
+                try {
+                    pb.start();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    Logger.getLogger(FileHandler.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+
+        if (createPdfOutput) {
+            PDDocument document = new PDDocument();
+            PDPage page = new PDPage();
+            document.addPage(page);
+            System.out.println("PRINT PDF");
+            int newLinePost = 745;
+            try {
+                PDPageContentStream contentStream = new PDPageContentStream(document, page);
+                //contentStream.setFont(PDType1Font.COURIER, 12);
+
+                PDFont pdfFont = PDType1Font.HELVETICA;
+                float fontSize = 12;
+                float leading = 1.5f * fontSize;
+
+                PDRectangle mediabox = page.getMediaBox();
+                float margin = 72;
+                float width = mediabox.getWidth() - 2 * margin;
+                float startX = mediabox.getLowerLeftX() + margin;
+                float startY = mediabox.getUpperRightY() - margin;
+
+                //contentStream.setFont(PDType1Font.TIMES_ROMAN, 16);
+                List<String> lines = new ArrayList<String>();
+                for (String text : outputPdf) {
+                    int lastSpace = -1;
+                    while (text.length() > 0) {
+                        int spaceIndex = text.indexOf(' ', lastSpace + 1);
+                        if (spaceIndex < 0) {
+                            spaceIndex = text.length();
+                        }
+                        String subString = text.substring(0, spaceIndex);
+                        float size = fontSize * pdfFont.getStringWidth(subString) / 1000;
+                        //System.out.printf("'%s' - %f of %f\n", subString, size, width);
+                        if (size > width) {
+                            if (lastSpace < 0) {
+                                lastSpace = spaceIndex;
+                            }
+                            subString = text.substring(0, lastSpace);
+                            lines.add(subString);
+                            text = text.substring(lastSpace).trim();
+                            //System.out.printf("'%s' is line\n", subString);
+                            lastSpace = -1;
+                        } else if (spaceIndex == text.length()) {
+                            lines.add(text);
+                            //System.out.printf("'%s' is line\n", text);
+                            text = "";
+                        } else {
+                            lastSpace = spaceIndex;
+                        }
+                    }
+                }
+                //Setting the position for the line 
+                //contentStream.newLineAtOffset(25, newLinePost);
+                contentStream.beginText();
+                contentStream.setFont(pdfFont, fontSize);
+                contentStream.newLineAtOffset(startX, startY);
+                float currentY = startY;
+                for (String line : lines) {
+                    currentY -= leading;
+
+                    if (currentY <= margin) {
+
+                        contentStream.endText();
+                        contentStream.close();
+                        PDPage new_Page = new PDPage();
+                        document.addPage(new_Page);
+                        contentStream = new PDPageContentStream(document, new_Page);
+                        contentStream.beginText();
+                        contentStream.setFont(pdfFont, fontSize);
+                        contentStream.newLineAtOffset(startX, startY);
+                        currentY = startY;
+                    }
+                    contentStream.showText(line);
+                    contentStream.newLineAtOffset(0, -leading);
+                }
+                contentStream.endText();
+                contentStream.close();
+
+                document.save("Output.pdf");
+                System.out.println("PDF OUTPUT SAVED");
+                document.close();
+
+                if (Desktop.isDesktopSupported()) {
+                    try {
+                        Desktop.getDesktop().open(new File("Output.pdf"));
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
             } catch (IOException ex) {
                 ex.printStackTrace();
                 Logger.getLogger(FileHandler.class.getName()).log(Level.SEVERE, null, ex);

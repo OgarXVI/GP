@@ -152,95 +152,94 @@ public class Gen {
      * (BigDecimalMath) na práci s BigDecimal
      * @return Vrátí vypočtený kus pro další vyhodnocení
      */
-    public BigDecimal resolveCommand(Map<String, BigDecimal> values) {
+    public double resolveCommand(Map<String, Double> values) {
         switch (command) {
             case "+":
-                return gens.get(0).resolveCommand(values).add(gens.get(1).resolveCommand(values));
+                return gens.get(0).resolveCommand(values) + gens.get(1).resolveCommand(values);
             case "-":
-                return gens.get(0).resolveCommand(values).subtract(gens.get(1).resolveCommand(values));
+                return gens.get(0).resolveCommand(values) - gens.get(1).resolveCommand(values);
             case "*":
-                return gens.get(0).resolveCommand(values).multiply(gens.get(1).resolveCommand(values));
+                return gens.get(0).resolveCommand(values) * gens.get(1).resolveCommand(values);
             case "^":
-                BigDecimal bgPom = gens.get(1).resolveCommand(values);
-                if (bgPom.intValue() > 0 && bgPom.intValue() < 6) {
-                    return gens.get(0).resolveCommand(values).pow(bgPom.intValue());
+                double bgPom = gens.get(1).resolveCommand(values);
+                if (bgPom < Double.MAX_EXPONENT) {
+                    return Math.pow(gens.get(0).resolveCommand(values), gens.get(1).resolveCommand(values));
                 }
-                return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity //UNSUPPORTED
+                return Double.POSITIVE_INFINITY; //+infinity 
             case "/":
-                BigDecimal bDD = gens.get(1).resolveCommand(values);
-                if (bDD.compareTo(BigDecimal.ZERO) == 0) {
-                    return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity
+                double bDD = gens.get(1).resolveCommand(values);
+                if (bDD== 0) {
+                    return Double.POSITIVE_INFINITY; //+infinity
                 } else {
-                    return gens.get(0).resolveCommand(values).divide(gens.get(1).resolveCommand(values), 6, RoundingMode.HALF_UP);
+                    return gens.get(0).resolveCommand(values) / gens.get(1).resolveCommand(values);
                 }
             case "sin":
-                try {
-                    return BigDecimalMath.sin(gens.get(0).resolveCommand(values), new MathContext(6));
-                } catch (ArithmeticException e) {
-                    return gens.get(0).resolveCommand(values); //IGNORE
-                }
+                return Math.sin(gens.get(0).resolveCommand(values));
+//                try {
+//                    
+//                } catch (ArithmeticException e) {
+//                    return gens.get(0).resolveCommand(values); //IGNORE
+//                }
             case "cos":
-                try {
-                    return BigDecimalMath.cos(gens.get(0).resolveCommand(values), new MathContext(6));
-                } catch (ArithmeticException e) {
-                    return gens.get(0).resolveCommand(values); //IGNORE
-                }
+                return Math.cos(gens.get(0).resolveCommand(values));
+//                try {
+//                    
+//                } catch (ArithmeticException e) {
+//                    return gens.get(0).resolveCommand(values); //IGNORE
+//                }
             case "tan":
-                try {
-                    return BigDecimalMath.tan(gens.get(0).resolveCommand(values), new MathContext(6));
-                } catch (ArithmeticException e) {
-                    return gens.get(0).resolveCommand(values); //IGNORE
-                }
+                return Math.tan(gens.get(0).resolveCommand(values));
+//                try {
+//                    
+//                } catch (ArithmeticException e) {
+//                    return gens.get(0).resolveCommand(values); //IGNORE
+//                }
             case "sqrt":
-                BigDecimal bgSqrt = gens.get(0).resolveCommand(values);
-                if (bgSqrt.doubleValue() == Double.POSITIVE_INFINITY
-                        || bgSqrt.doubleValue() == Double.NEGATIVE_INFINITY) {
-                    return BigDecimal.valueOf(Double.MAX_VALUE); // MOC VELKÝ!
+                double bgSqrt = gens.get(0).resolveCommand(values);
+                if (bgSqrt == Double.POSITIVE_INFINITY
+                        || bgSqrt < 0) {
+                    return Double.POSITIVE_INFINITY;
                 }
-                if (bgSqrt.compareTo(BigDecimal.ZERO) < 0) {
-                    return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity //NOT DEFINET
-                }
-                if (bgSqrt.compareTo(BigDecimal.ZERO) == 0) {
-                    return bgSqrt;
-                }
-                if (bgSqrt.compareTo(BigDecimal.ONE) == 0) {
-                    return bgSqrt;
-                }
-                return mysqrt(bgSqrt, new MathContext(6));
+                return Math.sqrt(bgSqrt);
+                
+//                if (bgSqrt.compareTo(BigDecimal.ZERO) < 0) {
+//                    return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity //NOT DEFINET
+//                }
+//                if (bgSqrt.compareTo(BigDecimal.ZERO) == 0) {
+//                    return bgSqrt;
+//                }
+//                if (bgSqrt.compareTo(BigDecimal.ONE) == 0) {
+//                    return bgSqrt;
+//                }
+//                return mysqrt(bgSqrt, new MathContext(6));
             case "abs":
-                return gens.get(0).resolveCommand(values).abs();
+                return Math.abs(gens.get(0).resolveCommand(values));
             case "exp":
-                return BigDecimalMath.exp(gens.get(0).resolveCommand(values), new MathContext(6));
-            case "log2":
-                BigDecimal bgLog2 = gens.get(0).resolveCommand(values);
-                if (bgLog2.compareTo(BigDecimal.ZERO) <= 0) {
-                    return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity //NOT DEFINET
-                }
-                return BigDecimalMath.log2(bgLog2, new MathContext(6));
+                return Math.exp(gens.get(0).resolveCommand(values));
+//            case "log2":
+//                Math.lo
+//                BigDecimal bgLog2 = gens.get(0).resolveCommand(values);
+//                if (bgLog2.compareTo(BigDecimal.ZERO) <= 0) {
+//                    return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity //NOT DEFINET
+//                }
+//                return BigDecimalMath.log2(bgLog2, new MathContext(6));
             case "log":
-                BigDecimal bgLog10 = gens.get(0).resolveCommand(values);
-                if (bgLog10.compareTo(BigDecimal.ZERO) <= 0) {
-                    return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity //NOT DEFINET
-                }
-                return BigDecimalMath.log10(bgLog10, new MathContext(6));
+                return Math.log10(gens.get(0).resolveCommand(values));
             case "ln":
-                BigDecimal bgLog = gens.get(0).resolveCommand(values);
-                if (bgLog.compareTo(BigDecimal.ZERO) <= 0) {
-                    return BigDecimal.valueOf(Double.MAX_VALUE); //+infinity //NOT DEFINET
-                }
-                return BigDecimalMath.log(bgLog, new MathContext(6));
-            case "!":
-                return gens.get(0).resolveCommand(values).negate();
-            case "cotg":
-                try {
-                    return BigDecimalMath.cot(gens.get(0).resolveCommand(values), new MathContext(6));
-                } catch (ArithmeticException e) {
-                    return gens.get(0).resolveCommand(values); //IGNORE
-                }
-            case "min":
-                return gens.get(0).resolveCommand(values).min(gens.get(1).resolveCommand(values));
-            case "max":
-                return gens.get(0).resolveCommand(values).max(gens.get(1).resolveCommand(values));
+                return Math.log(gens.get(0).resolveCommand(values));
+                
+//            case "!":
+//                return Math.ngens.get(0).resolveCommand(values).negate();
+//            case "cotg":
+//                try {
+//                    return BigDecimalMath.cot(gens.get(0).resolveCommand(values), new MathContext(6));
+//                } catch (ArithmeticException e) {
+//                    return gens.get(0).resolveCommand(values); //IGNORE
+//                }
+//            case "min":
+//                return gens.get(0).resolveCommand(values).min(gens.get(1).resolveCommand(values));
+//            case "max":
+//                return gens.get(0).resolveCommand(values).max(gens.get(1).resolveCommand(values));
             default:
                 return values.get(command);
         }
@@ -358,20 +357,20 @@ public class Gen {
      * @param mc Přesnost
      * @return Druhá odmocnina
      */
-    private static BigDecimal mysqrt(BigDecimal n, MathContext mc) {
-        ArrayList<BigDecimal> results = new ArrayList<>();
-        BigDecimal xnp1 = new BigDecimal(Math.sqrt(n.doubleValue()), mc);
-        results.add(xnp1);
-        xnp1 = xnp1.add(n.divide(xnp1, mc)).divide(TWO, mc);
-        while (true) {
-            if (xnp1.subtract(results.get(results.size() - 1), mc).abs(mc).doubleValue() <= 0.000001) {
-                break;
-            }
-            results.add(xnp1);
-            xnp1 = xnp1.add(n.divide(xnp1, mc)).divide(TWO, mc);
-        }
-        results.add(xnp1);
-        return results.get(results.size() - 1);
-
-    }
+//    private static BigDecimal mysqrt(BigDecimal n, MathContext mc) {
+//        ArrayList<BigDecimal> results = new ArrayList<>();
+//        BigDecimal xnp1 = new BigDecimal(Math.sqrt(n.doubleValue()), mc);
+//        results.add(xnp1);
+//        xnp1 = xnp1.add(n.divide(xnp1, mc)).divide(TWO, mc);
+//        while (true) {
+//            if (xnp1.subtract(results.get(results.size() - 1), mc).abs(mc).doubleValue() <= 0.000001) {
+//                break;
+//            }
+//            results.add(xnp1);
+//            xnp1 = xnp1.add(n.divide(xnp1, mc)).divide(TWO, mc);
+//        }
+//        results.add(xnp1);
+//        return results.get(results.size() - 1);
+//
+//    }
 }

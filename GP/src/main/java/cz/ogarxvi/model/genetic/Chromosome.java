@@ -79,11 +79,10 @@ public class Chromosome implements Comparable<Chromosome>{
      */
     @Override
     public int compareTo(Chromosome o) {
-        
-        if (this.getFitness().getValue().abs().compareTo(o.getFitness().getValue().abs()) > 0){
+        if (Math.abs(this.getFitness().getValue()) > Math.abs(o.getFitness().getValue())){
             return 1;
         }
-        if (this.getFitness().getValue().abs().compareTo(o.getFitness().getValue().abs()) == 0){
+        if (Math.abs(this.getFitness().getValue()) == Math.abs(o.getFitness().getValue())){
             return 0;
         }
         return -1;

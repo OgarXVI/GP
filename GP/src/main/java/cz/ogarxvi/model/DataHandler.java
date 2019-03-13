@@ -37,11 +37,11 @@ public class DataHandler {
     /**
      * Tabulka dat, tedy obsah načteného souboru kromě výsledkového sloupce
      */
-    private BigDecimal[][] mathData;
+    private double[][] mathData;
     /**
      * Výsledkový sloupec, slouží pro porovnání vypočtených výsledků.
      */
-    private BigDecimal[] expectedResults;
+    private double[] expectedResults;
     /**
      * Definuje, zda došlo k načtení souboru
      */
@@ -66,7 +66,7 @@ public class DataHandler {
      * Určuje počet použití daných kategorií 0 - Binary, 1 - Unary, 2 -
      * Trigonometric
      */
-    private int[] numberIterationsCategory;
+    //private int[] numberIterationsCategory;
     /**
      * Reference na odkaz
      */
@@ -80,35 +80,49 @@ public class DataHandler {
      */
     private List<String> allCheckedTerminals;
     /**
-     * 
+     *
      */
     private boolean printGeneration;
     /**
-     * 
+     *
      */
     private boolean printPopulation;
     /**
-     * 
+     *
      */
     private boolean createFile = true;
     /**
-     * 
+     *
      */
     private boolean openFileAfter = true;
-    
+    /**
+     *
+     */
+    private double fitnessLimit;
+    /**
+     *
+     */
+    private double calculatedAritResults;
+    /**
+     *
+     */
+    private String expansionReportFile = "txt";
+    /**
+     *
+     */
+    private boolean createPdfOutput = true;
+
     /**
      * Založení uložiště dat
      */
     private DataHandler() {
-        numberIterationsCategory = new int[FunctionCategory.values().length];
+        //numberIterationsCategory = new int[FunctionCategory.values().length];
         loadedTerminals = new ArrayList<>();
         allTerminals = new ArrayList<>();
         allCheckedTerminals = new ArrayList<>();
         loadedFunctionsCategories = new ArrayList<>();
-        loadedFunctionsCategories.add(new ArrayList<>()); //0
-        loadedFunctionsCategories.get(0).addAll(getFunctionsByCategory(0));
-        loadedFunctionsCategories.add(new ArrayList<>()); //1
-        loadedFunctionsCategories.add(new ArrayList<>()); //2
+        fitnessLimit = 0d;
+        generateAllFunction();
     }
 
     /**
@@ -145,8 +159,8 @@ public class DataHandler {
     public void parseData(String[][] data) {
         //Vyčisti prostor
         params = data[0];
-        mathData = new BigDecimal[data.length - 1][params.length - 1];
-        expectedResults = new BigDecimal[data.length - 1];
+        mathData = new double[data.length - 1][params.length - 1];
+        expectedResults = new double[data.length - 1];
         //Načti data pro tabulku a sloupec
         for (int i = 0; i < mathData.length; i++) {
             for (int j = 0; j < mathData[i].length; j++) {
@@ -175,15 +189,15 @@ public class DataHandler {
         //System.out.println(Arrays.toString(errorRowPosition.toArray()));
     }
 
-    private BigDecimal resultMathData(String[][] data, int i, int j) throws NumberFormatException {
-        BigDecimal pomValue;
+    private double resultMathData(String[][] data, int i, int j) {
+        double pomValue = 0d;
         try {
-            pomValue = BigDecimal.valueOf(Double.valueOf(data[i + 1][j]));
+            pomValue = Double.valueOf(data[i + 1][j]);
         } catch (NullPointerException | NumberFormatException e) {
             FileHandler.getInstance().errorsInFile = true; //registruj chybu
             FileHandler.getInstance().errorRowPositions.add(i);
             FileHandler.getInstance().errorColummPosition.add(j);
-            return null; //pracujeme se zástupnými znaky
+            //return null; //pracujeme se zástupnými znaky //TODO: POZOR NA NULU
         }
         return pomValue;
     }
@@ -192,11 +206,11 @@ public class DataHandler {
         return params;
     }
 
-    public BigDecimal[][] getMathData() {
+    public double[][] getMathData() {
         return mathData;
     }
 
-    public BigDecimal[] getExpectedResults() {
+    public double[] getExpectedResults() {
         return expectedResults;
     }
 
@@ -223,19 +237,19 @@ public class DataHandler {
     public Chromosome getBestChromosome() {
         return bestChromosome;
     }
-
-    public int[] getNumberIterationsCategory() {
-        return numberIterationsCategory;
-    }
+//
+//    public int[] getNumberIterationsCategory() {
+//        return numberIterationsCategory;
+//    }
 
     public void setLoaded(boolean loaded) {
         this.loaded = loaded;
     }
 
-    public void gpStop(){
+    public void gpStop() {
         this.gpStop = true;
     }
-    
+
     public void setGpStop(boolean gpStop) {
         this.gpStop = gpStop;
     }
@@ -300,6 +314,80 @@ public class DataHandler {
         this.openFileAfter = openFileAfter;
     }
 
+    public double getFitnessLimit() {
+        return fitnessLimit;
+    }
+
+    public void setFitnessLimit(double fitnessLimit) {
+        this.fitnessLimit = fitnessLimit;
+    }
+
+    public String getExpansionReportFile() {
+        return expansionReportFile;
+    }
+
+    public void setExpansionReportFile(String expansionReportFile) {
+        this.expansionReportFile = expansionReportFile;
+    }
+
+    public boolean isCreatePdfOutput() {
+        return createPdfOutput;
+    }
+
+    public void setCreatePdfOutput(boolean createPdfOutput) {
+        this.createPdfOutput = createPdfOutput;
+    }
+
+    /**
+     * Vyhodnotí relativní omezení fitness funkce, u které se má zastavit.
+     *
+     * @param newValue Jakou mírou upravuje uživatel fitness treshold
+     */
+    public void resolveFitnessLimit(double newValue) {
+        //Ideální by bylo zjistit arit průměr a poté dělit počtem řádků.
+        //Tím se vymezí nějaká ok hodnota pro limit.
+        //Např. když výsledky se pochybují 10-12 a mám 1000 řádků, tak limit by mohl být 0,011
+//        if (calculatedAritResults == 0d) {
+//            calculatedAritResults = calculateAritResults();
+//        }
+          fitnessLimit = newValue;
+    }
+    
+    private double pdf(double x) {
+        return Math.exp(-x*x / 2) / Math.sqrt(2 * Math.PI);
+    }
+
+    private double cdf(double z) {
+        if (z < 0.0) return 0.0;
+        if (z >  1.0) return 1.0;
+        double sum = 0.0, term = z;
+        for (int i = 3; sum + term != sum; i += 2) {
+            sum  = sum + term;
+            term = term * z * z / i;
+        }
+        return sum * pdf(z);
+    }
+    
+    /**
+     * Vypočte průměr všech načtených výsledků
+     *
+     * @return Průměr výsledků
+     */
+    private double calculateAritResults() {
+        double pomAritResult = 0d;
+        int realtSize = 0;
+        if (expectedResults != null) {
+            for (double expectedResult : expectedResults) {
+                pomAritResult += expectedResult;
+                realtSize++;
+            }
+        }
+        if (realtSize == 0) {
+            return 0;
+        }
+        return pomAritResult / realtSize;
+    }
+
     /**
      * Načte hlavičky jako terminály
      */
@@ -335,18 +423,15 @@ public class DataHandler {
     /**
      * Přidá funkce do seznamu
      *
-     * @param number kolkrát se bude se funkcema pracovat
      * @param type Jaký typ kategorie to je
      */
-    public void AddFunctions(int number, int type) {
-        loadedFunctionsCategories.get(type).clear();
-        if (number > 0) {
-            List<Gen> category = getFunctionsByCategory(type);
-            loadedFunctionsCategories.get(type).addAll(category);
-        }
-        numberIterationsCategory[type] = number;
-    }
-
+//    private void AddFunctions(int type) {
+//        if (type >= loadedFunctionsCategories.size()) {
+//            loadedFunctionsCategories.add(new ArrayList<>());
+//        }
+//        //loadedFunctionsCategories.get(type).clear();
+//        loadedFunctionsCategories.get(type).addAll(getFunctionsByCategory(type));
+//    }
     /**
      * Vrátí všechny funkce jako položky v poli
      *
@@ -354,13 +439,18 @@ public class DataHandler {
      */
     public String getAllFunctionsAsString() {
         String pom = "[";
-        for (List<Gen> loadedFunctionsCategory : loadedFunctionsCategories) {
-            for (Gen gen : loadedFunctionsCategory) {
+        if (!loadedFunctionsCategories.isEmpty()) {
+            for (List<Gen> loadedFunctionsCategory : loadedFunctionsCategories) {
                 if (loadedFunctionsCategory != null) {
-                    pom += gen.getCommand() + ",";
+                    for (Gen gen : loadedFunctionsCategory) {
+                        if (gen != null) {
+                            pom += gen.getCommand() + ", ";
+                        }
+                    }
                 }
             }
         }
+        pom = pom.substring(0, pom.length() - 2); //REMOVE ", "
         return pom += "]";
     }
 
@@ -373,30 +463,38 @@ public class DataHandler {
     private List<Gen> getFunctionsByCategory(int category) {
         List<Gen> list = new ArrayList<>();
         switch (category) {
-            //BINARY
-            case 0: {
+            case 0: { // PLUS_MINUS
                 list.addAll(Function.getSet("+", 2, false));
                 list.addAll(Function.getSet("-", 2, false));
-                list.addAll(Function.getSet("*", 2, false));
-                list.addAll(Function.getSet("/", 2, false));
-                list.addAll(Function.getSet("^", 2, false));
-                //list.addAll(Function.getSet("min", 2, false));
-                //list.addAll(Function.getSet("max", 2, false));
                 break;
             }
-            //UNARY
-            case 1: {
+            case 1: { //DIVINE_TIMES
+                list.addAll(Function.getSet("*", 2, false));
+                list.addAll(Function.getSet("/", 2, false));
+                break;
+            }
+            case 2: { // EXP
+                list.addAll(Function.getSet("^", 2, false));
+                break;
+            }
+            case 3: { // SQRT
                 list.addAll(Function.getSet("sqrt", 1, false));
-                //list.addAll(Function.getSet("log2", 1, false));
-                //list.addAll(Function.getSet("exp", 1, false));
+                break;
+            }
+            case 4: { //LOG
                 list.addAll(Function.getSet("log", 1, false));
                 list.addAll(Function.getSet("ln", 1, false));
                 break;
             }
-            //REST UNARY - TRIGONOMETRIC
-            case 2: {
+            case 5: { //SINUS
                 list.addAll(Function.getSet("sin", 1, false));
+                break;
+            }
+            case 6: { //COS
                 list.addAll(Function.getSet("cos", 1, false));
+                break;
+            }
+            case 7: { //TAN
                 list.addAll(Function.getSet("tan", 1, false));
                 break;
             }
@@ -426,13 +524,50 @@ public class DataHandler {
         return loadedFunctionsCategories.stream().anyMatch((loadedFunctionsCategory) -> (!loadedFunctionsCategory.isEmpty()));
     }
 
+    /**
+     * Přidá všechny funkce dle kategorií
+     */
+    private void generateAllFunction() {
+        loadedFunctionsCategories.clear();
+        for (FunctionCategory category : FunctionCategory.values()) {
+            loadedFunctionsCategories.add(new ArrayList<>());
+            //loadedFunctionsCategories.get(type).clear();
+            loadedFunctionsCategories.get(category.category).addAll(getFunctionsByCategory(category.category));
+        }
+    }
+
+    /**
+     * return
+     *
+     * @return return
+     */
+    public String getLoadedTerminalsShort() {
+        String pom = "[";
+        int limit = 10;
+        int now = 0;
+        for (Gen loadedTerminal : loadedTerminals) {
+            pom += loadedTerminal.getCommand();
+            now++;
+            if (now >= limit) {
+                pom += ",...]";
+                return pom;
+            } else {
+                pom += ", ";
+            }
+        }
+        pom = pom.substring(0, pom.length() - 2); //REMOVE ", "
+        pom+="]";
+        return pom;
+    }
+
     public enum FunctionCategory {
-        BINARY(0), UNARY(1), TRIGONOMETRIK(2);
+        PLUS_MINUS(0), TIMES_DIVINE(1), EXP(2), SQRT(3), LOG(4), TRIGONOMETRIK_SINUS(5), TRIGONOMETRIK_COS(6), TRIGONOMETRIK_TAN(7);
         public final int category;
 
         private FunctionCategory(int category) {
             this.category = category;
         }
+
     }
 
 }

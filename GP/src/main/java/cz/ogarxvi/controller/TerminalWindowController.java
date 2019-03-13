@@ -22,8 +22,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javax.swing.JOptionPane;
 import org.controlsfx.control.CheckListView;
@@ -78,8 +80,6 @@ public class TerminalWindowController implements Initializable {
     @FXML
     private ToggleSwitch toogleSwitchSwap;
     @FXML
-    private RangeSlider slider;
-    @FXML
     private TextArea textAreaExample;
     @FXML
     private Label labelExample;
@@ -88,7 +88,14 @@ public class TerminalWindowController implements Initializable {
 
     private String integersText = "Integers";
     private String realNumbersText = "Real numbers";
-    private boolean stateNumnbers = false; //Default false like integers
+    private boolean stateNumbers = false; //Default false like integers
+    private double increment = 0.1d;
+    private List<String> generatedRawTerminals;
+
+    @FXML
+    private Slider sliderMin;
+    @FXML
+    private Slider sliderMax;
 
     /**
      * Initializes the controller class.
@@ -106,7 +113,7 @@ public class TerminalWindowController implements Initializable {
 //        tooltipTextFieldTerminal.setText(Localizator.getString("tooltip.textfield.terminalInput"));
 //        buttonAdd.setText(Localizator.getString("button.add"));
         //GET ALL TERMINALS
-        initRange();
+        generatedRawTerminals = new ArrayList<>();
         initTextArea();
         setListenerOnToogle();
         setListenerOnSlider();
@@ -117,45 +124,19 @@ public class TerminalWindowController implements Initializable {
      *
      * @return vybrané terminály
      */
-    public ObservableList<String> getSelectedTerminals() {
+    private ObservableList<String> getSelectedTerminals() {
         ArrayList<String> pom = new ArrayList<>();
-        if (stateNumnbers) {
-            for (double i = slider.lowValueProperty().intValue(); i < slider.highValueProperty().doubleValue(); i = i + 0.05) {
+        if (stateNumbers) {
+            for (double i = sliderMin.valueProperty().doubleValue(); i < sliderMax.valueProperty().doubleValue(); i = i + increment) {
                 pom.add(String.valueOf(i));
             }
         } else {
-            for (int i = slider.lowValueProperty().intValue(); i < slider.highValueProperty().doubleValue(); i++) {
+            for (int i = sliderMin.valueProperty().intValue(); i < sliderMax.valueProperty().intValue(); i++) {
                 pom.add(String.valueOf(i));
             }
         }
         return FXCollections.observableArrayList(pom);
     }
-
-//    /**
-//     * Kontroluje text
-//     * @param inputText vstupní text
-//     * @return true pokud text je konvertovatelný na číslo
-//     */
-//    private boolean validateText(String inputText) {
-//        try {
-//            Double.parseDouble(inputText); //CHECK TEST
-//        } catch (Exception e) {
-//            //
-//            JOptionPane.showMessageDialog(null, Localizator.getString("warning.wrongInput"));
-//            return false;
-//        }
-//        return true;
-//    }
-//
-//    /**
-//     *
-//     * @param event
-//     */
-//    private void ButtonAddClick(ActionEvent event) {
-//        if (validateText(terminalTextField.getText())) {
-//            checklistViewTerminals.getItems().add(terminalTextField.getText());
-//        }
-//    }
     /**
      *
      * @param event
@@ -163,8 +144,7 @@ public class TerminalWindowController implements Initializable {
     @FXML
     private void ButtonOKClose(ActionEvent event) {
         //SET TERMINALS
-//        DataHandler.getInstance().setAllCheckedTerminals(checklistViewTerminals.getCheckModel().getCheckedItems());
-//        DataHandler.getInstance().setAllTerminals(checklistViewTerminals.getItems());
+        DataHandler.getInstance().setAllCheckedTerminals(generatedRawTerminals);
         //UPDATE
         Messenger.getInstance().Update();
         //CLOSE
@@ -172,55 +152,54 @@ public class TerminalWindowController implements Initializable {
         event.consume();
         stage.close();
     }
-
-//    /**
-//     *
-//     * @param event
-//     */
-//    private void buttonRemoveTerminalClick(ActionEvent event) {
-//        checklistViewTerminals.getItems().remove(checklistViewTerminals.getSelectionModel().getSelectedIndex());
-//    }
-    private void initRange() {
-        slider = new RangeSlider(-100, 100, 0, 5);
-        slider.setShowTickMarks(true);
-        slider.setShowTickLabels(true);
-        slider.setBlockIncrement(10);
-    }
-
+    /**
+     * init
+     */
     private void initTextArea() {
         textAreaExample.setEditable(false);
         updateTextArea();
     }
-
+    /**
+     * update
+     */
     private void updateTextArea() {
+        generatedRawTerminals.clear();
+        textAreaExample.setText("");
         for (String selectedTerminal : getSelectedTerminals()) {
+            generatedRawTerminals.add(selectedTerminal);
             textAreaExample.appendText(selectedTerminal);
             textAreaExample.appendText(" ");
         }
     }
-
+    /**
+     * set
+     */
     private void setListenerOnToogle() {
         toogleSwitchSwap.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 if (newValue) {
                     toogleSwitchSwap.setText(realNumbersText);
+                    stateNumbers = true;
                 } else {
                     toogleSwitchSwap.setText(integersText);
+                    stateNumbers = false;
                 }
+                updateTextArea();
             }
         });
     }
-
+    /**
+     * set listener
+     */
     private void setListenerOnSlider() {
-        slider.lowValueProperty().addListener(o -> {
+        sliderMax.valueProperty().addListener(o -> {
             updateTextArea();
         }
         );
-        slider.highValueProperty().addListener(o -> {
+        sliderMin.valueProperty().addListener(o -> {
             updateTextArea();
         }
         );
     }
-
 }

@@ -12,10 +12,11 @@ import cz.ogarxvi.model.IReader;
 import cz.ogarxvi.model.Localizator;
 import cz.ogarxvi.model.Messenger;
 import cz.ogarxvi.model.XLSXReader;
-import cz.ogarxvi.model.genetic.Gen;
 import cz.ogarxvi.view.OutputGraph;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
@@ -33,6 +34,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -134,8 +136,7 @@ public class FXMLController implements Initializable {
     /**
      * Button
      */
-    @FXML
-    private Button FunctionsButton;
+    //private Button FunctionsButton;
     /**
      * Button
      */
@@ -237,15 +238,14 @@ public class FXMLController implements Initializable {
     @FXML
     private MenuItem menuItemTournament5;
     /**
-     * Menu Item Roulete 
+     * Menu Item Roulete
      */
     @FXML
     private MenuItem menuItemRoulete;
     /**
      * Label Functions
      */
-    @FXML
-    private Label labelFunctions;
+    //private Label labelFunctions;
     /**
      * Bale Terminals
      */
@@ -256,18 +256,22 @@ public class FXMLController implements Initializable {
      */
     @FXML
     private MenuItem menuitemSetting;
+    @FXML
+    private Label labelToleration;
+    @FXML
+    private Slider sliderTolerationFitness;
+
     /**
      * Nápověda pro TreeMaxDepthAfterOperation
      */
     //@FXML
     //private Tooltip tooltipTreeMaxDepthAfterOperationTextField;
-
     public void initialize(URL url, ResourceBundle rb) {
         Messenger.getInstance().setArea(this.ConsoleOutput);
         ElitistToogleButton.setText(Localizator.getString("parameter.elitism"));
         DecimationButton.setText(Localizator.getString("parameter.decimation"));
         labelTerminals.setText(Localizator.getString("parameter.terminals"));
-        labelFunctions.setText(Localizator.getString("parameter.functions"));
+        //labelFunctions.setText(Localizator.getString("parameter.functions"));
         menuItemRoulete.setText(Localizator.getString("parameter.selection.roulette"));
         menuItemTournament5.setText(Localizator.getString("parameter.selection.tournament5"));
         menuItemTournament3.setText(Localizator.getString("parameter.selection.tournament3"));
@@ -289,13 +293,14 @@ public class FXMLController implements Initializable {
         menuItemLoadData.setText(Localizator.getString("menu.file.loadData"));
         menuFile.setText(Localizator.getString("menu.file"));
         TerminalsButton.setText(Localizator.getString("parameter.terminals.select"));
-        SelectionMenu.setText(Localizator.getString("parameter.selection.method"));
-        FunctionsButton.setText(Localizator.getString("parameter.functions.select"));
+        //SelectionMenu.setText(Localizator.getString("parameter.selection.method"));
+        //FunctionsButton.setText(Localizator.getString("parameter.functions.select"));
         ClearButton.setText(Localizator.getString("button.clear"));
         StopButton.setText(Localizator.getString("button.stop"));
         StartButton.setText(Localizator.getString("button.start"));
         //tooltipTreeMaxDepthAfterOperationTextField.setText(Localizator.getString(""));
         TableView.setPlaceholder(new Label(Localizator.getString("tableview.empty")));
+
     }
 
     /**
@@ -311,7 +316,6 @@ public class FXMLController implements Initializable {
     /**
      * Zobrazení okno funkcí
      */
-    @FXML
     private void showFunctionWindow() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader();
@@ -498,7 +502,20 @@ public class FXMLController implements Initializable {
             }
             //}
             DataHandler.getInstance().setRows(TableView.getItems().size());
-            Clear(null);
+            //double d = DataHandler.getInstance().getFitnessLimit();
+            sliderTolerationFitness.valueProperty().addListener(o -> {
+                double round = sliderTolerationFitness.getValue();
+                DataHandler.getInstance().resolveFitnessLimit(round);
+                if (String.valueOf(round).length() > 10) {
+                    labelToleration.setText("Toleration:  " + String.valueOf(DataHandler.getInstance().getFitnessLimit()).substring(0, 10));
+                } else {
+                    labelToleration.setText("Toleration:  " + String.valueOf(DataHandler.getInstance().getFitnessLimit()));
+                }
+            });
+
+            sliderTolerationFitness.setShowTickLabels(false);
+            sliderTolerationFitness.setShowTickMarks(true);
+            clear(null);
 
         }
     }
@@ -551,12 +568,14 @@ public class FXMLController implements Initializable {
     private void ShowAbout(ActionEvent event) {
         JOptionPane.showMessageDialog(null, Localizator.getString("app.autor") + Localizator.getString("app.version"));
     }
+
     /**
      * Slouží pro sdružení kódu volení selekčních mechanismů
+     *
      * @param x číslo výběru
      */
     private void TournamentXSelected(String x, int setType) {
-        Messenger.getInstance().AddMesseage(Localizator.getString("parameter.selection.selected") + " " + Localizator.getString("parameter.selection.tournament" + x)); 
+        Messenger.getInstance().AddMesseage(Localizator.getString("parameter.selection.selected") + " " + Localizator.getString("parameter.selection.tournament" + x));
         SelectionMenu.setText(Localizator.getString("parameter.selection.method")
                 + Localizator.getString("parameter.selection.tournament" + x));
         DataHandler.getInstance().setSelectionMethod(setType);
@@ -601,7 +620,7 @@ public class FXMLController implements Initializable {
      */
     @FXML
     private void RouleteSelected(ActionEvent event) {
-        Messenger.getInstance().AddMesseage(Localizator.getString("parameter.selection.selected") 
+        Messenger.getInstance().AddMesseage(Localizator.getString("parameter.selection.selected")
                 + " " + Localizator.getString("parameter.selection.roulette"));
         SelectionMenu.setText(Localizator.getString("parameter.selection.method")
                 + Localizator.getString("parameter.selection.roulette"));
@@ -616,13 +635,13 @@ public class FXMLController implements Initializable {
      * @param event event
      */
     @FXML
-    private void Clear(ActionEvent event) {
+    private void clear(ActionEvent event) {
         Messenger.getInstance().ClearMessenger();
         DataHandler.getInstance().getLoadedTerminals().clear();
         //clear
-        DataHandler.getInstance().getLoadedFunctionsCategories().forEach((loadedFunctionsCategory) -> {
-            loadedFunctionsCategory.clear();
-        });
+//        DataHandler.getInstance().getLoadedFunctionsCategories().forEach((loadedFunctionsCategory) -> {
+//            loadedFunctionsCategory.clear();
+//        });
         DataHandler.getInstance().loadParamsAsTerminals();
         Messenger.getInstance().Update();
     }
@@ -637,6 +656,10 @@ public class FXMLController implements Initializable {
      */
     @FXML
     private void RunCofiguration(ActionEvent event) throws URISyntaxException, TransformerConfigurationException, TransformerException {
+        if (FileHandler.getInstance().file == null) {
+            JOptionPane.showMessageDialog(null, Localizator.getString("warning.loadData"));
+            return;
+        }
         ConfigurationThread configurationThread = new ConfigurationThread(FileHandler.getInstance().file.getName());
         configurationThread.LoadData();
         configurationThread.start();

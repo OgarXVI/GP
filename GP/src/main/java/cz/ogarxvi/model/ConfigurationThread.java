@@ -45,7 +45,7 @@ public class ConfigurationThread extends Thread {
 
     private List<Configuration> configurations;
     private List<Map<Output, Integer>> outputs;
-    private List<Map<BigDecimal, Integer>> finalOutputs;
+    private List<Map<Double, Integer>> finalOutputs;
 
     private String fileName;
     
@@ -202,10 +202,10 @@ public class ConfigurationThread extends Thread {
                         loadedConfi.Terminals
                 );
                 // Zde je čas zapsat si výsledek
-                BigDecimal item = bestChromosome.getFitness().getValue();
+                double item = bestChromosome.getFitness().getValue();
                 //Pokud nějak vznikla absordita, měli bychom jí smazat z výsledků
                 // System.out.println("ITEM: " +  item.doubleValue());
-                if (item.doubleValue() >= 9999.9f /*|| item.doubleValue() <= 0.0000001*/) {
+                if (item >= 9999.9f /*|| item.doubleValue() <= 0.0000001*/) {
                     System.out.println("Cal. N.: " + j + ": " + (startTime - System.currentTimeMillis()));
                     continue;
                 }
@@ -259,7 +259,7 @@ public class ConfigurationThread extends Thread {
                     wrapOutputsElement.appendChild(outputElement);
 
                     Element outputFitnessElement = doc.createElement("Fitness");
-                    outputFitnessElement.appendChild(doc.createTextNode(key.Fitness.toString()));
+                    outputFitnessElement.appendChild(doc.createTextNode(String.valueOf(key.Fitness)));
                     outputElement.appendChild(outputFitnessElement);
 
                     Element outputFormulaElement = doc.createElement("Formula");
@@ -270,8 +270,8 @@ public class ConfigurationThread extends Thread {
                 Element wrapResultsElement = doc.createElement("Results");
                 confi.appendChild(wrapResultsElement);
 
-                for (Map.Entry<BigDecimal, Integer> entry : finalOutputs.get(i).entrySet()) {
-                    BigDecimal key = entry.getKey();
+                for (Map.Entry<Double, Integer> entry : finalOutputs.get(i).entrySet()) {
+                    Double key = entry.getKey();
                     Integer value = entry.getValue();
 
                     Element resultElement = doc.createElement("Result");
@@ -308,17 +308,17 @@ public class ConfigurationThread extends Thread {
 
     class Output {
 
-        BigDecimal Fitness;
+        double Fitness;
         String formula;
 
-        public Output(BigDecimal Fitness, String formula) {
+        public Output(double Fitness, String formula) {
             this.Fitness = Fitness;
             this.formula = formula;
         }
 
         @Override
         public String toString() {
-            return formula + ": " + Fitness.toString();
+            return formula + ": " + Fitness;
         }
 
         @Override

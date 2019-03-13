@@ -64,10 +64,10 @@
                 <TextField fx:id="MutationProbabilityTextField" layoutX="15.0" layoutY="170.0" prefWidth="222.0" promptText="0.3" />
                 <TextField fx:id="CrossoverProbabilityTextField" layoutX="15.0" layoutY="220.0" prefWidth="222.0" promptText="0.6" />
                 <TextField fx:id="TreeMaxDepthAfterOperationTextField" layoutX="15.0" layoutY="270.0" prefWidth="222.0" promptText="5" />
-                <TextField fx:id="TreeMaxInicializationDepthTextField" layoutX="15.0" layoutY="320.0" prefWidth="222.0" promptText="3" />
-                <ToggleSwitch fx:id="ElitistToogleButton" layoutX="15.0" layoutY="365.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="65.0" text="Elitism " />
-                <ToggleSwitch fx:id="DecimationButton" layoutX="111.0" layoutY="365.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="94.0" text="Decimation " />
-                <MenuButton fx:id="SelectionMenu" contentDisplay="CENTER" layoutX="14.0" layoutY="408.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="222.0" text="Selection: Tournament 3">
+                <TextField fx:id="TreeMaxInicializationDepthTextField" layoutX="15.0" layoutY="320.0" prefWidth="222.0" promptText="2" />
+                <ToggleSwitch fx:id="ElitistToogleButton" selected="true" layoutX="15.0" layoutY="365.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="65.0" text="Elitism " />
+                <ToggleSwitch fx:id="DecimationButton" selected="true" layoutX="111.0" layoutY="365.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="94.0" text="Decimation " />
+                <MenuButton fx:id="SelectionMenu" contentDisplay="CENTER" layoutX="14.0" layoutY="462.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="222.0" text="Selection: Tournament 3">
                     <items>
                         <MenuItem fx:id="menuItemTournament3" mnemonicParsing="false" onAction="#Tournament3Selected" text="Tournament3" />
                         <MenuItem fx:id="menuItemTournament2" mnemonicParsing="false" onAction="#Tournament2Selected" text="Tournament2" />
@@ -81,13 +81,14 @@
                 <Label fx:id="labelTerminals" layoutX="14.0" layoutY="494.0" text="Terminals:" />
                 <Button fx:id="TerminalsButton" cancelButton="false" text="" onAction="#showTerminalWindow" layoutX="14.0" layoutY="514.0" prefHeight="26.0" prefWidth="222.0" />
                 -->
-            <Label fx:id="labelFunctions" layoutX="14.0" layoutY="442.0" text="Functions:" /> 
-            <Button fx:id="FunctionsButton" layoutX="14.0" layoutY="462.0" onAction="#showFunctionWindow" prefHeight="26.0" prefWidth="222.0" text="Select functions" />
-            <Label fx:id="labelTerminals" layoutX="14.0" layoutY="494.0" text="Terminals:" />
+            <Label fx:id="labelToleration" layoutX="14.0" layoutY="400.0" text="Toleration: 0.00000" /> 
+            <Slider fx:id="sliderTolerationFitness" value="0" min="0" max="1" majorTickUnit="0.01" layoutX="14.0" layoutY="420.0"
+                    prefHeight="26.0" prefWidth="222.0" />
+            <Label fx:id="labelTerminals" layoutX="14.0" layoutY="495.0" text="Terminals:" />
             <Button fx:id="TerminalsButton" layoutX="14.0" layoutY="514.0" onAction="#showTerminalWindow" prefHeight="26.0" prefWidth="222.0" text="Select terminals" />
             
                 <Button fx:id="StartButton" layoutX="14.0" layoutY="561.0" mnemonicParsing="false" onAction="#StartCalculation" prefWidth="72.0" text="Start" />
-                <Button fx:id="ClearButton" layoutX="89.0" layoutY="561.0" mnemonicParsing="false" onAction="#Clear" prefWidth="72.0" text="Clear" />
+                <Button fx:id="ClearButton" layoutX="89.0" layoutY="561.0" mnemonicParsing="false" onAction="#clear" prefWidth="72.0" text="Clear" />
                 <Button fx:id="StopButton" layoutX="164.0" layoutY="561.0" mnemonicParsing="false" onAction="#StopCalculation" prefWidth="72.0" text="Stop" />
             </children>
             <!-- </BorderPane> -->

@@ -34,6 +34,8 @@ public class SettingWindowController implements Initializable {
     private CheckBox checkBoxOpenFileAfter;
     @FXML
     private Button buttonOK;
+    @FXML
+    private CheckBox checkBoxCreateOutput;
 
     /**
      * Initializes the controller class.
@@ -45,6 +47,7 @@ public class SettingWindowController implements Initializable {
 //        checkBoxCreateFile.setText(Localizator.getString(""));
 //        checkBoxOpenFileAfter.setText(Localizator.getString(""));
         checkBoxOpenFileAfter.disableProperty().bind(checkBoxCreateFile.selectedProperty().not());
+        checkBoxOpenFileAfter.disableProperty().bind(checkBoxCreateOutput.selectedProperty().not());
     }    
     
     @FXML
@@ -54,6 +57,7 @@ public class SettingWindowController implements Initializable {
         DataHandler.getInstance().setPrintPopulation(checkBoxPrintPopulation.selectedProperty().get());
         DataHandler.getInstance().setCreateFile(checkBoxCreateFile.selectedProperty().get());
         DataHandler.getInstance().setOpenFileAfter(checkBoxOpenFileAfter.selectedProperty().get());
+        DataHandler.getInstance().setCreatePdfOutput(checkBoxCreateOutput.selectedProperty().get());
         //Close
         Stage stage = (Stage) buttonOK.getScene().getWindow();
         stage.close();

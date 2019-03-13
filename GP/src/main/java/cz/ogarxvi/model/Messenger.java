@@ -109,6 +109,7 @@ public class Messenger {
             GetMesseage();
         }
     }
+
     /**
      * Vypíše aktuální stav načtených funkcí, terminálů a souboru.
      */
@@ -120,8 +121,15 @@ public class Messenger {
             AddMesseage(Localizator.getString("output.rows")
                     + DataHandler.getInstance().getTableRows());
         }
-        AddMesseage(Localizator.getString("output.terminals")
-                + DataHandler.getInstance().getLoadedTerminals());
+        String reportTerminals = Localizator.getString("output.terminals")
+                + DataHandler.getInstance().getLoadedTerminals();
+        if (reportTerminals.length() > 30) {
+            AddMesseage(Localizator.getString("output.terminals")
+                    + DataHandler.getInstance().getLoadedTerminalsShort());
+        } else {
+            AddMesseage(Localizator.getString("output.terminals")
+                    + DataHandler.getInstance().getLoadedTerminals());
+        }
         AddMesseage(Localizator.getString("output.functions")
                 + DataHandler.getInstance().getAllFunctionsAsString());
         GetAllMesseages();
